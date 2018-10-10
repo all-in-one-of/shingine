@@ -1,5 +1,6 @@
 .vscode/*
 src/.vs/*
+src/Debug/*
 
 # Prerequisites
 *.d

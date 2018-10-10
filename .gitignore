@@ -1,6 +1,7 @@
 .vscode/*
-src/.vs/*
-src/Debug/*
+Source/.vs/*
+Source/Debug/*
+Source/x64/Debug/*
 
 # Prerequisites
 *.d

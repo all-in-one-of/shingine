@@ -6,8 +6,6 @@ HEADER
 {
     signature U24
     version U8
-    node_count U16
-    nodes NODE[node_count]
 }
 NODE
 {
@@ -25,11 +23,18 @@ ATTRIBUTE
     attr_begin U8
     name U8[32]
     container_type U8
-    data_type U8
+    DATA_TYPE U8
     element_count U32
-    value ARBITRARY_DATA[element_count]
+    value DATA_TYPE[element_count]
     attr_end U8
 }
+FILE
+{
+    header HEADER
+    node_count U16
+    nodes NODE[node_count]
+}
+
 '''
 
 from enum import IntEnum
@@ -56,8 +61,9 @@ class NodeType(IntEnum):
 
 class Node:
     def __init__(self, id=0, name="Node", type=NodeType.TRANSFORM):
-        self.id = 0
-        self.parent_id = -1
+        # zero is the scene root
+        self.id = id + 1
+        self.parent_id = 0
         self.name = name
         self.attributes = []
         self.type = type
@@ -84,7 +90,7 @@ for id, node in enumerate(hou.node("/obj").children()):
 
 # set parent ids
 for id, hom_node in enumerate(hom_nodes):
-    parent_id = -1
+    parent_id = 0
     if hom_node.inputs():
         input_node = hom_node.inputs()[0]
         if input_node.name() not in node_name_to_id.keys():
@@ -186,7 +192,8 @@ def string_to_bytes(s):
     return bytearray(s[:character_limit])
     
 def attribute_to_bytes(attr):
-    attr_data = bytearray(attr_begin)
+    attr_data = bytearray()
+    attr_data.append(attr_begin)
     attr_data.extend(string_to_bytes(attr.name))
     attr_data.append(int(attr.container_type) & 0xff)
     attr_data.append(int(attr.data_type) & 0xff)
@@ -203,22 +210,22 @@ def attribute_to_bytes(attr):
         if (attr.data_type == DataType.FLOAT):
             attr_data.extend(bytearray(struct.pack("f", values[x])))
         if (attr.data_type == DataType.UINT):
-            data.extend(get_uint16_to_bytes(values[x]))
+            attr_data.extend(get_uint16_to_bytes(values[x]))
         if (attr.data_type == DataType.BYTE):
-            data.extend(values[x] & 0xff)
+            attr_data.extend(values[x] & 0xff)
 
     attr_data.append(attr_end)
     return attr_data
 
 def node_to_bytes(node):
-    node_data = bytearray(node_begin)
+    node_data = bytearray()
+    node_data.append(node_begin)
     node_data.extend(get_uint16_to_bytes(node.id))
     node_data.extend(get_uint16_to_bytes(node.parent_id))
     node_data.append(node.type & 0xff)
     node_data.extend(string_to_bytes(node.name))
     node_data.append(len(node.attributes) & 0xff)
-    print node.name
-    print node.attributes
+
     for x in range(len(node.attributes)):
         node_data.extend(attribute_to_bytes(node.attributes[x]))
     node_data.append(node_end)

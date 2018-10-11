@@ -181,9 +181,9 @@ def get_uint16_to_bytes(val):
 def get_uint32_to_bytes(val):
     val = val & 0xffffffff
     return (
-        (val << 24) & 0xff, 
-        (val << 16) & 0xff, 
-        (val << 8) & 0xff, 
+        (val >> 24) & 0xff, 
+        (val >> 16) & 0xff, 
+        (val >> 8) & 0xff, 
         val & 0xff)
 
 def string_to_bytes(s):

@@ -1,18 +1,20 @@
 #pragma once
 #include <vector>
-#include "ISceneDescription.h"
 #include "SSD.h"
+#include "ISceneDescription.h"
 
 class CSceneDescription : public ISceneDescription
 {
 public:
     virtual ~CSceneDescription();
-    static ISceneDescription* Load(std::string fileName);
-    virtual std::string GetLastError();
+    static ISceneDescription* Load(const CString &fileName);
+    virtual CString GetLastError();
     virtual IScene* GenerateScene();
 private:
-    CSceneDescription(std::string fileName, bool &success);
+    CSceneDescription(CString fileName, bool &success);
+    bool Read(const CString &fileName);
     struct SSD::SHeader Header;
-    struct SSD::SNode* Nodes;
-    std::string LastError = "";
+    unsigned short NodeCount;
+    struct SSD::SNode** Nodes;
+    CString LastError = "";
 };

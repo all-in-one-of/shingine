@@ -1,48 +1,66 @@
-#include "CSceneDescription.h"
 #include <fstream>
 #include <iostream>
+#include "CSceneDescription.h"
+#include "CSceneReaderFactory.h"
 
-std::string CSceneDescription::GetLastError() { return LastError; }
 
 IScene * CSceneDescription::GenerateScene()
 {
     return nullptr;
 }
 
+CString CSceneDescription::GetLastError() { return LastError; }
+
 CSceneDescription::~CSceneDescription()
 {
 }
 
-ISceneDescription* CSceneDescription::Load(std::string fileName)
+ISceneDescription* CSceneDescription::Load(const CString &fileName)
 {
     bool readSuccess = false;
     CSceneDescription* sceneDescription = new CSceneDescription(fileName, readSuccess);
     if (!readSuccess)
-        std::cout<<sceneDescription->GetLastError()<<std::endl;
+        std::cout<<sceneDescription->LastError.GetStdString()<<std::endl;
     return sceneDescription;
 }
 
-CSceneDescription::CSceneDescription(std::string fileName, bool &success)
+CSceneDescription::CSceneDescription(CString fileName, bool &success)
 {
-    std::ifstream file;
-    file.open(fileName, std::ios::binary | std::ios::in);
-    if (!file.is_open())
-    {
-        LastError = "Couldn't open the file: " + fileName;
-        success = false;
-        return;
-    } 
+    // 3 file types are supported
+    // *.ssd - binary version
+    // *.ssda - ascii version
+    // *.ssd_json - json
 
-    Header = SSD::SHeader();
-    file.read(Header.Signature, 3);
-    file.read((char*)&Header.Version, 1);
+    success = Read(fileName);
+}
 
-    std::cout << "Signature :";
-    for (unsigned int x = 0; x < 3; x++)
-        std::cout << Header.Signature[x];
-
-    std::cout << std::endl
-    << "Version: " << +Header.Version << std::endl;
+bool CSceneDescription::Read(const CString &fileName)
+{
     
-    success = true;
+    std::vector<CString> elems = CString(fileName).Split('.');
+    CString ext = elems[elems.size() - 1];
+
+    CSceneReaderFactory sceneReaderFactory;
+    ISceneReader* reader = sceneReaderFactory.CreateReader(ext);
+
+    if (!reader->Open())
+    {
+        LastError = "Couldn't open file : " + fileName;
+        delete reader;
+        return false;
+    }
+
+    reader->ReadHeader(Header);
+    reader->ReadUShort(NodeCount);
+
+    Nodes = new SSD::SNode*[NodeCount];
+
+    for (unsigned int x = 0; x < NodeCount; x++)
+    {
+        Nodes[x] = reader->ReadNode();
+    }
+
+    reader->Close();
+    delete reader;
+    return true;
 }

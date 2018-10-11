@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="**\*.h" />
+    <ClInclude Include="**\*.c" />
+    <ClInclude Include="**\*.hpp" />
+    <ClInclude Include="**\*.cpp" />
+  </ItemGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -70,12 +76,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SourcePath)External/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SourcePath)External/lib/x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SourcePath)../External/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SourcePath)../External/lib/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SourcePath)External/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SourcePath)External/lib/x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SourcePath)../External/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SourcePath)../External/lib/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -125,9 +131,7 @@
       <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="App.cpp" />
-  </ItemGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

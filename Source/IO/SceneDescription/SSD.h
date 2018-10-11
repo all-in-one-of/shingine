@@ -9,7 +9,6 @@ namespace SSD
     const unsigned char NodeEnd = 0xab;
     const unsigned char AttributeBegin = 0xba;
     const unsigned char AttributeEnd = 0xbb;
-    const unsigned int CharacterLimit = 32;
 
     struct SHeader
     {
@@ -23,17 +22,21 @@ namespace SSD
         unsigned short ID;
         unsigned short ParentID;
         unsigned char Type;
-        char Name[CharacterLimit];
-        SAttribute* Attributes;
+        unsigned char NameLength;
+        char* Name;
+        unsigned char AttributeCount;
+        unsigned char NodeCount;
+        SAttribute** Attributes;
+        SNode** Nodes;
     };
 
     struct SAttribute
     {
-        char Name[CharacterLimit];
-        unsigned char ContainerType;
+        unsigned char NameLength;
+        char* Name;
         unsigned char DataType;
         unsigned int ElementCount;
         unsigned char* Values;
     };
-    
+
 };

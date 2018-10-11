@@ -13,19 +13,22 @@ NODE
     id U16
     parent_id U16
     type U8
-    name U8[32]
+    name_length U8
+    name U8[name_length]
     attribute_count U8
+    node_count U8
     attributes ATTRIBUTE[attribute_count]
+    nodes NODE[node_count]
     node_end U8
 }
 ATTRIBUTE
 {
     attr_begin U8
-    name U8[32]
-    container_type U8
-    DATA_TYPE U8
+    name_length U8
+    name U8[name_length]
+    data_type U8
     element_count U32
-    value DATA_TYPE[element_count]
+    value U8[element_count]
     attr_end U8
 }
 FILE
@@ -34,15 +37,10 @@ FILE
     node_count U16
     nodes NODE[node_count]
 }
-
 '''
 
 from enum import IntEnum
 import struct
-
-class ContainerType(IntEnum):
-    NODE = 0
-    VALUE = 1
 
 class DataType(IntEnum):
     NONE = 0
@@ -66,12 +64,12 @@ class Node:
         self.parent_id = 0
         self.name = name
         self.attributes = []
+        self.nodes = []
         self.type = type
 
 class Attribute:
-    def __init__(self, name, containter_type, data_type, element_count, value):
+    def __init__(self, name, data_type, element_count, value):
         self.name = name
-        self.container_type = containter_type
         self.data_type = data_type
         self.element_count = element_count
         self.value = value
@@ -102,14 +100,14 @@ for id, hom_node in enumerate(hom_nodes):
 for id, node in enumerate(hom_nodes):
     # collect the local transform matrix, write to the attribute
     local_transform = node.localTransform()
-    nodes[id].attributes.append(Attribute("LocalTransform", ContainerType.VALUE, DataType.FLOAT, 16, local_transform.asTuple()))
+    nodes[id].attributes.append(Attribute("LocalTransform", DataType.FLOAT, 16, local_transform.asTuple()))
     # find lights
     if node.type().name() == "light":
-        light_node = Node(type=NodeType.LIGHT)
-        light_node.attributes.append(Attribute("Color", ContainerType.VALUE, DataType.FLOAT, 3, node.parmTuple("light_color").eval()))
-        light_node.attributes.append(Attribute("Exposure", ContainerType.VALUE, DataType.FLOAT, 1, node.parm("light_exposure").eval()))
-        light_node.attributes.append(Attribute("Intensity", ContainerType.VALUE, DataType.FLOAT, 1, node.parm("light_intensity").eval()))
-        nodes[id].attributes.append(Attribute("Light", ContainerType.NODE, DataType.NONE, 1, light_node))
+        light_node = Node(name="Light", type=NodeType.LIGHT)
+        light_node.attributes.append(Attribute("Color", DataType.FLOAT, 3, node.parmTuple("light_color").eval()))
+        light_node.attributes.append(Attribute("Exposure", DataType.FLOAT, 1, node.parm("light_exposure").eval()))
+        light_node.attributes.append(Attribute("Intensity", DataType.FLOAT, 1, node.parm("light_intensity").eval()))
+        nodes[id].nodes.append(light_node)
     
     # find geo
     if node.type().name() == "geo":
@@ -149,12 +147,12 @@ for id, node in enumerate(hom_nodes):
                 indices.append(vert.point().number())
         
         # add attributes
-        geometry_node = Node(type=NodeType.MESH)
-        geometry_node.attributes.append(Attribute("Indices", ContainerType.VALUE, DataType.UINT, len(indices), indices))
-        geometry_node.attributes.append(Attribute("Normals", ContainerType.VALUE, DataType.FLOAT, len(normals), normals))
-        geometry_node.attributes.append(Attribute("Positions", ContainerType.VALUE, DataType.FLOAT, len(positions), positions))
-        geometry_node.attributes.append(Attribute("TexCoord", ContainerType.VALUE, DataType.FLOAT, len(texcoord), texcoord))
-        nodes[id].attributes.append(Attribute("Mesh", ContainerType.NODE, DataType.NONE, 1, geometry_node))
+        geometry_node = Node(name="Mesh", type=NodeType.MESH)
+        geometry_node.attributes.append(Attribute("Indices", DataType.UINT, len(indices), indices))
+        geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, len(normals), normals))
+        geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, len(positions), positions))
+        geometry_node.attributes.append(Attribute("TexCoord", DataType.FLOAT, len(texcoord), texcoord))
+        nodes[id].nodes.append(geometry_node)
 
         # delete temp houdini nodes
         normal.destroy()
@@ -164,9 +162,9 @@ for id, node in enumerate(hom_nodes):
         if node.parm("shop_materialpath").eval():
             material_hom_node = hou.node(node.parm("shop_materialpath").eval())
             if material_hom_node.type().name() == "principledshader":
-                material_node = Node(type=NodeType.MATERIAL)
-                material_node.attributes.append(Attribute("DiffuseColor", ContainerType.VALUE, DataType.FLOAT, 3, node.parmTuple("basecolor").eval()))
-                nodes[id].attributes.append(Attribute("Material", ContainerType.NODE, DataType.NONE, 1, material_node))
+                material_node = Node(name="Material", type=NodeType.MATERIAL)
+                material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, 3, node.parmTuple("basecolor").eval()))
+                nodes[id].nodes.append(material_node)
 
 version = 1
 signature = "SSD"
@@ -189,13 +187,14 @@ def get_uint32_to_bytes(val):
         val & 0xff)
 
 def string_to_bytes(s):
-    return bytearray(s[:character_limit])
+    return bytearray(s)
     
 def attribute_to_bytes(attr):
     attr_data = bytearray()
     attr_data.append(attr_begin)
-    attr_data.extend(string_to_bytes(attr.name))
-    attr_data.append(int(attr.container_type) & 0xff)
+    attr_name = attr.name[:character_limit]
+    attr_data.append(len(attr_name) & 0xff)
+    attr_data.extend(bytearray(attr_name))
     attr_data.append(int(attr.data_type) & 0xff)
     attr_data.extend(get_uint32_to_bytes(attr.element_count))
 
@@ -204,9 +203,6 @@ def attribute_to_bytes(attr):
         values = [attr.value,]
 
     for x in range(len(values)):
-        if attr.container_type == ContainerType.NODE:
-            attr_data.extend(node_to_bytes(values[x]))
-            continue
         if (attr.data_type == DataType.FLOAT):
             attr_data.extend(bytearray(struct.pack("f", values[x])))
         if (attr.data_type == DataType.UINT):
@@ -223,11 +219,16 @@ def node_to_bytes(node):
     node_data.extend(get_uint16_to_bytes(node.id))
     node_data.extend(get_uint16_to_bytes(node.parent_id))
     node_data.append(node.type & 0xff)
-    node_data.extend(string_to_bytes(node.name))
+    node_name = node.name[:character_limit]
+    node_data.append(len(node_name) & 0xff)
+    node_data.extend(bytearray(node_name))
     node_data.append(len(node.attributes) & 0xff)
+    node_data.append(len(node.nodes) & 0xff)
 
     for x in range(len(node.attributes)):
         node_data.extend(attribute_to_bytes(node.attributes[x]))
+    for x in range(len(node.nodes)):
+        node_data.extend(node_to_bytes(node.nodes[x]))
     node_data.append(node_end)
     return node_data
 

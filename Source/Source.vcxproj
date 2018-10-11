@@ -2,9 +2,9 @@
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="**\*.h" />
-    <ClInclude Include="**\*.c" />
+    <ClCompile Include="**\*.c" />
     <ClInclude Include="**\*.hpp" />
-    <ClInclude Include="**\*.cpp" />
+    <ClCompile Include="**\*.cpp" />
   </ItemGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">

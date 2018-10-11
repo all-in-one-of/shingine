@@ -41,17 +41,17 @@ from enum import IntEnum
 import struct
 
 class ContainerType(IntEnum):
-    NODE = 1
-    VALUE = 3
+    NODE = 0
+    VALUE = 1
 
 class DataType(IntEnum):
     NONE = 0
     BYTE = 1
     UINT = 2
-    FLOAT = 4
+    FLOAT = 3
 
 class LightType(IntEnum):
-    POINT = 1
+    POINT = 0
 
 class NodeType(IntEnum):
     LIGHT = 0

@@ -7,7 +7,6 @@ class ISceneDescription
 {
 public:
     virtual ~ISceneDescription() {};
-    static ISceneDescription* Load(CString fileName);
     virtual IScene* GenerateScene() = 0;
     virtual CString GetLastError() = 0;
 };

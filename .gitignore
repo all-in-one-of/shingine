@@ -2,6 +2,8 @@
 Source/.vs/*
 Source/Debug/*
 Source/x64/Debug/*
+.idea/*
+cmake-build-debug/*
 
 # Prerequisites
 *.d
@@ -28,7 +30,7 @@ Source/x64/Debug/*
 # Compiled Static libraries
 *.lai
 *.la
-*.a
+#*.a
 #*.lib
 
 # Executables

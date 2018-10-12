@@ -4,6 +4,8 @@ Source/Debug/*
 Source/x64/Debug/*
 .idea/*
 cmake-build-debug/*
+build/*
+.DS_Store
 
 # Prerequisites
 *.d

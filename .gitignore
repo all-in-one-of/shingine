@@ -1,7 +1,7 @@
 .vscode/*
-Source/.vs/*
-Source/Debug/*
-Source/x64/Debug/*
+.vs/*
+Debug/*
+x64/Debug/*
 .idea/*
 cmake-build-debug/*
 build/*

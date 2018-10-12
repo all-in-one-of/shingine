@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="**\*.h" />
-    <ClCompile Include="**\*.c" />
-    <ClInclude Include="**\*.hpp" />
-    <ClCompile Include="**\*.cpp" />
+    <ClInclude Include="Source\**\*.h" />
+    <ClCompile Include="Source\**\*.c" />
+    <ClInclude Include="Source\**\*.hpp" />
+    <ClCompile Include="Source\**\*.cpp" />
   </ItemGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -76,12 +76,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SourcePath)../External/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SourcePath)../External/lib/x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SourcePath)External/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SourcePath)External/lib/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SourcePath)../External/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SourcePath)../External/lib/x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SourcePath)External/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SourcePath)External/lib/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

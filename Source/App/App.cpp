@@ -3,7 +3,9 @@
 
 int main()
 {
-    ISceneDescription* SceneDescription = CSceneDescription::Load("Assets/Scenes/test.ssd");
-    std::cout << "Hello" << std::endl;
+    bool sceneDescriptionLoaded = false;
+    ISceneDescription* SceneDescription = CSceneDescription::Load("Assets/Scenes/test.ssd", sceneDescriptionLoaded);
+    IScene* Scene = SceneDescription->GenerateScene();
+    
     return 0;
 }

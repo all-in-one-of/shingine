@@ -17,9 +17,9 @@ Source/x64/Debug/*
 *.pch
 
 # Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+#*.so
+#*.dylib
+#*.dll
 
 # Fortran module files
 *.mod
@@ -29,7 +29,7 @@ Source/x64/Debug/*
 *.lai
 *.la
 *.a
-*.lib
+#*.lib
 
 # Executables
 *.exe

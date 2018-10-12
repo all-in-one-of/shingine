@@ -1,16 +1,17 @@
 #include "CString.h"
 #include <sstream>
+#include <iostream>
 
 CString::CString() 
 {
     ArrayLength = 0;
-    Data = new char[0];
+    Data = new char[1]{ '\0' };
 }
 
 CString::CString(char character) 
 { 
     ArrayLength = 1;
-    Data = new char[1] { character }; 
+    Data = new char[2] { character, '\0' }; 
 }
 
 CString::CString(const char* sourceString) 
@@ -18,24 +19,36 @@ CString::CString(const char* sourceString)
     if (sourceString)
         for (ArrayLength = 0; sourceString[ArrayLength] != '\0'; ArrayLength++);
 
-    Data = new char[ArrayLength];
+    Data = new char[ArrayLength + 1];
     if (ArrayLength > 0)
     {
         for (unsigned int x = 0; x < ArrayLength; x++)
-        {
             Data[x] = sourceString[x];
-        }
     }
+    Data[ArrayLength] = '\0';
 }
 
-CString::CString(std::string sourceStdString) { CString(sourceStdString.c_str()); }
+CString::CString(std::string sourceStdString) : CString(sourceStdString.c_str()) {};
 
 CString::CString(const CString &sourceString)
 {
     ArrayLength = sourceString.Length();
-    Data = new char[ArrayLength];
+    Data = new char[ArrayLength + 1];
     for (unsigned int x = 0; x < ArrayLength; x++)
         Data[x] = sourceString[x];
+    Data[ArrayLength] = '\0';
+}
+
+CString & CString::operator=(const CString & str)
+{
+    if (this == &str) return *this;
+    delete[] Data;
+    ArrayLength = str.Length();
+    Data = new char[ArrayLength + 1];
+    for (unsigned int x = 0; x < ArrayLength; x++)
+        Data[x] = str[x];
+    Data[ArrayLength] = '\0';
+    return *this;
 }
 
 char CString::operator[] (unsigned index)
@@ -48,14 +61,15 @@ CString& CString::operator+=(const CString &str)
 {
     unsigned int strLength = str.Length();
     unsigned int newLength = ArrayLength + strLength;
-    char* newStr = new char[newLength];
+    char* newStr = new char[newLength + 1];
     for (unsigned int x = 0; x < ArrayLength; x++)
         newStr[x] = Data[x];
     for (unsigned int x = 0; x < strLength; x++)
         newStr[x + ArrayLength] = str[x];
-    delete Data;
+    delete[] Data;
     ArrayLength = newLength;
     Data = newStr;
+    Data[ArrayLength] = '\0';
     return *this;
 }
 
@@ -99,14 +113,18 @@ CString::~CString()
 
 unsigned int CString::Length() const { return ArrayLength; }
 const char* CString::GetCharArray() { return Data; }
-std::string CString::GetStdString() { return std::string(Data); }
+std::string CString::GetStdString() const { return std::string(Data); }
 
-std::vector<CString> CString::Split(char delimeter)
+std::vector<CString> CString::Split(char delimeter) const
 {
     std::stringstream stringStream(GetStdString());
     std::vector<CString> e;
     std::string part;
-    while(std::getline(stringStream, part, delimeter))
-        e.push_back(CString(part));
+    while (std::getline(stringStream, part, delimeter))
+    {
+        std::cout << part;
+        auto cpart = CString(part);
+        e.push_back(cpart);
+    }
     return e;
 }

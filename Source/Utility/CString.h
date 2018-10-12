@@ -17,6 +17,7 @@ public:
 
     unsigned int Length() const;
 
+    CString& operator= (const CString& str);
     char operator[] (unsigned index);
     char& operator[] (unsigned index) const;
 
@@ -26,11 +27,11 @@ public:
     CString& operator+=(const CString &str);
     friend CString operator+(const char* chars, const CString& str);
 
-    std::string GetStdString();
+    std::string GetStdString() const;
     const char* GetCharArray();
     
     int IndexOf(char character);
-    std::vector<CString> Split(char delim);
+    std::vector<CString> Split(char delim) const;
 
 private:
     char* Data;

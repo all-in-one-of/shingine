@@ -1,5 +1,13 @@
 #include "CSceneReaderBinary.h"
 
+namespace SSD
+{
+     enum ContainerType { NODE = 0, VALUE = 1 };
+     enum DataType { NONE = 0, BYTE = 1, UINT = 2, FLOAT = 3 };
+     enum LightType { POINT = 0 };
+     enum NodeType { LIGHT = 0, TRANSFORM = 1, MATERIAL = 2, MESH = 3 };
+}
+
 CSceneReaderBinary::CSceneReaderBinary(const CString &fileName)
 {
     FileName = fileName;
@@ -33,11 +41,16 @@ SSD::SNode* CSceneReaderBinary::ReadNode()
     ReadUShort(node->ParentID);
     ReadByte(node->Type);
     ReadByte(node->NameLength);
+    node->Name = new char[node->NameLength + 1];
     FileStream.read(node->Name, node->NameLength);
+    node->Name[node->NameLength] = '\0';
     ReadByte(node->AttributeCount);
     ReadByte(node->NodeCount);
 
     node->Attributes = new SSD::SAttribute*[node->AttributeCount];
+    node->Nodes = new SSD::SNode*[node->NodeCount];
+    if (CString(node->Name) == CString("Mesh"))
+        int z = 1;
 
     for (unsigned char x = 0; x != node->AttributeCount; x++)
         node->Attributes[x] = ReadAttribute();
@@ -66,14 +79,27 @@ SSD::SAttribute* CSceneReaderBinary::ReadAttribute()
     
     SSD::SAttribute* attr = new SSD::SAttribute();
     ReadByte(attr->NameLength);
+
+    attr->Name = new char[attr->NameLength + 1];
     FileStream.read(attr->Name, attr->NameLength);
+    attr->Name[attr->NameLength] = '\0';
+
     ReadByte(attr->DataType);
     ReadUInt32(attr->ElementCount);
-    attr->Values = new unsigned char[attr->ElementCount];
-    FileStream.read((char *)attr->Values, attr->ElementCount);
+
+    unsigned int stride = ((SSD::DataType)attr->DataType) == SSD::DataType::BYTE ? 1 : 4;
+    unsigned int byteCount = attr->ElementCount * stride;
+
+    attr->Values = new unsigned char[byteCount];
+    for (unsigned int x = 0; x < byteCount; x++)
+    {
+        char v;
+        FileStream.read(&v, 1);
+        attr->Values[x] = v;
+    }
     
     ReadByte(garbage);
-    if (garbage == SSD::NodeEnd)
+    if (garbage == SSD::AttributeEnd)
         return attr;
 
     delete attr;
@@ -121,5 +147,6 @@ void CSceneReaderBinary::Close()
 
 CSceneReaderBinary::~CSceneReaderBinary()
 {
+    
     Close();
 }

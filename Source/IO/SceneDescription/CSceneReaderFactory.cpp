@@ -1,9 +1,9 @@
 #include "CSceneReaderFactory.h"
 #include "CSceneReaderBinary.h"
 
-ISceneReader* CreateReader(const CString &fileName)
+ISceneReader* CSceneReaderFactory::CreateReader(const CString &fileName)
 {
-    std::vector<CString> elems = CString(fileName).Split('.');
+    std::vector<CString> elems = fileName.Split('.');
     CString fileExtensionName = elems[elems.size() - 1];
 
     // TODO add ascii and json formats

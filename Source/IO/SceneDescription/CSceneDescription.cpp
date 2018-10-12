@@ -20,7 +20,7 @@ ISceneDescription* CSceneDescription::Load(const CString &fileName)
     bool readSuccess = false;
     CSceneDescription* sceneDescription = new CSceneDescription(fileName, readSuccess);
     if (!readSuccess)
-        std::cout<<sceneDescription->LastError.GetStdString()<<std::endl;
+        std::cout << sceneDescription->LastError.GetStdString() << std::endl;
     return sceneDescription;
 }
 
@@ -36,12 +36,8 @@ CSceneDescription::CSceneDescription(CString fileName, bool &success)
 
 bool CSceneDescription::Read(const CString &fileName)
 {
-    
-    std::vector<CString> elems = CString(fileName).Split('.');
-    CString ext = elems[elems.size() - 1];
-
     CSceneReaderFactory sceneReaderFactory;
-    ISceneReader* reader = sceneReaderFactory.CreateReader(ext);
+    ISceneReader* reader = sceneReaderFactory.CreateReader(fileName);
 
     if (!reader->Open())
     {
@@ -56,9 +52,7 @@ bool CSceneDescription::Read(const CString &fileName)
     Nodes = new SSD::SNode*[NodeCount];
 
     for (unsigned int x = 0; x < NodeCount; x++)
-    {
         Nodes[x] = reader->ReadNode();
-    }
 
     reader->Close();
     delete reader;

@@ -1,10 +1,6 @@
 #pragma once
 namespace SSD
 {
-    // enum ContainerType { NODE = 0, VALUE = 1 };
-    // enum DataType { NONE = 0, BYTE = 1, UINT = 2, FLOAT = 3 };
-    // enum LightType { POINT = 0 };
-    // enum NodeType { LIGHT = 0, TRANSFORM = 1, MATERIAL = 2, MESH = 3 };
     const unsigned char NodeBegin = 0xaa;
     const unsigned char NodeEnd = 0xab;
     const unsigned char AttributeBegin = 0xba;

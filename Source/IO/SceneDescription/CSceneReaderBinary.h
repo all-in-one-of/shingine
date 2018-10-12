@@ -18,4 +18,9 @@ public:
     virtual void ReadUInt32(unsigned int &val);
     virtual SSD::SNode* ReadNode();
     virtual SSD::SAttribute* ReadAttribute();
+    // virtual 
+private:
+    CString FileName;
+    CString LastError;
+    std::ifstream FileStream;
 };

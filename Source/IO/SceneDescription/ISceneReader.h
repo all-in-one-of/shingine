@@ -12,7 +12,6 @@ public:
     virtual bool Open() = 0;
     virtual void Close() = 0;
 
-
     virtual void ReadHeader(SSD::SHeader &header) = 0;
     virtual void ReadUShort(unsigned short &nodeCount) = 0;
     virtual void ReadByte(unsigned char &val) = 0;
@@ -20,9 +19,4 @@ public:
     virtual SSD::SNode* ReadNode() = 0;
     virtual SSD::SAttribute* ReadAttribute() = 0;
 
-    // virtual 
-protected:
-    CString FileName;
-    CString LastError;
-    std::ifstream FileStream;
 };

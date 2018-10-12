@@ -206,7 +206,7 @@ def attribute_to_bytes(attr):
         if (attr.data_type == DataType.FLOAT):
             attr_data.extend(bytearray(struct.pack("f", values[x])))
         if (attr.data_type == DataType.UINT):
-            attr_data.extend(get_uint16_to_bytes(values[x]))
+            attr_data.extend(get_uint32_to_bytes(values[x]))
         if (attr.data_type == DataType.BYTE):
             attr_data.extend(values[x] & 0xff)
 

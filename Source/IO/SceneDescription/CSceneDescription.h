@@ -7,7 +7,7 @@ class CSceneDescription : public ISceneDescription
 {
 public:
     virtual ~CSceneDescription();
-    static ISceneDescription* Load(const CString &fileName);
+    static ISceneDescription* Load(const CString &fileName, bool &success);
     virtual CString GetLastError();
     virtual IScene* GenerateScene();
 private:

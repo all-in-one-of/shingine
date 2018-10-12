@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../../Modules/IScene.h"
+#include "../../Modules/Scene/IScene.h"
 #include "Common.h"
 
 class ISceneDescription

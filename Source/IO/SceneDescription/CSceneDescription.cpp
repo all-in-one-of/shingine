@@ -3,10 +3,11 @@
 #include "CSceneDescription.h"
 #include "CSceneReaderFactory.h"
 
+#include "../../Modules/Scene/CScene.h"
 
 IScene * CSceneDescription::GenerateScene()
 {
-    return nullptr;
+    return CScene::Create(Nodes, NodeCount);
 }
 
 CString CSceneDescription::GetLastError() { return LastError; }
@@ -15,11 +16,10 @@ CSceneDescription::~CSceneDescription()
 {
 }
 
-ISceneDescription* CSceneDescription::Load(const CString &fileName)
+ISceneDescription* CSceneDescription::Load(const CString &fileName, bool &success)
 {
-    bool readSuccess = false;
-    CSceneDescription* sceneDescription = new CSceneDescription(fileName, readSuccess);
-    if (!readSuccess)
+    CSceneDescription* sceneDescription = new CSceneDescription(fileName, success);
+    if (!success)
         std::cout << sceneDescription->LastError.GetStdString() << std::endl;
     return sceneDescription;
 }
@@ -30,7 +30,6 @@ CSceneDescription::CSceneDescription(CString fileName, bool &success)
     // *.ssd - binary version
     // *.ssda - ascii version
     // *.ssd_json - json
-
     success = Read(fileName);
 }
 

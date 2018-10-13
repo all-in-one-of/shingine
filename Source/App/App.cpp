@@ -4,8 +4,9 @@
 int main()
 {
     bool sceneDescriptionLoaded = false;
-    ISceneDescription* SceneDescription = CSceneDescription::Load("Assets/Scenes/test.ssd", sceneDescriptionLoaded);
-    IScene* Scene = SceneDescription->GenerateScene();
+    ISceneDescription* sceneDescription = CSceneDescription::Load("Assets/Scenes/test.ssd", sceneDescriptionLoaded);
+    IScene* Scene = sceneDescription->GenerateScene();
     
+    delete sceneDescription;
     return 0;
 }

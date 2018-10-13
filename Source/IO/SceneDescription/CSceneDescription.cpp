@@ -13,6 +13,11 @@ CString CSceneDescription::GetLastError() { return LastError; }
 
 CSceneDescription::~CSceneDescription()
 {
+    for (unsigned int x = 0; x < NodeCount; x++)
+    {
+        delete Nodes[x];
+    }
+    delete [] Nodes;
 }
 
 ISceneDescription* CSceneDescription::Load(const CString &fileName, bool &success)

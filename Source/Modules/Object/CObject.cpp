@@ -9,7 +9,6 @@ CObject::CObject(unsigned int id)
 
 CObject::~CObject()
 {
-
 }
 
 IComponent* CObject::AddComponent(const CString &componentTypeName)

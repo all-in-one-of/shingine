@@ -10,6 +10,6 @@ public:
     virtual unsigned int ID();
     virtual IComponent* AddComponent(const CString &componentTypeName);
     virtual IComponent* GetComponent(const CString &componentTypeName) const;
-private:
+protected:
     unsigned int Id;
 };

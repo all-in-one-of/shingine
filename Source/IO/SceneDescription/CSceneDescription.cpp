@@ -2,12 +2,11 @@
 #include <iostream>
 #include "CSceneDescription.h"
 #include "CSceneReaderFactory.h"
-
-#include "../../Modules/Scene/CScene.h"
+#include "../../Modules/Scene/CSceneMaker.h"
 
 IScene * CSceneDescription::GenerateScene()
 {
-    return CScene::Create(Nodes, NodeCount);
+    return CSceneMaker::Create(Nodes, NodeCount);
 }
 
 CString CSceneDescription::GetLastError() { return LastError; }

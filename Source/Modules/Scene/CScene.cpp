@@ -1,38 +1,29 @@
 #include "CSceneBuilder.h"
 #include "CScene.h"
-#include "../Object/CObject.h"
-
-IScene* CScene::Create(SSD::SNode** nodes, const unsigned int &nodeCount)
-{
-    CScene* scene = new CScene();
-    CSceneBuilder* sceneBuilder = new CSceneBuilder();
-
-    for (unsigned int x = 0; x < nodeCount; x++)
-    {
-
-    }
-    
-    delete sceneBuilder;
-    return scene;
-}
-
+#include "../Object/CSceneObject.h"
 CScene::CScene()
 {
 }
 
 void CScene::SetParent(const unsigned int &id, const unsigned int &parentId)
 {
-    
+    IdToParentId[id] = parentId;
 }
 
 IObject* CScene::MakeObject()
 {
-    return NULL;
+    IObject* object = new CObject(NextID);
+    Objects[NextID] = object;
+    IdToParentId[NextID] = 0;
+    NextID++;
+    return object;
 }
 
 IObject* CScene::GetObject(const unsigned int &id) const
 {
-    return NULL;
+    auto it = Objects.find(id);
+    if (it == Objects.end()) return NULL;
+    return it->second;
 }
 
 IObject* CScene::CloneObject(const IObject* object)
@@ -40,17 +31,34 @@ IObject* CScene::CloneObject(const IObject* object)
     return NULL;
 }
 
-void CScene::GetObjectIdByName(unsigned int &id, bool &didFind) const
+unsigned int CScene::GetObjectIdByName(const CString &name, bool &didFind) const
 {
+    didFind = false;
+    for (auto it = Objects.begin(); it != Objects.end(); it++)
+    {
+        if ( ((CSceneObject*)it->second)->Name() == name )
+        {
+            didFind = true;
+            return it->second->ID();
+        }
+    }
+    return 0;
 }
 
 void CScene::DeleteObject(const unsigned int &id)
 {
 }
 
-std::vector<IObject*> CScene::FindObjectsByType(const CString type) const
+void CScene::FindObjectsByType(const CString type, std::vector<IObject*> &objects) const
 {
-    return std::vector<IObject*>();
+    for (auto it = Objects.begin(); it != Objects.end(); it++)
+    {
+        if (type == "_")
+            objects.push_back(it->second);
+
+    }
+
+    return;
 }
 
 CScene::~CScene() 

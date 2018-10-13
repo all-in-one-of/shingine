@@ -9,6 +9,9 @@ public:
     CSceneObject(unsigned int id);
     CString Name();
     CSceneObject* Parent();
+    void SetParent(CSceneObject* object);
+    void SetName(const CString &newName);
+
 private:
     CSceneObject* ParentObject;
     CString ObjectName;

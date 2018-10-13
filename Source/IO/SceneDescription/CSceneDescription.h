@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "SSD.h"
+#include "../../Utility/SSD.h"
 #include "ISceneDescription.h"
 
 class CSceneDescription : public ISceneDescription

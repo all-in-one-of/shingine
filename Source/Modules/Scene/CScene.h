@@ -10,7 +10,7 @@ public:
     virtual ~CScene();
 
     // Object Management
-    virtual IObject* MakeObject();
+    virtual IObject* MakeObject(const CString &objectName = "Object");
     virtual IObject* GetObject(const unsigned int &id) const;
     virtual IObject* CloneObject(const IObject* object);
 
@@ -22,6 +22,5 @@ public:
 
 private:
     std::map<unsigned int, IObject*> Objects;
-    std::map<unsigned int, unsigned int> IdToParentId;
     unsigned int NextID = 1;
 };

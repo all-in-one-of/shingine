@@ -1,9 +1,9 @@
 #pragma once
-#include "../Object/IObject.h"
+#include "IObject.h"
 
 namespace SSD { struct SNode; }
 
-class CSceneBuilder
+class CObjectBuilder
 {
 public:
     void SetupObjectFromDescriptionNode(IObject* object, SSD::SNode* node);

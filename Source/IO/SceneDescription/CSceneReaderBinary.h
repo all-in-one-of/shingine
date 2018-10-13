@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "SSD.h"
+#include "../../Utility/SSD.h"
 #include "ISceneReader.h"
 
 class CSceneReaderBinary : public ISceneReader

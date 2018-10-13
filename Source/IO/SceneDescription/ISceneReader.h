@@ -1,7 +1,7 @@
 #pragma once
 #include <fstream>
 #include "Common.h"
-#include "SSD.h"
+#include "../../Utility/SSD.h"
 
 class ISceneReader
 {

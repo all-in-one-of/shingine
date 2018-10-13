@@ -1,20 +1,23 @@
-#include "CSceneBuilder.h"
 #include "CScene.h"
 #include "../Object/CSceneObject.h"
+
 CScene::CScene()
 {
 }
 
 void CScene::SetParent(const unsigned int &id, const unsigned int &parentId)
 {
-    IdToParentId[id] = parentId;
+    CSceneObject* currentObject = (CSceneObject*) GetObject(id);
+    CSceneObject* parentObject = (CSceneObject*) GetObject(parentId);
+    if (currentObject)
+        currentObject->SetParent(parentObject);
 }
 
-IObject* CScene::MakeObject()
+IObject* CScene::MakeObject(const CString &objectName)
 {
-    IObject* object = new CObject(NextID);
+    CSceneObject* object = new CSceneObject(NextID);
+    object->SetName(objectName);
     Objects[NextID] = object;
-    IdToParentId[NextID] = 0;
     NextID++;
     return object;
 }
@@ -22,7 +25,8 @@ IObject* CScene::MakeObject()
 IObject* CScene::GetObject(const unsigned int &id) const
 {
     auto it = Objects.find(id);
-    if (it == Objects.end()) return NULL;
+    if (it == Objects.end()) 
+        return NULL;
     return it->second;
 }
 

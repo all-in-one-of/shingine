@@ -6,6 +6,7 @@
 
 IScene * CSceneDescription::GenerateScene()
 {
+    if (!IsLoaded()) return NULL;
     return CSceneMaker::Create(Nodes, NodeCount);
 }
 
@@ -20,21 +21,23 @@ CSceneDescription::~CSceneDescription()
     delete [] Nodes;
 }
 
-ISceneDescription* CSceneDescription::Load(const CString &fileName, bool &success)
+bool CSceneDescription::IsLoaded() { return Loaded; }
+
+ISceneDescription* CSceneDescription::Load(const CString &fileName)
 {
-    CSceneDescription* sceneDescription = new CSceneDescription(fileName, success);
-    if (!success)
+    CSceneDescription* sceneDescription = new CSceneDescription(fileName);
+    if (!sceneDescription->IsLoaded())
         std::cout << sceneDescription->LastError.GetStdString() << std::endl;
     return sceneDescription;
 }
 
-CSceneDescription::CSceneDescription(CString fileName, bool &success)
+CSceneDescription::CSceneDescription(CString fileName)
 {
     // 3 file types are supported
     // *.ssd - binary version
     // *.ssda - ascii version
     // *.ssd_json - json
-    success = Read(fileName);
+    Loaded = Read(fileName);
 }
 
 bool CSceneDescription::Read(const CString &fileName)

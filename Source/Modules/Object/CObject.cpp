@@ -1,4 +1,5 @@
 #include "CObject.h"
+#include "../../Components/SComponentFactory.h"
 
 unsigned int CObject::ID() { return Id; }
 
@@ -13,7 +14,10 @@ CObject::~CObject()
 
 IComponent* CObject::AddComponent(const CString &componentTypeName)
 {
-    return NULL;
+    IComponent* component = 
+        SComponentFactory::CreateInstance(componentTypeName.GetStdString());
+    Components[componentTypeName] = component;
+    return component;
 }
 
 IComponent* CObject::GetComponent(const CString &componentTypeName) const

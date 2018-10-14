@@ -1,6 +1,7 @@
 #include "CString.h"
 #include <sstream>
 #include <iostream>
+#include <string.h>
 
 CString::CString() 
 {
@@ -21,10 +22,8 @@ CString::CString(const char* sourceString)
 
     Data = new char[ArrayLength + 1];
     if (ArrayLength > 0)
-    {
         for (unsigned int x = 0; x < ArrayLength; x++)
             Data[x] = sourceString[x];
-    }
     Data[ArrayLength] = '\0';
 }
 
@@ -34,19 +33,25 @@ CString::CString(const CString &sourceString)
 {
     ArrayLength = sourceString.Length();
     Data = new char[ArrayLength + 1];
+
     for (unsigned int x = 0; x < ArrayLength; x++)
         Data[x] = sourceString[x];
+
     Data[ArrayLength] = '\0';
 }
 
 CString & CString::operator=(const CString & str)
 {
-    if (this == &str) return *this;
+    if (this == &str) 
+        return *this;
+
     delete[] Data;
     ArrayLength = str.Length();
     Data = new char[ArrayLength + 1];
+
     for (unsigned int x = 0; x < ArrayLength; x++)
         Data[x] = str[x];
+
     Data[ArrayLength] = '\0';
     return *this;
 }
@@ -62,10 +67,13 @@ CString& CString::operator+=(const CString &str)
     unsigned int strLength = str.Length();
     unsigned int newLength = ArrayLength + strLength;
     char* newStr = new char[newLength + 1];
+
     for (unsigned int x = 0; x < ArrayLength; x++)
         newStr[x] = Data[x];
+    
     for (unsigned int x = 0; x < strLength; x++)
         newStr[x + ArrayLength] = str[x];
+    
     delete[] Data;
     ArrayLength = newLength;
     Data = newStr;
@@ -98,6 +106,15 @@ bool operator==(const CString &a, const char* b)
     return a == CString(b);
 }
 
+bool operator<(const CString &a, const CString &b)
+{
+    return !(a == b) && (a > b);
+}
+
+bool operator>(const CString &a, const CString &b)
+{
+    return strcmp(a.GetCharArray(), b.GetCharArray()) > 0;
+}
 
 int CString::IndexOf(char character)
 {
@@ -112,7 +129,7 @@ CString::~CString()
 }
 
 unsigned int CString::Length() const { return ArrayLength; }
-const char* CString::GetCharArray() { return Data; }
+const char* CString::GetCharArray() const { return Data; }
 std::string CString::GetStdString() const { return std::string(Data); }
 
 std::vector<CString> CString::Split(char delimeter) const

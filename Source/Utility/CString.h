@@ -24,11 +24,15 @@ public:
     friend bool operator==(const CString &a, const CString &b);
     friend bool operator==(const CString &a, const char* b);
 
+    
+    friend bool operator< (const CString &a, const CString &b);
+    friend bool operator> (const CString &a, const CString &b);
+
     CString& operator+=(const CString &str);
     friend CString operator+(const char* chars, const CString& str);
 
     std::string GetStdString() const;
-    const char* GetCharArray();
+    const char* GetCharArray() const;
     
     int IndexOf(char character);
     std::vector<CString> Split(char delim) const;

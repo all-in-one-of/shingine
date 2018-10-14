@@ -18,5 +18,15 @@ IComponent* CObject::AddComponent(const CString &componentTypeName)
 
 IComponent* CObject::GetComponent(const CString &componentTypeName) const
 {
+    if (Components.find(componentTypeName) != Components.end())
+        return Components.at(componentTypeName);
     return NULL;
+}
+
+void CObject::DestroyComponent(const CString &componentTypeName)
+{
+    if (Components.find(componentTypeName) != Components.end())
+    {
+        // TODO
+    }
 }

@@ -40,10 +40,9 @@ struct SComponentRegistry : SComponentFactory
 #define REGISTER_COMPONENT_TYPE(TYPENAME) \
     virtual CString GetTypeName(); \
     static const CString TypeName; \
-    static SComponentRegistry<TYPENAME> reg
+    static SComponentRegistry<TYPENAME> reg;
 
 #define REGISTER_COMPONENT_NAME(TYPENAME,NAME) \
     const CString TYPENAME::TypeName = #NAME; \
     CString TYPENAME::GetTypeName() { return TYPENAME::TypeName; } \
     SComponentRegistry<TYPENAME> TYPENAME::reg(TYPENAME::TypeName); \
-

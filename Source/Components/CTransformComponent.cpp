@@ -1,7 +1,7 @@
 #include "CTransformComponent.h"
 #include <iostream>
 
-REGISTER_COMPONENT_NAME(CTransformComponent,Transform);
+REGISTER_COMPONENT_NAME(CTransformComponent,Transform)
 
 CTransformComponent::CTransformComponent()
 {

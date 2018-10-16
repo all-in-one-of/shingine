@@ -117,7 +117,7 @@ for id, node in enumerate(hom_nodes):
     transform_node.attributes.append(Attribute("Matrix", DataType.FLOAT, 16, local_transform.asTuple()))
     nodes[id].nodes.append(transform_node)
     # find lights
-    if node.type().name() == "light":
+    if node.type().name() == "hlight::2.0":
         light_node = Node(name="Light", type=NodeType.LIGHT)
         light_node.attributes.append(Attribute("Color", DataType.FLOAT, 3, node.parmTuple("light_color").eval()))
         light_node.attributes.append(Attribute("Exposure", DataType.FLOAT, 1, node.parm("light_exposure").eval()))
@@ -176,7 +176,7 @@ for id, node in enumerate(hom_nodes):
         # find material
         if node.parm("shop_materialpath").eval():
             material_hom_node = hou.node(node.parm("shop_materialpath").eval())
-            if material_hom_node.type().name() == "principledshader":
+            if material_hom_node.type().name() == "principledshader::2.0":
                 material_node = Node(name="Material", type=NodeType.MATERIAL)
                 material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, 3, node.parmTuple("basecolor").eval()))
                 nodes[id].nodes.append(material_node)

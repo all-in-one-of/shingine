@@ -4,7 +4,6 @@
 class CComponent : public IComponent
 {
 public:
-    CComponent();
     virtual ~CComponent();
     virtual IObject* Owner();
     virtual void SetOwner(IObject* owner);

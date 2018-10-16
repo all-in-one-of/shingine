@@ -2,11 +2,6 @@
 #include "SComponentFactory.h"
 
 SComponentFactory::TComponentTypeMap * SComponentFactory::Map = NULL;
-
-CComponent::CComponent()
-{
-}
-
 CComponent::~CComponent()
 {
 }

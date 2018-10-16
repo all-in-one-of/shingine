@@ -7,9 +7,7 @@ class CTransformComponent : public CComponent
 public:
     CTransformComponent();
     virtual ~CTransformComponent();
-
     REGISTER_COMPONENT_TYPE(CTransformComponent);
-    // virtual CString GetTypeName();
+private:
     // static const CString TypeName;
-    // static SComponentRegistry<CTransformComponent> reg;
 };

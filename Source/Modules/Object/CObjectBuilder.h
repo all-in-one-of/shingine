@@ -1,10 +1,10 @@
 #pragma once
 #include "IObject.h"
 
-namespace SSD { struct SNode; }
+class IDataNode;
 
 class CObjectBuilder
 {
 public:
-    void SetupObjectFromDescriptionNode(IObject* object, SSD::SNode* node);
+    void SetupFromDataNode(IObject* object, IDataNode* node);
 };

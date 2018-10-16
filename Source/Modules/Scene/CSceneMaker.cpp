@@ -16,7 +16,7 @@ IScene* CSceneMaker::Create(const std::vector<IDataNode*> &nodes)
     {
         IObject* object = scene->MakeObject(CString(nodes[x]->Name()));
         descriptionIdToSceneId[nodes[x]->ID()] = object->ID();
-        objectBuilder->SetupObjectFromDescriptionNode(object, nodes[x]);
+        objectBuilder->SetupFromDataNode(object, nodes[x]);
     }
 
     // Setup parenting 

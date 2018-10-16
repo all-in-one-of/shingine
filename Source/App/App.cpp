@@ -3,7 +3,7 @@
 
 int main()
 {
-    ISceneDescription* sceneDescription = CSceneDescription::Load("Assets/Scenes/test.ssd");
+    ISceneDescription* sceneDescription = CSceneDescription::Load("Assets/Scenes/SingleObject.ssd");
     IScene* Scene = sceneDescription->GenerateScene();
     
     delete sceneDescription;

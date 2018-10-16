@@ -1,4 +1,5 @@
 #pragma once
+
 namespace SSD
 {
     const unsigned char NodeBegin = 0xaa;
@@ -16,13 +17,15 @@ namespace SSD
     {
         unsigned char NameLength;
         char* Name;
-        unsigned char DataType;
+        unsigned char DataTypeLength;
+        char* DataType;
         unsigned int ElementCount;
         unsigned char* Values;
 
         ~SAttribute()
         {
             delete[] Name;
+            delete[] DataType;
             delete[] Values;
         }
     };

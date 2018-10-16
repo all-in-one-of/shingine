@@ -26,7 +26,8 @@ ATTRIBUTE
     attr_begin U8
     name_length U8
     name U8[name_length]
-    data_type U8
+    data_type_char_length U8
+    data_type U8[data_type_char_length]
     element_count U32
     value U8[element_count]
     attr_end U8
@@ -47,6 +48,9 @@ class DataType(IntEnum):
     BYTE = 1
     UINT = 2
     FLOAT = 3
+    INT = 4
+    INT16 = 5
+    UINT16 = 6
 
 class LightType(IntEnum):
     POINT = 0
@@ -56,6 +60,15 @@ class NodeType(IntEnum):
     TRANSFORM = 1
     MATERIAL = 2
     MESH = 3
+
+data_type_name_map = {
+    DataType.BYTE : "unsigned char",
+    DataType.INT : "int",
+    DataType.INT16 : "short",
+    DataType.UINT : "unsigned int",
+    DataType.UINT16 : "unsigned short",
+    DataType.FLOAT : "float"
+}
 
 class Node:
     def __init__(self, id=0, name="Node", type=NodeType.TRANSFORM):
@@ -100,7 +113,9 @@ for id, hom_node in enumerate(hom_nodes):
 for id, node in enumerate(hom_nodes):
     # collect the local transform matrix, write to the attribute
     local_transform = node.localTransform()
-    nodes[id].attributes.append(Attribute("LocalTransform", DataType.FLOAT, 16, local_transform.asTuple()))
+    transform_node = Node(name="Transform", type=NodeType.TRANSFORM)
+    transform_node.attributes.append(Attribute("Matrix", DataType.FLOAT, 16, local_transform.asTuple()))
+    nodes[id].nodes.append(transform_node)
     # find lights
     if node.type().name() == "light":
         light_node = Node(name="Light", type=NodeType.LIGHT)
@@ -195,7 +210,12 @@ def attribute_to_bytes(attr):
     attr_name = attr.name[:character_limit]
     attr_data.append(len(attr_name) & 0xff)
     attr_data.extend(bytearray(attr_name))
-    attr_data.append(int(attr.data_type) & 0xff)
+
+    # data type name
+    data_type_name = data_type_name_map[attr.data_type]
+    attr_data.append(len(data_type_name) & 0xff)
+    attr_data.extend(bytearray(data_type_name))
+    
     attr_data.extend(get_uint32_to_bytes(attr.element_count))
 
     values = attr.value

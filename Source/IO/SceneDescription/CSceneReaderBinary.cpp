@@ -1,4 +1,9 @@
 #include "CSceneReaderBinary.h"
+#include "../../Utility/Data/SSD.h"
+#include "../../Utility/Data/Struct.h"
+#include "../../Utility/Data/CDataNode.h"
+
+#include <iostream>
 
 namespace SSD
 {
@@ -24,7 +29,21 @@ bool CSceneReaderBinary::Open()
         return false;
     }
     return true;
+}
 
+void CSceneReaderBinary::ReadNodes(std::vector<IDataNode*> &nodes)
+{
+    SSD::SHeader header;
+    unsigned short nodeCount;
+    ReadHeader(header);
+    ReadUShort(nodeCount);
+    
+    for (unsigned short x = 0; x < nodeCount; x++)
+    {
+        SSD::SNode* node = ReadNode();
+        nodes.push_back(new CDataNode(node));
+        delete node;
+    }
 }
 
 SSD::SNode* CSceneReaderBinary::ReadNode()
@@ -49,8 +68,6 @@ SSD::SNode* CSceneReaderBinary::ReadNode()
 
     node->Attributes = new SSD::SAttribute*[node->AttributeCount];
     node->Nodes = new SSD::SNode*[node->NodeCount];
-    if (CString(node->Name) == CString("Mesh"))
-        int z = 1;
 
     for (unsigned char x = 0; x != node->AttributeCount; x++)
         node->Attributes[x] = ReadAttribute();
@@ -84,10 +101,14 @@ SSD::SAttribute* CSceneReaderBinary::ReadAttribute()
     FileStream.read(attr->Name, attr->NameLength);
     attr->Name[attr->NameLength] = '\0';
 
-    ReadByte(attr->DataType);
+    ReadByte(attr->DataTypeLength);
+    attr->DataType = new char[attr->DataTypeLength + 1];
+    FileStream.read(attr->DataType, attr->DataTypeLength);
+    attr->DataType[attr->DataTypeLength] = '\0';
+
     ReadUInt32(attr->ElementCount);
 
-    unsigned int stride = ((SSD::DataType)attr->DataType) == SSD::DataType::BYTE ? 1 : 4;
+    unsigned int stride = CString(attr->DataType) == "unsigned char" ? 1 : 4;
     unsigned int byteCount = attr->ElementCount * stride;
 
     attr->Values = new unsigned char[byteCount];
@@ -112,26 +133,23 @@ void CSceneReaderBinary::ReadHeader(SSD::SHeader &header)
 
     FileStream.read(header.Signature, 3);
     ReadByte(header.Version);
-    // FileStream.read((char*)&header.Version, 1);
 }
 void CSceneReaderBinary::ReadUInt32(unsigned int &val)
 {
     if (!FileStream.is_open()) return;
-    unsigned char bytes[4];
-    FileStream.read((char*)&bytes, 4);
-    val =   (0xff000000 & (bytes[0] << 24)) |
-            (0xff0000 & (bytes[1] << 16)) |
-            (0xff00 & (bytes[2] << 8)) |
-            (0xff & bytes[3]);
+    unsigned char* bytes = new unsigned char[4];
+    FileStream.read((char*)bytes, 4);
+    DataStruct::UnpackUInt32(val, bytes);
+    delete bytes;
 }
 
-void CSceneReaderBinary::ReadUShort(unsigned short &nodeCount)
+void CSceneReaderBinary::ReadUShort(unsigned short &val)
 {
     if (!FileStream.is_open()) return;
-    unsigned char bytes[2];
-    FileStream.read((char*)&bytes, 2);
-    nodeCount = (0xff00 & (bytes[0] << 8)) |
-                (0xff & bytes[1]);
+    unsigned char* bytes = new unsigned char[2];
+    FileStream.read((char*)bytes, 2);
+    DataStruct::UnpackUShort(val, bytes);
+    delete bytes;
 }
 
 void CSceneReaderBinary::ReadByte(unsigned char &val)

@@ -16,7 +16,8 @@ IComponent* CObject::AddComponent(const CString &componentTypeName)
 {
     IComponent* component = 
         SComponentFactory::CreateInstance(componentTypeName.GetStdString());
-    Components[componentTypeName] = component;
+    if (component)
+        Components[componentTypeName] = component;
     return component;
 }
 

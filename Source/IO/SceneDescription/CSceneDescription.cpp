@@ -3,22 +3,22 @@
 #include "CSceneDescription.h"
 #include "CSceneReaderFactory.h"
 #include "../../Modules/Scene/CSceneMaker.h"
+#include "../../Utility/Data/IDataNode.h"
 
 IScene * CSceneDescription::GenerateScene()
 {
     if (!IsLoaded()) return NULL;
-    return CSceneMaker::Create(Nodes, NodeCount);
+    return CSceneMaker::Create(Nodes);
 }
 
 CString CSceneDescription::GetLastError() { return LastError; }
 
 CSceneDescription::~CSceneDescription()
 {
-    for (unsigned int x = 0; x < NodeCount; x++)
+    for (unsigned int x = 0; x < Nodes.size(); x++)
     {
         delete Nodes[x];
     }
-    delete [] Nodes;
 }
 
 bool CSceneDescription::IsLoaded() { return Loaded; }
@@ -37,11 +37,7 @@ CSceneDescription::CSceneDescription(CString fileName)
     // *.ssd - binary version
     // *.ssda - ascii version
     // *.ssd_json - json
-    Loaded = Read(fileName);
-}
 
-bool CSceneDescription::Read(const CString &fileName)
-{
     CSceneReaderFactory sceneReaderFactory;
     ISceneReader* reader = sceneReaderFactory.CreateReader(fileName);
 
@@ -49,18 +45,12 @@ bool CSceneDescription::Read(const CString &fileName)
     {
         LastError = "Couldn't open file : " + fileName;
         delete reader;
-        return false;
+        Loaded = false;
     }
 
-    reader->ReadHeader(Header);
-    reader->ReadUShort(NodeCount);
-
-    Nodes = new SSD::SNode*[NodeCount];
-
-    for (unsigned int x = 0; x < NodeCount; x++)
-        Nodes[x] = reader->ReadNode();
+    reader->ReadNodes(Nodes);
 
     reader->Close();
     delete reader;
-    return true;
+    Loaded = true;
 }

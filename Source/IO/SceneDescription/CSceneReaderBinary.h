@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
-#include "../../Utility/SSD.h"
 #include "ISceneReader.h"
+
+namespace SSD { struct SHeader; struct SNode; struct SAttribute; }
 
 class CSceneReaderBinary : public ISceneReader
 {
@@ -10,16 +10,17 @@ public:
     virtual ~CSceneReaderBinary();
     virtual bool Open();
     virtual void Close();
+    virtual void ReadNodes(std::vector<IDataNode*> &nodes);
     virtual CString GetLastError() { return LastError; }
-
-    virtual void ReadHeader(SSD::SHeader &header);
-    virtual void ReadUShort(unsigned short &nodeCount);
-    virtual void ReadByte(unsigned char &val);
-    virtual void ReadUInt32(unsigned int &val);
-    virtual SSD::SNode* ReadNode();
-    virtual SSD::SAttribute* ReadAttribute();
     // virtual 
 private:
+    void ReadHeader(SSD::SHeader &header);
+    void ReadUShort(unsigned short &val);
+    void ReadByte(unsigned char &val);
+    void ReadUInt32(unsigned int &val);
+    SSD::SNode* ReadNode();
+    SSD::SAttribute* ReadAttribute();
+
     CString FileName;
     CString LastError;
     std::ifstream FileStream;

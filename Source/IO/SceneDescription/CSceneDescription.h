@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
-#include "../../Utility/SSD.h"
 #include "ISceneDescription.h"
+
+class IDataNode;
 
 class CSceneDescription : public ISceneDescription
 {
@@ -11,13 +12,12 @@ public:
     virtual bool IsLoaded();
     virtual CString GetLastError();
     virtual IScene* GenerateScene();
+
 private:
     CSceneDescription(CString fileName);
-    bool Read(const CString &fileName);
+
     bool Loaded = false;
     CString LastError = "";
 
-    struct SSD::SHeader Header;
-    unsigned short NodeCount;
-    struct SSD::SNode** Nodes;
+    class std::vector<IDataNode*> Nodes;
 };

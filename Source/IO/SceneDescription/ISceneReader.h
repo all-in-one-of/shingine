@@ -1,7 +1,9 @@
 #pragma once
 #include <fstream>
+#include <vector>
 #include "Common.h"
-#include "../../Utility/SSD.h"
+
+class IDataNode;
 
 class ISceneReader
 {
@@ -10,13 +12,6 @@ public:
 
     virtual CString GetLastError() = 0;
     virtual bool Open() = 0;
+    virtual void ReadNodes(std::vector<IDataNode*> &nodes) = 0;
     virtual void Close() = 0;
-
-    virtual void ReadHeader(SSD::SHeader &header) = 0;
-    virtual void ReadUShort(unsigned short &nodeCount) = 0;
-    virtual void ReadByte(unsigned char &val) = 0;
-    virtual void ReadUInt32(unsigned int &val) = 0;
-    virtual SSD::SNode* ReadNode() = 0;
-    virtual SSD::SAttribute* ReadAttribute() = 0;
-
 };

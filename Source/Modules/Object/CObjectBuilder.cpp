@@ -1,19 +1,31 @@
-#include "CObjectBuilder.h"
-#include "../../Utility/SSD.h"
-
-#include "../../Components/CComponentBuilder.h"
-
 #include <iostream>
+#include "../../Utility/Data/IDataNode.h"
+#include "../../Utility/Data/IAttributeSerialized.h"
+#include "CObjectBuilder.h"
 
-void CObjectBuilder::SetupObjectFromDescriptionNode(IObject* object, SSD::SNode* node)
+void CObjectBuilder::SetupFromDataNode(IObject* object, IDataNode* node)
 {
-    CComponentBuilder* componentBuilder = new CComponentBuilder();
-    for (unsigned char x = 0; x < node->AttributeCount; x++)
+    std::vector<IDataNode*> childNodes = node->GetNodes();
+    for (unsigned char x = 0; x < childNodes.size(); x++)
     {
-        SSD::SAttribute* attr = node->Attributes[x];
-        std::cout << "Attempting to add component " << attr->Name << std::endl;
-        IComponent* component = object->AddComponent(attr->Name);
-        
+        IDataNode* childNode = childNodes[x];
+        std::cout << "Attempting to add component " << childNode->Name().GetStdString() << std::endl;
+        IComponent* component = object->AddComponent(childNode->Name());
+
+        std::vector<ITypedAttribute*> attributes = childNode->GetAttributes();
+
+        if (attributes.size() > 0)
+            int e = 2;
+
+        for (unsigned char x = 0; x < attributes.size(); x++)
+        {
+            IAttributeSerialized* attributeSerializedObject = 
+                dynamic_cast<IAttributeSerialized*>(component);
+                
+            if (attributeSerializedObject == NULL) continue;
+            std::cout << "Calling set attr" << std::endl;
+            attributeSerializedObject->SetAttribute(attributes[x]);
+            int z = 4;
+        }
     }
-    delete componentBuilder;
 }

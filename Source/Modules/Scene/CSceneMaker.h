@@ -1,9 +1,9 @@
 #pragma once
 #include "IScene.h"
 
-namespace SSD { struct SNode; }
+class IDataNode;
 class CSceneMaker
 {
 public:
-    static IScene* Create(SSD::SNode** nodes, const unsigned int &nodeCount);
+    static IScene* Create(const std::vector<IDataNode*> &nodes);
 };

@@ -50,6 +50,7 @@ class DataType(IntEnum):
     INT = 4
     INT16 = 5
     UINT16 = 6
+    CHAR = 7
 
 class LightType(IntEnum):
     POINT = 0
@@ -60,13 +61,19 @@ class NodeType(IntEnum):
     MATERIAL = 2
     MESH = 3
 
+class DrawType(IntEnum):
+    WIRE_FRAME = 0
+    FILL = 1
+    POINTS = 2
+
 data_type_name_map = {
     DataType.BYTE : "unsigned char",
     DataType.INT : "int",
     DataType.INT16 : "short",
     DataType.UINT : "unsigned int",
     DataType.UINT16 : "unsigned short",
-    DataType.FLOAT : "float"
+    DataType.FLOAT : "float",
+    DataType.CHAR : "char"
 }
 
 class Node:
@@ -80,13 +87,16 @@ class Node:
         self.type = type
 
 class Attribute:
-    def __init__(self, name, data_type, element_count, value):
+    def __init__(self, name, data_type, value, single_element=False):
         self.name = name
         self.data_type = data_type
-        self.element_count = element_count
+        self.single_element = single_element
         self.value = value
 
+    
+
 node_name_to_id = {}
+node_id_to_parent_id = {}
 hom_nodes = []
 nodes = []
 
@@ -95,7 +105,15 @@ for id, node in enumerate(hou.node("/obj").children()):
     if node.type().name() not in ["light", "null", "geo"]:
         continue
     node_name_to_id[node.name()] = id
-    nodes.append(Node(id, node.name()))
+    new_node = Node(id, node.name())
+    # add object metadata
+    metadata_node = Node(name="ObjectMetadata", type=NodeType.TRANSFORM)
+    metadata_node.attributes.append(Attribute("Name", DataType.CHAR, node.name()))
+    metadata_node.attributes.append(Attribute("Tag", DataType.CHAR, "default"))
+    metadata_node.attributes.append(Attribute("Layer", DataType.CHAR, "default"))
+    new_node.nodes.append(metadata_node)
+    nodes.append(new_node)
+
     hom_nodes.append(node)
 
 # set parent ids
@@ -106,22 +124,22 @@ for id, hom_node in enumerate(hom_nodes):
         if input_node.name() not in node_name_to_id.keys():
             continue
         parent_id = node_name_to_id[input_node.name()]
-    nodes[id].parent_id = parent_id
+    node_id_to_parent_id[id] = parent_id
 
 # read node attributes
 for id, node in enumerate(hom_nodes):
     # collect the local transform matrix, write to the attribute
     local_transform = node.localTransform()
     transform_node = Node(name="Transform", type=NodeType.TRANSFORM)
-    transform_node.attributes.append(Attribute("Matrix", DataType.FLOAT, 16, local_transform.asTuple()))
-    transform_node.attributes.append(Attribute("ParentID", DataType.UINT, 1, nodes[id.parent_id]))
+    transform_node.attributes.append(Attribute("Matrix", DataType.FLOAT, local_transform.asTuple()))
+    transform_node.attributes.append(Attribute("ParentID", DataType.UINT, node_id_to_parent_id[id], True))
     nodes[id].nodes.append(transform_node)
     # find lights
     if node.type().name() == "hlight::2.0":
         light_node = Node(name="Light", type=NodeType.LIGHT)
-        light_node.attributes.append(Attribute("Color", DataType.FLOAT, 3, node.parmTuple("light_color").eval()))
-        light_node.attributes.append(Attribute("Exposure", DataType.FLOAT, 1, node.parm("light_exposure").eval()))
-        light_node.attributes.append(Attribute("Intensity", DataType.FLOAT, 1, node.parm("light_intensity").eval()))
+        light_node.attributes.append(Attribute("Color", DataType.FLOAT, node.parmTuple("light_color").eval()))
+        light_node.attributes.append(Attribute("Exposure", DataType.FLOAT, node.parm("light_exposure").eval(), True))
+        light_node.attributes.append(Attribute("Intensity", DataType.FLOAT, node.parm("light_intensity").eval(), True))
         nodes[id].nodes.append(light_node)
     
     # find geo
@@ -163,23 +181,30 @@ for id, node in enumerate(hom_nodes):
         
         # add attributes
         geometry_node = Node(name="Mesh", type=NodeType.MESH)
-        geometry_node.attributes.append(Attribute("Indices", DataType.UINT, len(indices), indices))
-        geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, len(normals), normals))
-        geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, len(positions), positions))
-        geometry_node.attributes.append(Attribute("TexCoord", DataType.FLOAT, len(texcoord), texcoord))
+        geometry_node.attributes.append(Attribute("Indices", DataType.UINT, indices))
+        geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, normals))
+        geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, positions))
+        geometry_node.attributes.append(Attribute("TexCoord", DataType.FLOAT, texcoord))
         nodes[id].nodes.append(geometry_node)
 
         # delete temp houdini nodes
         normal.destroy()
         divide.destroy()
 
+        renderer_node = Node(name="Renderer", type=NodeType.MESH)
+        renderer_node.attributes.append(Attribute("DrawType", DataType.BYTE, DrawType.FILL, True))
+        renderer_node.attributes.append(Attribute("Enabled", DataType.BYTE, 1, True))
+
+        material_node = None
         # find material
         if node.parm("shop_materialpath").eval():
             material_hom_node = hou.node(node.parm("shop_materialpath").eval())
             if material_hom_node.type().name() == "principledshader::2.0":
                 material_node = Node(name="Material", type=NodeType.MATERIAL)
-                material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, 3, node.parmTuple("basecolor").eval()))
-                nodes[id].nodes.append(material_node)
+                material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, node.parmTuple("basecolor").eval()))
+                renderer_node.nodes.append(material_node)
+
+        nodes[id].nodes.append(renderer_node)
 
 version = 1
 signature = "SSD"
@@ -216,19 +241,21 @@ def attribute_to_bytes(attr):
     attr_data.append(len(data_type_name) & 0xff)
     attr_data.extend(bytearray(data_type_name))
     
-    attr_data.extend(get_uint32_to_bytes(attr.element_count))
-
     values = attr.value
-    if attr.element_count == 1:
+    if attr.single_element:
         values = [attr.value,]
 
+    attr_data.extend(get_uint32_to_bytes(len(values)))
+        
     for x in range(len(values)):
         if (attr.data_type == DataType.FLOAT):
             attr_data.extend(bytearray(struct.pack("f", values[x])))
         if (attr.data_type == DataType.UINT):
             attr_data.extend(get_uint32_to_bytes(values[x]))
         if (attr.data_type == DataType.BYTE):
-            attr_data.extend(values[x] & 0xff)
+            attr_data.append(values[x] & 0xff)
+        if (attr.data_type == DataType.CHAR):
+            attr_data.extend(values[x])
 
     attr_data.append(attr_end)
     return attr_data

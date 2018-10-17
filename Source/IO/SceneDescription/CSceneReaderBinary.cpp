@@ -106,8 +106,13 @@ SSD::SAttribute* CSceneReaderBinary::ReadAttribute()
 
     ReadUInt32(attr->ElementCount);
 
-    unsigned int stride = CString(attr->DataType) == "unsigned char" ? 1 : 4;
+    CString dataTypeName = CString(attr->DataType);
+    // TODO get stride
+    unsigned char stride;   // = dataTypeName == "unsigned char" || dataTypeName == "char" ? 1 : 4;
+    DataStruct::GetStride(dataTypeName, stride);
+
     unsigned int byteCount = attr->ElementCount * stride;
+
 
     attr->Values = new unsigned char[byteCount];
     for (unsigned int x = 0; x < byteCount; x++)

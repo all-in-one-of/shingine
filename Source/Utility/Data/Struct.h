@@ -1,9 +1,20 @@
 #pragma once
+#include "../Common.h"
 
 namespace 
 {
 namespace DataStruct
 {
+    void GetStride(const CString &typeName, unsigned char &stride)
+    {
+        stride = 1;
+        if (typeName == "int") stride = 4;
+        if (typeName == "unsigned int") stride = 4;
+        if (typeName == "unsigned short") stride = 2;
+        if (typeName == "short") stride = 2;
+        if (typeName == "float") stride = 4;
+        // if (typeName == "unsigned char") stride = 1;
+    }
     void UnpackUInt32(unsigned int &val, unsigned char *bytes)
     {
         val =   (0xff000000 & (bytes[0] << 24)) |

@@ -1,50 +1,56 @@
-#pragma once
-#include "CTypedAttribute.h"
 #include <string>
 #include <map>
-#include <iostream>
 
-class IAttributeSerialized
-{
-public:
-    virtual ~IAttributeSerialized() {};
-    virtual void SetAttribute(ITypedAttribute* &attr) = 0;
-    virtual void GetAttribute(ITypedAttribute* &attr) = 0;
-    virtual void GetAllAttributes(std::vector<ITypedAttribute*> &attr) = 0;
-};
-
+class ISerialized;
 #define ATTRIBUTE_DECL_INIT(CLASSNAME) \
-    typedef void (CLASSNAME::*MFP)(ITypedAttribute* &attr); \
+    typedef void (CLASSNAME::*MFP)(ISerialized* &attr); \
     std::map<std::string, MFP> AttributeFunctionMap; \
-    virtual void SetAttribute(ITypedAttribute* &attr) \
+    std::vector<std::string> AttributeNames; \
+    virtual void SetAttribute(ISerialized* &attr) \
     { \
-        std::string mapName = std::string("Set_") + attr->Name().GetStdString(); \
-        std::cout << "SetAttribute" << mapName << std::endl; \
-        if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end()) return; \
-        std::cout << "FOUND " << mapName << std::endl; \
+        std::string mapName = std::string("Set_") + attr->SerializedName().GetStdString(); \
+        if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end()) \
+            return; \
         MFP fp = AttributeFunctionMap[mapName]; \
         (this->*fp)(attr); \
     }; \
-    virtual void GetAttribute(ITypedAttribute* &attr) \
+    virtual void GetAttribute(ISerialized* &attr) \
     { \
-        std::string mapName = std::string("Get_") + attr->Name().GetStdString(); \
+        std::string mapName = std::string("Get_") + attr->SerializedName().GetStdString(); \
         if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end()) return; \
         MFP fp = AttributeFunctionMap[mapName]; \
         (this->*fp)(attr); \
     }; \
-    virtual void GetAllAttributes(std::vector<ITypedAttribute*> &attr) \
+    virtual void GetAllAttributes(std::vector<ISerialized*> &attributes) \
     { \
+        for (unsigned int x = 0; x < AttributeNames.size(); x++) \
+        { \
+            ISerialized* newAttr; \
+            MFP fp = AttributeFunctionMap[std::string("Get_") + AttributeNames[x]]; \
+            (this->*fp)(newAttr); \
+            attributes.push_back(newAttr); \
+        } \
     }; \
+
+#define ATTRIBUTE_CLASS_INFO(CLASSNAME,NAME) \
+    CLASSNAME* NAME; \
+    void Attrib_Set_##NAME(ISerialized* &attr) \
+    { \
+        NAME = dynamic_cast<CLASSNAME*>(attr); \
+    } \
+    void Attrib_Get_##NAME(ISerialized* &attr) \
+    { \
+        attr = NAME; \
+    }
 
 #define ATTRIBUTE_VALUE_INFO(TYPE_NAME,NAME) \
     TYPE_NAME NAME; \
-    void Attrib_Set_##NAME(ITypedAttribute* &attr) \
+    void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
-        std::cout << "CALLING SET" << #NAME << std::endl; \
         std::vector<TYPE_NAME> arr = ((CTypedAttribute<TYPE_NAME> *)attr)->Get(); \
         NAME = arr[0]; \
     } \
-    void Attrib_Get_##NAME(ITypedAttribute* &attr) \
+    void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
         std::vector<TYPE_NAME> data; \
         data.push_back(NAME); \
@@ -53,17 +59,18 @@ public:
 
 #define ATTRIBUTE_VECTOR_INFO(TYPE_NAME,NAME) \
     std::vector<TYPE_NAME> NAME; \
-    void Attrib_Set_##NAME(ITypedAttribute* &attr) \
+    void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
         CTypedAttribute<TYPE_NAME> * typedAttr = (CTypedAttribute<TYPE_NAME> *)attr; \
         if (typedAttr == NULL) return; \
         NAME = typedAttr->Get(); \
     } \
-    void Attrib_Get_##NAME(ITypedAttribute* &attr) \
+    void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
         attr = new CTypedAttribute<TYPE_NAME>(#NAME, #TYPE_NAME, NAME); \
     } 
 
 #define ATTRIBUTE_REGISTER(CLASSNAME,NAME) \
+    AttributeNames.push_back(#NAME); \
     AttributeFunctionMap.insert( std::make_pair( std::string("Get_") + #NAME , &CLASSNAME::Attrib_Get_##NAME )); \
     AttributeFunctionMap.insert( std::make_pair( std::string("Set_") + #NAME , &CLASSNAME::Attrib_Set_##NAME )); 

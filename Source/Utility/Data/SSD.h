@@ -32,7 +32,7 @@ namespace SSD
 
     struct SNode
     {
-        unsigned unsigned int ID;
+        unsigned int ID;
         unsigned char Type;
         unsigned char NameLength;
         char* Name;

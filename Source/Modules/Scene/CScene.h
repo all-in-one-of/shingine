@@ -10,7 +10,7 @@ public:
     virtual ~CScene();
 
     // Object Management
-    virtual IObject* MakeObject(const CString &objectName = "Object");
+    virtual IObject* AddObject(const CString &objectName = "Object");
     virtual IObject* GetObject(const unsigned int &id) const;
     virtual IObject* CloneObject(const IObject* object);
 

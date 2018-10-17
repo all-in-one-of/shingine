@@ -1,0 +1,2 @@
+#include "CObjectMetadataComponent.h"
+REGISTER_SERIALIZED_NAME(CObjectMetadataComponent,ObjectMetadata)

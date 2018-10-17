@@ -27,6 +27,13 @@ CString::CString(const char* sourceString)
     Data[ArrayLength] = '\0';
 }
 
+bool CString::StartsWith(const CString &inputString)
+{
+    return ArrayLength < inputString.Length() 
+        ? false
+        : strncmp(inputString.GetCharArray(), Data, inputString.Length()) == 0;
+}
+
 CString::CString(std::string sourceStdString) : CString(sourceStdString.c_str()) {};
 
 CString::CString(const CString &sourceString)

@@ -37,6 +37,8 @@ public:
     int IndexOf(char character);
     std::vector<CString> Split(char delim) const;
 
+    bool StartsWith(const CString &inputString);
+
 private:
     char* Data;
     unsigned int ArrayLength;

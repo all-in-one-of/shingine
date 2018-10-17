@@ -1,5 +1,5 @@
 #include "CObject.h"
-#include "../../Components/SComponentFactory.h"
+#include "../../Utility/Data/CSerializedFactory.h"
 
 unsigned int CObject::ID() { return Id; }
 
@@ -14,10 +14,18 @@ CObject::~CObject()
 
 IComponent* CObject::AddComponent(const CString &componentTypeName)
 {
-    IComponent* component = 
-        SComponentFactory::CreateInstance(componentTypeName.GetStdString());
-    if (component)
-        Components[componentTypeName] = component;
+    ISerialized* serializedObject = CSerializedFactory::CreateInstance(componentTypeName.GetStdString());
+    if (!serializedObject) return NULL;
+
+    IComponent* component = dynamic_cast<IComponent*>(serializedObject);
+        
+    if (!component)
+    {
+        delete serializedObject;
+        return NULL;
+    }
+    
+    Components[componentTypeName] = component;
     component->SetOwner(this);
     return component;
 }

@@ -13,7 +13,7 @@ void CScene::SetParent(const unsigned int &id, const unsigned int &parentId)
         currentObject->SetParent(parentObject);
 }
 
-IObject* CScene::MakeObject(const CString &objectName)
+IObject* CScene::AddObject(const CString &objectName)
 {
     CSceneObject* object = new CSceneObject(NextID);
     object->SetName(objectName);

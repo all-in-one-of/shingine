@@ -1,6 +1,6 @@
 #include <iostream>
 #include "../../Utility/Data/IDataNode.h"
-#include "../../Utility/Data/IAttributeSerialized.h"
+#include "../../Utility/Data/ISerialized.h"
 #include "CObjectBuilder.h"
 
 void CObjectBuilder::SetupFromDataNode(IObject* object, IDataNode* node)
@@ -14,17 +14,20 @@ void CObjectBuilder::SetupFromDataNode(IObject* object, IDataNode* node)
         if (component == NULL)
             continue;
 
-        std::vector<ITypedAttribute*> attributes = childNode->GetAttributes();
+        ISerializedClass* attributeSerializedObject = 
+            dynamic_cast<ISerializedClass*>(component);
+
+        std::vector<ISerialized*> attributes = childNode->GetAttributes();
+        std::vector<IDataNode*> childDataNodes = childNode->GetNodes();
 
         for (unsigned char x = 0; x < attributes.size(); x++)
-        {
-            IAttributeSerialized* attributeSerializedObject = 
-                dynamic_cast<IAttributeSerialized*>(component);
-                
-            if (attributeSerializedObject == NULL) 
-                continue;
-
             attributeSerializedObject->SetAttribute(attributes[x]);
+
+        for (unsigned char x = 0; x < childDataNodes.size(); x++)
+        {
+            int a = 1;
+            ISerialized* deserializedDataNode = childDataNodes[x]->Deserialize();
+            attributeSerializedObject->SetAttribute(deserializedDataNode);
         }
     }
 }

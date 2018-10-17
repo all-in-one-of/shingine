@@ -14,7 +14,7 @@ IScene* CSceneMaker::Create(const std::vector<IDataNode*> &nodes)
     // Create objects, attach components
     for (unsigned int x = 0; x < nodes.size(); x++)
     {
-        IObject* object = scene->MakeObject(CString(nodes[x]->Name()));
+        IObject* object = scene->AddObject(CString(nodes[x]->Name()));
         descriptionIdToSceneId[nodes[x]->ID()] = object->ID();
         objectBuilder->SetupFromDataNode(object, nodes[x]);
     }

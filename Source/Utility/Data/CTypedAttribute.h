@@ -1,9 +1,10 @@
 #pragma once
 #include <vector>
-#include "ITypedAttribute.h"
+#include "../Common.h"
+#include "ISerialized.h"
 
 template <class T>
-class CTypedAttribute : public ITypedAttribute
+class CTypedAttribute : public ISerialized
 {
 public:
     CTypedAttribute(CString name, CString type, std::vector<T> &data)
@@ -13,16 +14,12 @@ public:
         Data = data;
     };
 
-    
     virtual ~CTypedAttribute();
-    virtual CString Name();
+    virtual CString SerializedName();
     virtual CString TypeName();
 
     std::vector<T> Get();
     void Set(std::vector<T> &data);
-
-    // void SetAt(unsigned int index, T &value);
-    // void AddValue(T &value);
 
 private:
     std::vector<T> Data;
@@ -36,7 +33,7 @@ CTypedAttribute<T>::~CTypedAttribute()
 }
 
 template <class T>
-CString CTypedAttribute<T>::Name()
+CString CTypedAttribute<T>::SerializedName()
 {
     return AttributeName;
 }

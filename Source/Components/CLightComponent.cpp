@@ -1,7 +1,7 @@
 #include "CLightComponent.h"
 #include <iostream>
 
-REGISTER_COMPONENT_NAME(CLightComponent,Light)
+REGISTER_SERIALIZED_NAME(CLightComponent,Light)
 
 CLightComponent::~CLightComponent()
 {

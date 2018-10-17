@@ -7,7 +7,7 @@ class IScene // : public IObject
 {
 public:
     virtual ~IScene() {};
-    virtual IObject* MakeObject(const CString &objectName) = 0;
+    virtual IObject* AddObject(const CString &objectName) = 0;
     virtual IObject* GetObject(const unsigned int &id) const = 0;
 
     virtual unsigned int GetObjectIdByName(const CString &name, bool &didFind) const = 0;

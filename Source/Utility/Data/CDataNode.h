@@ -10,15 +10,16 @@ public:
     virtual ~CDataNode();
     virtual unsigned int ID();
     virtual CString Name();
-    virtual std::vector<ITypedAttribute*> GetAttributes();
+    virtual std::vector<ISerialized*> GetAttributes();
     virtual std::vector<IDataNode*> GetNodes();
+    virtual ISerialized* Deserialize();
 
     static void GetStride(const CString &typeName, unsigned char &stride);
 private:
-    ITypedAttribute* MakeTypedAttribute(SSD::SAttribute* attribute);
+    ISerialized* MakeTypedAttribute(SSD::SAttribute* attribute);
 
     unsigned int NodeID;
     CString NodeName;
-    std::vector<ITypedAttribute*> Attributes;
+    std::vector<ISerialized*> Attributes;
     std::vector<IDataNode*> Nodes;
 };

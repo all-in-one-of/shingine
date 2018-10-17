@@ -10,8 +10,7 @@ HEADER
 NODE
 {
     node_begin U8
-    id U16
-    parent_id U16
+    id U32
     type U8
     name_length U8
     name U8[name_length]
@@ -115,6 +114,7 @@ for id, node in enumerate(hom_nodes):
     local_transform = node.localTransform()
     transform_node = Node(name="Transform", type=NodeType.TRANSFORM)
     transform_node.attributes.append(Attribute("Matrix", DataType.FLOAT, 16, local_transform.asTuple()))
+    transform_node.attributes.append(Attribute("ParentID", DataType.UINT, 1, nodes[id.parent_id]))
     nodes[id].nodes.append(transform_node)
     # find lights
     if node.type().name() == "hlight::2.0":
@@ -236,8 +236,7 @@ def attribute_to_bytes(attr):
 def node_to_bytes(node):
     node_data = bytearray()
     node_data.append(node_begin)
-    node_data.extend(get_uint16_to_bytes(node.id))
-    node_data.extend(get_uint16_to_bytes(node.parent_id))
+    node_data.extend(get_uint32_to_bytes(node.id))
     node_data.append(node.type & 0xff)
     node_name = node.name[:character_limit]
     node_data.append(len(node_name) & 0xff)

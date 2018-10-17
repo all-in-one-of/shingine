@@ -24,7 +24,6 @@ bool CSceneReaderBinary::Open()
     bool success = FileStream.is_open();
     if (!success)
     {
-
         LastError = "Couldn't open the file " + FileName;
         return false;
     }
@@ -56,8 +55,7 @@ SSD::SNode* CSceneReaderBinary::ReadNode()
         return NULL;
     }
     SSD::SNode* node = new SSD::SNode();
-    ReadUShort(node->ID);
-    ReadUShort(node->ParentID);
+    ReadUInt32(node->ID);
     ReadByte(node->Type);
     ReadByte(node->NameLength);
     node->Name = new char[node->NameLength + 1];

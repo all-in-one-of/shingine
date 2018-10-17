@@ -18,15 +18,6 @@ IScene* CSceneMaker::Create(const std::vector<IDataNode*> &nodes)
         descriptionIdToSceneId[nodes[x]->ID()] = object->ID();
         objectBuilder->SetupFromDataNode(object, nodes[x]);
     }
-
-    // Setup parenting 
-    for (unsigned int x = 0; x < nodes.size(); x++)
-    {
-        scene->SetParent(
-            descriptionIdToSceneId[nodes[x]->ID()],
-            descriptionIdToSceneId[nodes[x]->ParentID()]
-        );
-    }
     
     delete objectBuilder;
     return scene;

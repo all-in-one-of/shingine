@@ -32,8 +32,7 @@ namespace SSD
 
     struct SNode
     {
-        unsigned short ID;
-        unsigned short ParentID;
+        unsigned unsigned int ID;
         unsigned char Type;
         unsigned char NameLength;
         char* Name;

@@ -9,23 +9,22 @@ void CObjectBuilder::SetupFromDataNode(IObject* object, IDataNode* node)
     for (unsigned char x = 0; x < childNodes.size(); x++)
     {
         IDataNode* childNode = childNodes[x];
-        std::cout << "Attempting to add component " << childNode->Name().GetStdString() << std::endl;
         IComponent* component = object->AddComponent(childNode->Name());
+        
+        if (component == NULL)
+            continue;
 
         std::vector<ITypedAttribute*> attributes = childNode->GetAttributes();
-
-        if (attributes.size() > 0)
-            int e = 2;
 
         for (unsigned char x = 0; x < attributes.size(); x++)
         {
             IAttributeSerialized* attributeSerializedObject = 
                 dynamic_cast<IAttributeSerialized*>(component);
                 
-            if (attributeSerializedObject == NULL) continue;
-            std::cout << "Calling set attr" << std::endl;
+            if (attributeSerializedObject == NULL) 
+                continue;
+
             attributeSerializedObject->SetAttribute(attributes[x]);
-            int z = 4;
         }
     }
 }

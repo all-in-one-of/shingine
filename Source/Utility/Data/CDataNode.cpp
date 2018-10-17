@@ -6,7 +6,6 @@
 CDataNode::CDataNode(SSD::SNode* node)
 {
     NodeID = node->ID;
-    NodeParentID = node->ParentID;
     NodeName = CString(node->Name);
     
     for (unsigned int x = 0; x < node->NodeCount; x++)
@@ -47,6 +46,7 @@ ITypedAttribute* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
     std::vector<short> data_short;
     std::vector<float> data_float;
     std::vector<unsigned char> data_uchar;
+    std::vector<char> data_char;
 
     for (unsigned int x = 0; x < attribute->ElementCount * stride; x+=stride)
     {
@@ -66,6 +66,8 @@ ITypedAttribute* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
             data_float.push_back(DataStruct::GetFloat(value));
         if (typeName == "unsigned char") 
             data_uchar.push_back(value[0]);
+        if (typeName == "char") 
+            data_char.push_back(value[0]);
         delete[] value;
     }
 
@@ -81,11 +83,12 @@ ITypedAttribute* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
         return new CTypedAttribute<float>(name, typeName, data_float);
     if (typeName == "unsigned char") 
         return new CTypedAttribute<unsigned char>(name, typeName, data_uchar);
+    if (typeName == "char") 
+        return new CTypedAttribute<char>(name, typeName, data_char);
     return NULL;
 }
 
-short CDataNode::ID() { return NodeID; }
-short CDataNode::ParentID() { return NodeParentID; }
+unsigned int CDataNode::ID() { return NodeID; }
 CString CDataNode::Name() { return NodeName; }
 std::vector<ITypedAttribute*> CDataNode::GetAttributes() { return Attributes; }
 std::vector<IDataNode*> CDataNode::GetNodes() { return Nodes; }

@@ -46,6 +46,7 @@ CSceneDescription::CSceneDescription(CString fileName)
         LastError = "Couldn't open file : " + fileName;
         delete reader;
         Loaded = false;
+        return;
     }
 
     reader->ReadNodes(Nodes);

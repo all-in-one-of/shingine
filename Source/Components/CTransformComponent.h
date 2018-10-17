@@ -9,5 +9,6 @@ public:
     virtual ~CTransformComponent();
     REGISTER_COMPONENT_TYPE(CTransformComponent)
 private:
+    ATTRIBUTE_VALUE_INFO(unsigned int, ParentID)
     ATTRIBUTE_VECTOR_INFO(float, Matrix)
 };

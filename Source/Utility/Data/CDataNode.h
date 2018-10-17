@@ -8,8 +8,7 @@ class CDataNode : public IDataNode
 public:
     CDataNode(SSD::SNode* node);
     virtual ~CDataNode();
-    virtual short ID();
-    virtual short ParentID();
+    virtual unsigned int ID();
     virtual CString Name();
     virtual std::vector<ITypedAttribute*> GetAttributes();
     virtual std::vector<IDataNode*> GetNodes();
@@ -18,7 +17,7 @@ public:
 private:
     ITypedAttribute* MakeTypedAttribute(SSD::SAttribute* attribute);
 
-    short NodeID, NodeParentID;
+    unsigned int NodeID;
     CString NodeName;
     std::vector<ITypedAttribute*> Attributes;
     std::vector<IDataNode*> Nodes;

@@ -18,6 +18,7 @@ IComponent* CObject::AddComponent(const CString &componentTypeName)
         SComponentFactory::CreateInstance(componentTypeName.GetStdString());
     if (component)
         Components[componentTypeName] = component;
+    component->SetOwner(this);
     return component;
 }
 

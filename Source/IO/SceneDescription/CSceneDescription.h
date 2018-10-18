@@ -2,7 +2,7 @@
 #include <vector>
 #include "ISceneDescription.h"
 
-class IDataNode;
+class ISerialized;
 
 class CSceneDescription : public ISceneDescription
 {
@@ -19,5 +19,5 @@ private:
     bool Loaded = false;
     CString LastError = "";
 
-    class std::vector<IDataNode*> Nodes;
+    class std::vector<ISerialized*> Nodes;
 };

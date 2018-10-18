@@ -1,7 +1,5 @@
 #pragma once
-#include "../Utility/Data/CSerializedFactory.h"
-#include "../Utility/Data/CTypedAttribute.h"
-#include "../Utility/Data/DSerialized.h"
+#include "../Utility/Data/Serialization.h"
 
 class CMaterial : public ISerializedClass
 {

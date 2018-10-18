@@ -4,21 +4,36 @@
 #include "CSceneReaderFactory.h"
 #include "../../Modules/Scene/CSceneMaker.h"
 #include "../../Utility/Data/IDataNode.h"
+#include "../../Utility/Data/ISerialized.h"
+#include "../../Modules/Object/IObject.h"
+
+// code which creates IDataNode
+// code which will deserialize data node
 
 IScene * CSceneDescription::GenerateScene()
 {
     if (!IsLoaded()) return NULL;
-    return CSceneMaker::Create(Nodes);
+
+    std::vector<IObject*> objects;
+    for (unsigned int x = 0; x < Nodes.size(); x++)
+        if(Nodes[x]->SerializedName() == "Object")
+        {
+            objects.push_back(
+                dynamic_cast<IObject*>(Nodes[x]));
+
+        }
+
+    return CSceneMaker::Create(objects);
 }
 
 CString CSceneDescription::GetLastError() { return LastError; }
 
 CSceneDescription::~CSceneDescription()
 {
-    for (unsigned int x = 0; x < Nodes.size(); x++)
-    {
-        delete Nodes[x];
-    }
+    //for (unsigned int x = 0; x < Nodes.size(); x++)
+    //{
+    //    delete Nodes[x];
+    //}
 }
 
 bool CSceneDescription::IsLoaded() { return Loaded; }
@@ -48,8 +63,16 @@ CSceneDescription::CSceneDescription(CString fileName)
         Loaded = false;
         return;
     }
+    std::vector<IDataNode*> nodes;
+    reader->ReadNodes(nodes);
 
-    reader->ReadNodes(Nodes);
+    for (unsigned int x = 0; x < nodes.size(); x++)
+    {
+        ISerialized* deserializedDataNode = nodes[x]->Deserialize();
+        if (deserializedDataNode)
+            Nodes.push_back(deserializedDataNode);
+        delete nodes[x];
+    }
 
     reader->Close();
     delete reader;

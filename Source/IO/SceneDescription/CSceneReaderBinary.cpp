@@ -55,8 +55,6 @@ SSD::SNode* CSceneReaderBinary::ReadNode()
         return NULL;
     }
     SSD::SNode* node = new SSD::SNode();
-    ReadUInt32(node->ID);
-    ReadByte(node->Type);
     ReadByte(node->NameLength);
     node->Name = new char[node->NameLength + 1];
     FileStream.read(node->Name, node->NameLength);

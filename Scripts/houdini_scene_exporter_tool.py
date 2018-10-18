@@ -10,8 +10,6 @@ HEADER
 NODE
 {
     node_begin U8
-    id U32
-    type U8
     name_length U8
     name U8[name_length]
     attribute_count U8
@@ -56,10 +54,8 @@ class LightType(IntEnum):
     POINT = 0
 
 class NodeType(IntEnum):
-    LIGHT = 0
-    TRANSFORM = 1
-    MATERIAL = 2
-    MESH = 3
+    OBJECT = 0
+    DATA = 1
 
 class DrawType(IntEnum):
     WIRE_FRAME = 0
@@ -77,10 +73,10 @@ data_type_name_map = {
 }
 
 class Node:
-    def __init__(self, id=0, name="Node", type=NodeType.TRANSFORM):
+    def __init__(self, name="Node", type=NodeType.OBJECT):
         # zero is the scene root
-        self.id = id + 1
-        self.parent_id = 0
+        # self.id = id + 1
+        # self.parent_id = 0
         self.name = name
         self.attributes = []
         self.nodes = []
@@ -93,8 +89,6 @@ class Attribute:
         self.single_element = single_element
         self.value = value
 
-    
-
 node_name_to_id = {}
 node_id_to_parent_id = {}
 hom_nodes = []
@@ -104,10 +98,11 @@ nodes = []
 for id, node in enumerate(hou.node("/obj").children()):
     if node.type().name() not in ["light", "null", "geo"]:
         continue
-    node_name_to_id[node.name()] = id
-    new_node = Node(id, node.name())
+    node_name_to_id[node.name()] = id + 1
+    new_node = Node("Object", type=NodeType.OBJECT)
+    new_node.attributes.append(Attribute("Id", DataType.UINT, id + 1, True))
     # add object metadata
-    metadata_node = Node(name="ObjectMetadata", type=NodeType.TRANSFORM)
+    metadata_node = Node("ObjectMetadata")
     metadata_node.attributes.append(Attribute("Name", DataType.CHAR, node.name()))
     metadata_node.attributes.append(Attribute("Tag", DataType.CHAR, "default"))
     metadata_node.attributes.append(Attribute("Layer", DataType.CHAR, "default"))
@@ -130,13 +125,13 @@ for id, hom_node in enumerate(hom_nodes):
 for id, node in enumerate(hom_nodes):
     # collect the local transform matrix, write to the attribute
     local_transform = node.localTransform()
-    transform_node = Node(name="Transform", type=NodeType.TRANSFORM)
+    transform_node = Node("Transform")
     transform_node.attributes.append(Attribute("Matrix", DataType.FLOAT, local_transform.asTuple()))
     transform_node.attributes.append(Attribute("ParentID", DataType.UINT, node_id_to_parent_id[id], True))
     nodes[id].nodes.append(transform_node)
     # find lights
     if node.type().name() == "hlight::2.0":
-        light_node = Node(name="Light", type=NodeType.LIGHT)
+        light_node = Node("Light")
         light_node.attributes.append(Attribute("Color", DataType.FLOAT, node.parmTuple("light_color").eval()))
         light_node.attributes.append(Attribute("Exposure", DataType.FLOAT, node.parm("light_exposure").eval(), True))
         light_node.attributes.append(Attribute("Intensity", DataType.FLOAT, node.parm("light_intensity").eval(), True))
@@ -180,7 +175,7 @@ for id, node in enumerate(hom_nodes):
                 indices.append(vert.point().number())
         
         # add attributes
-        geometry_node = Node(name="Mesh", type=NodeType.MESH)
+        geometry_node = Node("Mesh")
         geometry_node.attributes.append(Attribute("Indices", DataType.UINT, indices))
         geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, normals))
         geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, positions))
@@ -191,7 +186,7 @@ for id, node in enumerate(hom_nodes):
         normal.destroy()
         divide.destroy()
 
-        renderer_node = Node(name="Renderer", type=NodeType.MESH)
+        renderer_node = Node("Renderer")
         renderer_node.attributes.append(Attribute("DrawType", DataType.BYTE, DrawType.FILL, True))
         renderer_node.attributes.append(Attribute("Enabled", DataType.BYTE, 1, True))
 
@@ -200,7 +195,7 @@ for id, node in enumerate(hom_nodes):
         if node.parm("shop_materialpath").eval():
             material_hom_node = hou.node(node.parm("shop_materialpath").eval())
             if material_hom_node.type().name() == "principledshader::2.0":
-                material_node = Node(name="Material", type=NodeType.MATERIAL)
+                material_node = Node("Material")
                 material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, node.parmTuple("basecolor").eval()))
                 renderer_node.nodes.append(material_node)
 
@@ -263,8 +258,8 @@ def attribute_to_bytes(attr):
 def node_to_bytes(node):
     node_data = bytearray()
     node_data.append(node_begin)
-    node_data.extend(get_uint32_to_bytes(node.id))
-    node_data.append(node.type & 0xff)
+    # node_data.extend(get_uint32_to_bytes(node.id))
+    # node_data.append(node.type & 0xff)
     node_name = node.name[:character_limit]
     node_data.append(len(node_name) & 0xff)
     node_data.extend(bytearray(node_name))

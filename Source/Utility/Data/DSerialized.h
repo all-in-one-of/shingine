@@ -47,14 +47,11 @@ class ISerialized;
     TYPE_NAME NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
-        std::vector<TYPE_NAME> arr = ((CTypedAttribute<TYPE_NAME> *)attr)->Get(); \
-        NAME = arr[0]; \
+        NAME = ((CTypedAttributeValue<TYPE_NAME> *)attr)->Get(); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
-        std::vector<TYPE_NAME> data; \
-        data.push_back(NAME); \
-        attr = new CTypedAttribute<TYPE_NAME>(#NAME, #TYPE_NAME, data); \
+        attr = new CTypedAttributeValue<TYPE_NAME>(#NAME, #TYPE_NAME, NAME); \
     }
 
 #define ATTRIBUTE_VECTOR_INFO(TYPE_NAME,NAME) \

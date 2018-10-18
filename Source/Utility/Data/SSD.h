@@ -32,8 +32,6 @@ namespace SSD
 
     struct SNode
     {
-        unsigned int ID;
-        unsigned char Type;
         unsigned char NameLength;
         char* Name;
         unsigned char AttributeCount;

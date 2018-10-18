@@ -6,7 +6,6 @@
 
 CDataNode::CDataNode(SSD::SNode* node)
 {
-    NodeID = node->ID;
     NodeName = CString(node->Name);
     
     for (unsigned int x = 0; x < node->NodeCount; x++)
@@ -20,7 +19,14 @@ CDataNode::CDataNode(SSD::SNode* node)
     }
 }
 
-CDataNode::~CDataNode() {}
+CDataNode::~CDataNode() 
+{
+    for(unsigned int x = 0; x < Attributes.size(); x++)
+        delete Attributes[x];
+
+    for(unsigned int x = 0; x < Nodes.size(); x++)
+        delete Nodes[x];
+}
 
 ISerialized* CDataNode::Deserialize()
 {
@@ -48,14 +54,13 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
 
     if (typeName == "char")
     {
-        std::vector<CString> data_char;
         char* temp = new char[attribute->ElementCount + 1];
         for (unsigned x = 0; x < attribute->ElementCount; x++)
             temp[x] = attribute->Values[x];
         temp[attribute->ElementCount] = '\0';
-        data_char.push_back(CString(temp));
+        CString tempStr = CString(temp);
         delete[] temp;
-        return new CTypedAttribute<CString>(name, typeName, data_char);
+        return new CTypedAttributeValue<CString>(name, typeName, tempStr);
     }
     
     unsigned char stride;
@@ -75,19 +80,48 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
             value[y] = attribute->Values[x + y];
 
         if (typeName == "int") 
+        {
+            if (attribute->ElementCount == 1)
+                return new CTypedAttributeValue<int>(name, typeName, DataStruct::GetInt32(value));    
             data_int.push_back(DataStruct::GetInt32(value));
+        
+        }
         if (typeName == "unsigned int") 
+        {
+            if (attribute->ElementCount == 1)
+                return new CTypedAttributeValue<unsigned int>(name, typeName, DataStruct::GetUInt32(value));    
             data_uint.push_back(DataStruct::GetUInt32(value));
+        
+        }
         if (typeName == "unsigned short") 
+        {
+            if (attribute->ElementCount == 1)
+                return new CTypedAttributeValue<unsigned short>(name, typeName, DataStruct::GetUShort(value));    
             data_ushort.push_back(DataStruct::GetUShort(value));
+        
+        }
         if (typeName == "short") 
+        {
+            if (attribute->ElementCount == 1)
+                return new CTypedAttributeValue<short>(name, typeName, DataStruct::GetShort(value));    
             data_short.push_back(DataStruct::GetShort(value));
+        
+        }
         if (typeName == "float") 
+        {
+            if (attribute->ElementCount == 1)
+                return new CTypedAttributeValue<float>(name, typeName, DataStruct::GetFloat(value));    
             data_float.push_back(DataStruct::GetFloat(value));
+        
+        }
         if (typeName == "unsigned char") 
+        {
+            if (attribute->ElementCount == 1)
+                return new CTypedAttributeValue<unsigned char>(name, typeName, value[0]);    
+
             data_uchar.push_back(value[0]);
-        // if (typeName == "char") 
-        //     data_char.push_back(value[0]);
+        
+        }
         delete[] value;
     }
 
@@ -103,12 +137,9 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
         return new CTypedAttribute<float>(name, typeName, data_float);
     if (typeName == "unsigned char") 
         return new CTypedAttribute<unsigned char>(name, typeName, data_uchar);
-    // if (typeName == "char") 
-    //     return new CTypedAttribute<char>(name, typeName, data_char);
     return NULL;
 }
 
-unsigned int CDataNode::ID() { return NodeID; }
 CString CDataNode::Name() { return NodeName; }
 std::vector<ISerialized*> CDataNode::GetAttributes() { return Attributes; }
 std::vector<IDataNode*> CDataNode::GetNodes() { return Nodes; }

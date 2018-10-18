@@ -14,12 +14,12 @@ public:
         Data = data;
     };
 
-    virtual ~CTypedAttribute();
-    virtual CString SerializedName();
-    virtual CString TypeName();
+    virtual ~CTypedAttribute() {};
+    virtual CString SerializedName() { return AttributeName; }; 
+    virtual CString TypeName() { return AttributeType; }; 
 
-    std::vector<T> Get();
-    void Set(std::vector<T> &data);
+    std::vector<T> Get() { return Data; }
+    void Set(std::vector<T> &data) { Data = data; }
 
 private:
     std::vector<T> Data;
@@ -28,30 +28,25 @@ private:
 };
 
 template <class T>
-CTypedAttribute<T>::~CTypedAttribute()
+class CTypedAttributeValue : public ISerialized
 {
-}
+public:
+    CTypedAttributeValue(CString name, CString type, T data)
+    {
+        AttributeName = name; 
+        AttributeType = type;
+        Data = data;
+    };
 
-template <class T>
-CString CTypedAttribute<T>::SerializedName()
-{
-    return AttributeName;
-}
+    virtual ~CTypedAttributeValue() {};
+    virtual CString SerializedName() { return AttributeName; }; 
+    virtual CString TypeName() { return AttributeType; }; 
 
-template <class T>
-CString CTypedAttribute<T>::TypeName()
-{
-    return AttributeType;
-}
+    T Get() { return Data; }
+    void Set(T &data) { Data = data; }
 
-template<class T>
-std::vector<T> CTypedAttribute<T>::Get()
-{
-    return Data;
-}
-
-template<class T>
-void CTypedAttribute<T>::Set(std::vector<T> &data)
-{
-    Data = data;
-}
+private:
+    T Data;
+    CString AttributeName;
+    CString AttributeType;
+};

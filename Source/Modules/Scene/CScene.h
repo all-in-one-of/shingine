@@ -20,6 +20,7 @@ public:
 
     virtual void FindObjectsByType(const CString type, std::vector<IObject*> &objects) const;
 
+    void AddCreatedObject(IObject* object);
 private:
     std::map<unsigned int, IObject*> Objects;
     unsigned int NextID = 1;

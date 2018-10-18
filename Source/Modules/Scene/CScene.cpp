@@ -13,6 +13,17 @@ void CScene::SetParent(const unsigned int &id, const unsigned int &parentId)
         currentObject->SetParent(parentObject);
 }
 
+void CScene::AddCreatedObject(IObject* object)
+{
+    std::map<unsigned int, IObject*>::iterator it;
+    for (it = Objects.begin(); it != Objects.end(); it++)
+    {
+        if (it->second == object) return;
+    }
+    NextID = object->ID() > NextID ? object->ID() + 1 : NextID + 1;
+    Objects[object->ID()] = object;
+}
+
 IObject* CScene::AddObject(const CString &objectName)
 {
     CSceneObject* object = new CSceneObject(NextID);

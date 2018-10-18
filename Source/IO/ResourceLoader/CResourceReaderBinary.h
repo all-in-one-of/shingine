@@ -1,13 +1,13 @@
 #pragma once
-#include "ISceneReader.h"
+#include "IResourceReader.h"
 
 namespace SSD { struct SHeader; struct SNode; struct SAttribute; }
 
-class CSceneReaderBinary : public ISceneReader
+class CResourceReaderBinary : public IResourceReader
 {
 public:
-    CSceneReaderBinary(const CString &fileName);
-    virtual ~CSceneReaderBinary();
+    CResourceReaderBinary(const CString &fileName);
+    virtual ~CResourceReaderBinary();
     virtual bool Open();
     virtual void Close();
     virtual void ReadNodes(std::vector<IDataNode*> &nodes);

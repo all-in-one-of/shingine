@@ -3,9 +3,9 @@
 
 int main()
 {
-    ISceneDescription* sceneDescription = CSceneDescription::Load("Assets/Scenes/TestScene.ssd");
-    IScene* Scene = sceneDescription->GenerateScene();
+    IResourceLoader* ResourceLoader = CResourceLoader::Load("Assets/Scenes/TestScene.ssd");
+    IScene* Scene = ResourceLoader->GenerateScene();
 
-    delete sceneDescription;
+    delete ResourceLoader;
     return 0;
 }

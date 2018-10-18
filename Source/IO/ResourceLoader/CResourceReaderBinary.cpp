@@ -1,4 +1,4 @@
-#include "CSceneReaderBinary.h"
+#include "CResourceReaderBinary.h"
 #include "../../Utility/Data/SSD.h"
 #include "../../Utility/Data/Struct.h"
 #include "../../Utility/Data/CDataNode.h"
@@ -13,12 +13,12 @@ namespace SSD
      enum NodeType { LIGHT = 0, TRANSFORM = 1, MATERIAL = 2, MESH = 3 };
 }
 
-CSceneReaderBinary::CSceneReaderBinary(const CString &fileName)
+CResourceReaderBinary::CResourceReaderBinary(const CString &fileName)
 {
     FileName = fileName;
 }
 
-bool CSceneReaderBinary::Open()
+bool CResourceReaderBinary::Open()
 {
     FileStream.open(FileName.GetStdString(), std::ios::binary | std::ios::in);
     bool success = FileStream.is_open();
@@ -30,7 +30,7 @@ bool CSceneReaderBinary::Open()
     return true;
 }
 
-void CSceneReaderBinary::ReadNodes(std::vector<IDataNode*> &nodes)
+void CResourceReaderBinary::ReadNodes(std::vector<IDataNode*> &nodes)
 {
     SSD::SHeader header;
     unsigned short nodeCount;
@@ -45,7 +45,7 @@ void CSceneReaderBinary::ReadNodes(std::vector<IDataNode*> &nodes)
     }
 }
 
-SSD::SNode* CSceneReaderBinary::ReadNode()
+SSD::SNode* CResourceReaderBinary::ReadNode()
 {
     unsigned char garbage;
     ReadByte(garbage);
@@ -80,7 +80,7 @@ SSD::SNode* CSceneReaderBinary::ReadNode()
     return NULL;
 }
 
-SSD::SAttribute* CSceneReaderBinary::ReadAttribute()
+SSD::SAttribute* CResourceReaderBinary::ReadAttribute()
 {
     unsigned char garbage;
     ReadByte(garbage);
@@ -128,14 +128,14 @@ SSD::SAttribute* CSceneReaderBinary::ReadAttribute()
     return NULL;
 }
 
-void CSceneReaderBinary::ReadHeader(SSD::SHeader &header)
+void CResourceReaderBinary::ReadHeader(SSD::SHeader &header)
 {
     if (!FileStream.is_open()) return;
 
     FileStream.read(header.Signature, 3);
     ReadByte(header.Version);
 }
-void CSceneReaderBinary::ReadUInt32(unsigned int &val)
+void CResourceReaderBinary::ReadUInt32(unsigned int &val)
 {
     if (!FileStream.is_open()) return;
     unsigned char* bytes = new unsigned char[4];
@@ -144,7 +144,7 @@ void CSceneReaderBinary::ReadUInt32(unsigned int &val)
     delete bytes;
 }
 
-void CSceneReaderBinary::ReadUShort(unsigned short &val)
+void CResourceReaderBinary::ReadUShort(unsigned short &val)
 {
     if (!FileStream.is_open()) return;
     unsigned char* bytes = new unsigned char[2];
@@ -153,18 +153,18 @@ void CSceneReaderBinary::ReadUShort(unsigned short &val)
     delete bytes;
 }
 
-void CSceneReaderBinary::ReadByte(unsigned char &val)
+void CResourceReaderBinary::ReadByte(unsigned char &val)
 {
     if (!FileStream.is_open()) return;
     FileStream.read((char*)&val, 1);
 }
 
-void CSceneReaderBinary::Close()
+void CResourceReaderBinary::Close()
 {
     if (FileStream.is_open()) FileStream.close();
 }
 
-CSceneReaderBinary::~CSceneReaderBinary()
+CResourceReaderBinary::~CResourceReaderBinary()
 {
     
     Close();

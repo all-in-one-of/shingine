@@ -1,20 +1,20 @@
 #pragma once
 #include <vector>
-#include "ISceneDescription.h"
+#include "IResourceLoader.h"
 
 class ISerialized;
 
-class CSceneDescription : public ISceneDescription
+class CResourceLoader : public IResourceLoader
 {
 public:
-    virtual ~CSceneDescription();
-    static ISceneDescription* Load(const CString &fileName);
+    virtual ~CResourceLoader();
+    static IResourceLoader* Load(const CString &fileName);
     virtual bool IsLoaded();
     virtual CString GetLastError();
     virtual IScene* GenerateScene();
 
 private:
-    CSceneDescription(CString fileName);
+    CResourceLoader(CString fileName);
 
     bool Loaded = false;
     CString LastError = "";

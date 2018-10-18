@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
-#include "CSceneDescription.h"
-#include "CSceneReaderFactory.h"
+#include "CResourceLoader.h"
+#include "CResourceReaderFactory.h"
 #include "../../Modules/Scene/CSceneMaker.h"
 #include "../../Utility/Data/IDataNode.h"
 #include "../../Utility/Data/ISerialized.h"
@@ -10,7 +10,7 @@
 // code which creates IDataNode
 // code which will deserialize data node
 
-IScene * CSceneDescription::GenerateScene()
+IScene * CResourceLoader::GenerateScene()
 {
     if (!IsLoaded()) return NULL;
 
@@ -26,35 +26,31 @@ IScene * CSceneDescription::GenerateScene()
     return CSceneMaker::Create(objects);
 }
 
-CString CSceneDescription::GetLastError() { return LastError; }
+CString CResourceLoader::GetLastError() { return LastError; }
 
-CSceneDescription::~CSceneDescription()
+CResourceLoader::~CResourceLoader()
 {
-    //for (unsigned int x = 0; x < Nodes.size(); x++)
-    //{
-    //    delete Nodes[x];
-    //}
 }
 
-bool CSceneDescription::IsLoaded() { return Loaded; }
+bool CResourceLoader::IsLoaded() { return Loaded; }
 
-ISceneDescription* CSceneDescription::Load(const CString &fileName)
+IResourceLoader* CResourceLoader::Load(const CString &fileName)
 {
-    CSceneDescription* sceneDescription = new CSceneDescription(fileName);
-    if (!sceneDescription->IsLoaded())
-        std::cout << sceneDescription->LastError.GetStdString() << std::endl;
-    return sceneDescription;
+    CResourceLoader* ResourceLoader = new CResourceLoader(fileName);
+    if (!ResourceLoader->IsLoaded())
+        std::cout << ResourceLoader->LastError.GetStdString() << std::endl;
+    return ResourceLoader;
 }
 
-CSceneDescription::CSceneDescription(CString fileName)
+CResourceLoader::CResourceLoader(CString fileName)
 {
     // 3 file types are supported
     // *.ssd - binary version
     // *.ssda - ascii version
     // *.ssd_json - json
 
-    CSceneReaderFactory sceneReaderFactory;
-    ISceneReader* reader = sceneReaderFactory.CreateReader(fileName);
+    CResourceReaderFactory ResourceReaderFactory;
+    IResourceReader* reader = ResourceReaderFactory.CreateReader(fileName);
 
     if (!reader->Open())
     {

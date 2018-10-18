@@ -5,10 +5,10 @@
 
 class IDataNode;
 
-class ISceneReader
+class IResourceReader
 {
 public:
-    virtual ~ISceneReader() {};
+    virtual ~IResourceReader() {};
 
     virtual CString GetLastError() = 0;
     virtual bool Open() = 0;

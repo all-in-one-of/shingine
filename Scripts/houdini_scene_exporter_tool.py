@@ -75,8 +75,6 @@ data_type_name_map = {
 class Node:
     def __init__(self, name="Node", type=NodeType.OBJECT):
         # zero is the scene root
-        # self.id = id + 1
-        # self.parent_id = 0
         self.name = name
         self.attributes = []
         self.nodes = []
@@ -93,6 +91,8 @@ node_name_to_id = {}
 node_id_to_parent_id = {}
 hom_nodes = []
 nodes = []
+meshes = {}
+materials = {}
 
 # get all hom nodes
 for id, node in enumerate(hou.node("/obj").children()):
@@ -176,11 +176,12 @@ for id, node in enumerate(hom_nodes):
         
         # add attributes
         geometry_node = Node("Mesh")
+        geometry_node.attributes.append(Attribute("Name", DataType.CHAR, node.name()))
         geometry_node.attributes.append(Attribute("Indices", DataType.UINT, indices))
         geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, normals))
         geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, positions))
         geometry_node.attributes.append(Attribute("TexCoord", DataType.FLOAT, texcoord))
-        nodes[id].nodes.append(geometry_node)
+        meshes[node.name()] = geometry_node
 
         # delete temp houdini nodes
         normal.destroy()
@@ -189,17 +190,27 @@ for id, node in enumerate(hom_nodes):
         renderer_node = Node("Renderer")
         renderer_node.attributes.append(Attribute("DrawType", DataType.BYTE, DrawType.FILL, True))
         renderer_node.attributes.append(Attribute("Enabled", DataType.BYTE, 1, True))
+        renderer_node.attributes.append(Attribute("MeshName", DataType.CHAR, node.name()))
 
         material_node = None
         # find material
+        material_name = "default"
         if node.parm("shop_materialpath").eval():
             material_hom_node = hou.node(node.parm("shop_materialpath").eval())
             if material_hom_node.type().name() == "principledshader::2.0":
-                material_node = Node("Material")
-                material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, node.parmTuple("basecolor").eval()))
-                renderer_node.nodes.append(material_node)
+                material_name = material_hom_node.name()
+                if material_name not in materials.keys():
+                    material_node = Node("Material")
+                    material_node.attributes.append(Attribute("Name", DataType.CHAR, material_name))
+                    material_node.attributes.append(Attribute("ShaderName", DataType.CHAR, "default"))
+                    material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, node.parmTuple("basecolor").eval()))
+                    materials[material_name] = material_node
+        renderer_node.attributes.append(Attribute("MaterialName", DataType.CHAR, material_name))
 
         nodes[id].nodes.append(renderer_node)
+# add meshes 
+nodes.extend(meshes.values())
+nodes.extend(materials.values())
 
 version = 1
 signature = "SSD"

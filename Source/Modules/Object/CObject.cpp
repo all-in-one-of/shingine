@@ -15,7 +15,8 @@ CObject::~CObject()
 IComponent* CObject::AddComponent(const CString &componentTypeName)
 {
     ISerialized* serializedObject = CSerializedFactory::CreateInstance(componentTypeName.GetStdString());
-    if (!serializedObject) return NULL;
+    if (!serializedObject) 
+        return NULL;
 
     IComponent* component = dynamic_cast<IComponent*>(serializedObject);
         

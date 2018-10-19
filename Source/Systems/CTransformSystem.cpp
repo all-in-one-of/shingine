@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <glm/gtx/matrix_decompose.hpp>
+
 #include "Systems/CTransformSystem.h"
 #include "Modules/Statics/CStatics.h"
 #include "Engine/Components/CTransformComponent.h"
@@ -13,20 +16,47 @@ void CTransformSystem::Initialize()
 
 void CTransformSystem::CalculateTransforms(bool ignoreStatic)
 {
-    // recalculate transform on dynamic objects
     for (std::map<unsigned int, CTransformComponent*>::iterator it = Transforms.begin(); it != Transforms.end(); it++)
     {
+        CalculateTransform(it->second, ignoreStatic);
     }
 }
 
-void CTransformSystem::CalculateTransform(CTransformComponent* transform)
+glm::mat4 CTransformSystem::CalculateTransform(CTransformComponent* transform, bool ignoreStatic)
 {
+    if (ignoreStatic && !transform->IsDynamic) return transform->LocalTransform;
+    glm::mat4 ident(1);
+    glm::mat4 parentTransform = transform->ParentID == 0 
+        ? ident 
+        : CalculateTransform(Transforms.at(transform->ParentID));
 
+    glm::mat4 transformNoScale = glm::translate(ident, 
+        transform->GetLocalPosition()) * glm::toMat4(transform->GetLocalRotation());
+
+    transform->LocalTransform = transformNoScale *
+        glm::scale(ident, transform->GetLocalScale());
+
+    transform->WorldTransform = transform->LocalTransform * parentTransform;
+
+    float maxScaleAxis = *std::max_element(
+            transform->LocalScale.begin(), transform->LocalScale.end());
+
+    transform->WorldTransformUniformScale = transformNoScale *
+        glm::scale(ident, glm::vec3(maxScaleAxis)) * parentTransform;
+
+    glm::vec3 skew;
+    glm::vec4 perspective;
+    
+    glm::decompose(transform->WorldTransform, transform->Scale, transform->Rotation, 
+        transform->Position, skew, perspective);
+
+    transform->Rotation = glm::conjugate(transform->Rotation);
+
+    return transform->LocalTransform;
 }
 
 void CTransformSystem::Update()
 {
-    // recalculate transform on dynamic objects
     CalculateTransforms();
 }
 

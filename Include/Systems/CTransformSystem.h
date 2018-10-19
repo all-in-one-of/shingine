@@ -12,6 +12,6 @@ public:
 private:
     void UpdateComponentMap();
     void CalculateTransforms(bool ignoreStatic=true);
-    void CalculateTransform(CTransformComponent* transform);
+    glm::mat4 CalculateTransform(CTransformComponent* transform, bool ignoreStatic=true);
     std::map<unsigned int, CTransformComponent*> Transforms;
 };

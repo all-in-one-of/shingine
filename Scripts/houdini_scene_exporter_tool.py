@@ -135,9 +135,16 @@ for id, hom_node in enumerate(hom_nodes):
 for id, node in enumerate(hom_nodes):
     # collect the local transform matrix, write to the attribute
     local_transform = node.localTransform()
+    position = local_transform.extractTranslates()
+    quat = hou.Quaternion(local_transform.extractRotationMatrix3())
+    scale = local_transform.extractScales()
+
     transform_node = Node("Transform")
-    transform_node.attributes.append(Attribute("Matrix", DataType.FLOAT, local_transform.asTuple()))
     transform_node.attributes.append(Attribute("ParentID", DataType.UID, node_id_to_parent_id[id], True))
+    transform_node.attributes.append(Attribute("IsDynamic", DataType.BYTE, 0, True))
+    transform_node.attributes.append(Attribute("LocalPosition", DataType.FLOAT, position))
+    transform_node.attributes.append(Attribute("LocalRotation", DataType.FLOAT, quat))
+    transform_node.attributes.append(Attribute("LocalScale", DataType.FLOAT, scale))
     nodes[id].nodes.append(transform_node)
     # find lights
     if node.type().name() == "hlight::2.0":

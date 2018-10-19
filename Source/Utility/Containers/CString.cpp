@@ -1,7 +1,8 @@
-#include "CString.h"
 #include <sstream>
 #include <iostream>
 #include <string.h>
+
+#include "Utility/Containers/CString.h"
 
 CString::CString() 
 {

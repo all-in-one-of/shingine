@@ -1,4 +1,4 @@
-#include "CStatics.h"
+#include "Modules/Statics/CStatics.h"
 
 CStatics* CStatics::Instance = NULL;
 CSceneManager* CSceneManager::Instance = NULL;

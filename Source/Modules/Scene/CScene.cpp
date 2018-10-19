@@ -1,5 +1,4 @@
-#include "CScene.h"
-#include "../Object/CSceneObject.h"
+#include "Modules/Scene/CScene.h"
 
 CScene::CScene()
 {
@@ -7,10 +6,32 @@ CScene::CScene()
 
 void CScene::SetParent(const unsigned int &id, const unsigned int &parentId)
 {
-    CSceneObject* currentObject = (CSceneObject*) GetObject(id);
-    CSceneObject* parentObject = (CSceneObject*) GetObject(parentId);
-    if (currentObject)
-        currentObject->SetParent(parentObject);
+    // CSceneObject* currentObject = (CSceneObject*) GetObject(id);
+    // CSceneObject* parentObject = (CSceneObject*) GetObject(parentId);
+    // if (currentObject)
+    //     currentObject->SetParent(parentObject);
+}
+
+void CScene::GetComponents(const CString &type, std::map<unsigned int, IComponent*> &componentMap) const
+{
+    std::map<unsigned int, IObject*>::const_iterator it;
+    for (it = Objects.begin(); it != Objects.end(); it++)
+    {
+        IComponent* component = it->second->GetComponent(type);
+        if (component)
+            componentMap[it->first] = component;
+    }
+}
+
+void CScene::GetComponents(const CString &type, std::vector<IComponent*> &components) const
+{
+    std::map<unsigned int, IObject*>::const_iterator it;
+    for (it = Objects.begin(); it != Objects.end(); it++)
+    {
+        IComponent* component = it->second->GetComponent(type);
+        if (component)
+            components.push_back(component);
+    }
 }
 
 void CScene::AddCreatedObject(IObject* object)
@@ -50,13 +71,14 @@ IObject* CScene::CloneObject(const IObject* object)
 unsigned int CScene::GetObjectIdByName(const CString &name, bool &didFind) const
 {
     didFind = false;
-    for (auto it = Objects.begin(); it != Objects.end(); it++)
+    std::map<unsigned int, IObject*>::const_iterator it;
+    for (it = Objects.begin(); it != Objects.end(); it++)
     {
-        if ( ((CSceneObject*)it->second)->Name() == name )
-        {
-            didFind = true;
-            return it->second->ID();
-        }
+        // if ( ((CSceneObject*)it->second)->Name() == name )
+        // {
+        //     didFind = true;
+        //     return it->second->ID();
+        // }
     }
     return 0;
 }
@@ -67,7 +89,8 @@ void CScene::DeleteObject(const unsigned int &id)
 
 void CScene::FindObjectsByType(const CString type, std::vector<IObject*> &objects) const
 {
-    for (auto it = Objects.begin(); it != Objects.end(); it++)
+    std::map<unsigned int, IObject*>::const_iterator it;
+    for (it = Objects.begin(); it != Objects.end(); it++)
     {
         if (type == "_")
             objects.push_back(it->second);

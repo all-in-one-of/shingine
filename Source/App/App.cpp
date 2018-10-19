@@ -1,5 +1,5 @@
-#include "../Core.h"
-#include "../Modules/Statics/CStatics.h"
+#include "Core.h"
+#include "Modules/Statics/CStatics.h"
 #include <iostream>
 
 int main()

@@ -77,10 +77,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SourcePath)External/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SourcePath)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SourcePath)External/lib/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SourcePath)External/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SourcePath)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SourcePath)External/lib/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

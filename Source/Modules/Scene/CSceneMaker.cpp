@@ -1,8 +1,8 @@
 #include <vector>
 #include <map>
 
-#include "CSceneMaker.h"
-#include "CScene.h"
+#include "Modules/Scene/CSceneMaker.h"
+#include "Modules/Scene/CScene.h"
 
 IScene* CSceneMaker::Create(const std::vector<IObject*> &objects)
 {

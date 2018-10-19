@@ -1,7 +1,7 @@
-#include "../../Modules/Statics/CStatics.h"
-#include "IDataNode.h"
-#include "CTypedAttribute.h"
-#include "CUniqueIdSetter.h"
+#include "Modules/Statics/CStatics.h"
+#include "Utility/Data/IDataNode.h"
+#include "Utility/Data/CTypedAttribute.h"
+#include "Utility/Data/CUniqueIdSetter.h"
 
 void CUniqueIdSetter::SetIds(const std::vector<IDataNode*> &newNodes)
 {

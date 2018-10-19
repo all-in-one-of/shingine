@@ -1,8 +1,8 @@
-#include "CDataNode.h"
-#include "SSD.h"
-#include "Struct.h"
-#include "CTypedAttribute.h"
-#include "CSerializedFactory.h"
+#include "Utility/Data/CDataNode.h"
+#include "Utility/Data/SSD.h"
+#include "Utility/Data/Struct.h"
+#include "Utility/Data/CTypedAttribute.h"
+#include "Utility/Data/CSerializedFactory.h"
 
 CDataNode::CDataNode(SSD::SNode* node)
 {

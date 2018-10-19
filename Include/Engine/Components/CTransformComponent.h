@@ -22,12 +22,20 @@ public:
     ATTRIBUTE_VECTOR_INFO(float, LocalScale)
     ATTRIBUTE_VECTOR_INFO(float, LocalRotation)
 
-    // cached values
-    Matrix4x4 LocalTransform;
-    Matrix4x4 WorldTransform;
-    Matrix4x4 WorldTransformUniformScale;
+    glm::vec3 GetLocalPosition();
+    glm::quat GetLocalRotation();
+    glm::vec3 GetLocalScale();
 
-    Vector3 Position;
-    Quaternion Rotation;
-    Vector3 Scale;
+    void SetLocalPosition(glm::vec3 &val);
+    void SetLocalRotation(glm::quat &val);
+    void SetLocalScale(glm::vec3 &val);
+
+    // cached values
+    glm::mat4 LocalTransform;
+    glm::mat4 WorldTransform;
+    glm::mat4 WorldTransformUniformScale;
+
+    glm::vec3 Position;
+    glm::quat Rotation;
+    glm::vec3 Scale;
 };

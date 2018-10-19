@@ -146,9 +146,6 @@ std::vector<CString> CString::Split(char delimeter) const
     std::vector<CString> e;
     std::string part;
     while (std::getline(stringStream, part, delimeter))
-    {
-        auto cpart = CString(part);
-        e.push_back(cpart);
-    }
+        e.push_back(CString(part));
     return e;
 }

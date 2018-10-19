@@ -1,15 +1,10 @@
 #include "CObject.h"
 #include <iostream>
 REGISTER_SERIALIZED_NAME(CObject,Object)
-unsigned int CObject::ID() { return Id; }
 
-CObject::CObject(unsigned int id) : CObject()
+unsigned int CObject::ID()
 {
-    this->Id = id;
-}
-
-CObject::~CObject()
-{
+    return UniqueID();
 }
 
 IComponent* CObject::AddComponent(const CString &componentTypeName)
@@ -49,8 +44,8 @@ void CObject::DestroyComponent(const CString &componentTypeName)
 // ISerializedClass
 void CObject::SetAttribute(ISerialized* &attr)
 {
-    if (attr->SerializedName() == "Id")
-        Id = ((CTypedAttributeValue<unsigned int> *)attr)->Get();
+    // if (attr->SerializedName() == "Id")
+    //     Id = ((CTypedAttributeValue<unsigned int> *)attr)->Get();
 
     IComponent* component = dynamic_cast<IComponent*>(attr);
     if (!component) 
@@ -62,8 +57,8 @@ void CObject::SetAttribute(ISerialized* &attr)
 
 void CObject::GetAttribute(ISerialized* &attr)
 {
-    if (attr->SerializedName() == "Id")
-        attr = new CTypedAttributeValue<unsigned int>("Id", "unsigned int", Id);
+    // if (attr->SerializedName() == "Id")
+    //     attr = new CTypedAttributeValue<unsigned int>("Id", "unsigned int", Id);
 
     if (Components.find(attr->SerializedName()) != Components.end())
         attr = dynamic_cast<ISerialized*>(Components.at(attr->SerializedName()));
@@ -71,8 +66,8 @@ void CObject::GetAttribute(ISerialized* &attr)
 
 void CObject::GetAllAttributes(std::vector<ISerialized*> &attributes)
 {
-    attributes.push_back(
-        new CTypedAttributeValue<unsigned int>("Id", "unsigned int", Id));
+    // attributes.push_back(
+    //     new CTypedAttributeValue<unsigned int>("Id", "unsigned int", Id));
 
     std::map<CString,IComponent*>::iterator it;
     for (it = Components.begin(); it != Components.end(); it++)

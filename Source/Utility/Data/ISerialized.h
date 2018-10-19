@@ -14,6 +14,8 @@ class ISerializedClass : public ISerialized
 {
 public:
     virtual ~ISerializedClass() {};
+    virtual unsigned int UniqueID() = 0;
+    virtual void SetUniqueID(unsigned int newId) = 0;
     virtual CString TypeName() { return "SerializedClass"; };
     virtual void SetAttribute(ISerialized* &attr) = 0;
     virtual void GetAttribute(ISerialized* &attr) = 0;

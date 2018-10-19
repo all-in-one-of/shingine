@@ -9,14 +9,14 @@ public:
     {
         ATTRIBUTE_REGISTER(CRendererComponent, Enabled)
         ATTRIBUTE_REGISTER(CRendererComponent, DrawType)
-        ATTRIBUTE_REGISTER(CRendererComponent, MaterialName)
-        ATTRIBUTE_REGISTER(CRendererComponent, MeshName)
+        ATTRIBUTE_REGISTER(CRendererComponent, MaterialReference)
+        ATTRIBUTE_REGISTER(CRendererComponent, MeshReference)
     }
     virtual ~CRendererComponent() {};
     REGISTER_SERIALIZED_TYPE(CRendererComponent)
 private:
     ATTRIBUTE_VALUE_INFO(unsigned char, Enabled)
     ATTRIBUTE_VALUE_INFO(unsigned char, DrawType)
-    ATTRIBUTE_VALUE_INFO(CString, MaterialName)
-    ATTRIBUTE_VALUE_INFO(CString, MeshName)
+    ATTRIBUTE_ID_REFERENCE(MaterialReference)
+    ATTRIBUTE_ID_REFERENCE(MeshReference)
 };

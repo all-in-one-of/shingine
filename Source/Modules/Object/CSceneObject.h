@@ -6,7 +6,7 @@ class CSceneObject : public CObject
 {
 public:
     virtual ~CSceneObject();
-    CSceneObject(unsigned int id);
+    CSceneObject();
     CString Name();
     CSceneObject* Parent();
     void SetParent(CSceneObject* object);

@@ -55,6 +55,7 @@ SSD::SNode* CResourceReaderBinary::ReadNode()
         return NULL;
     }
     SSD::SNode* node = new SSD::SNode();
+    ReadUInt32(node->UniqueID);
     ReadByte(node->NameLength);
     node->Name = new char[node->NameLength + 1];
     FileStream.read(node->Name, node->NameLength);
@@ -105,6 +106,7 @@ SSD::SAttribute* CResourceReaderBinary::ReadAttribute()
     ReadUInt32(attr->ElementCount);
 
     CString dataTypeName = CString(attr->DataType);
+    if(dataTypeName == "uid") dataTypeName = "unsigned int";
     // TODO get stride
     unsigned char stride;   // = dataTypeName == "unsigned char" || dataTypeName == "char" ? 1 : 4;
     DataStruct::GetStride(dataTypeName, stride);

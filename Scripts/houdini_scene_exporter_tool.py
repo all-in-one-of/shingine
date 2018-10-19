@@ -10,6 +10,7 @@ HEADER
 NODE
 {
     node_begin U8
+    unique_id U32
     name_length U8
     name U8[name_length]
     attribute_count U8
@@ -49,6 +50,7 @@ class DataType(IntEnum):
     INT16 = 5
     UINT16 = 6
     CHAR = 7
+    UID = 8
 
 class LightType(IntEnum):
     POINT = 0
@@ -69,16 +71,22 @@ data_type_name_map = {
     DataType.UINT : "unsigned int",
     DataType.UINT16 : "unsigned short",
     DataType.FLOAT : "float",
-    DataType.CHAR : "char"
+    DataType.CHAR : "char",
+    DataType.UID : "uid"
 }
+
+NextID = 50
 
 class Node:
     def __init__(self, name="Node", type=NodeType.OBJECT):
         # zero is the scene root
+        global NextID
         self.name = name
+        self.unique_id = NextID
         self.attributes = []
         self.nodes = []
         self.type = type
+        NextID += 1
 
 class Attribute:
     def __init__(self, name, data_type, value, single_element=False):
@@ -87,8 +95,9 @@ class Attribute:
         self.single_element = single_element
         self.value = value
 
-node_name_to_id = {}
+#node_name_to_id = {}
 node_id_to_parent_id = {}
+node_name_to_ssd_node = {}
 hom_nodes = []
 nodes = []
 meshes = {}
@@ -98,7 +107,7 @@ materials = {}
 for id, node in enumerate(hou.node("/obj").children()):
     if node.type().name() not in ["light", "null", "geo"]:
         continue
-    node_name_to_id[node.name()] = id + 1
+    #node_name_to_id[node.name()] = id + 1
     new_node = Node("Object", type=NodeType.OBJECT)
     new_node.attributes.append(Attribute("Id", DataType.UINT, id + 1, True))
     # add object metadata
@@ -108,6 +117,7 @@ for id, node in enumerate(hou.node("/obj").children()):
     metadata_node.attributes.append(Attribute("Layer", DataType.CHAR, "default"))
     new_node.nodes.append(metadata_node)
     nodes.append(new_node)
+    node_name_to_ssd_node[node.name()] = new_node
 
     hom_nodes.append(node)
 
@@ -116,9 +126,9 @@ for id, hom_node in enumerate(hom_nodes):
     parent_id = 0
     if hom_node.inputs():
         input_node = hom_node.inputs()[0]
-        if input_node.name() not in node_name_to_id.keys():
+        if input_node.name() not in node_name_to_ssd_node.keys():
             continue
-        parent_id = node_name_to_id[input_node.name()]
+        parent_id = node_name_to_ssd_node[input_node.name()].unique_id
     node_id_to_parent_id[id] = parent_id
 
 # read node attributes
@@ -127,7 +137,7 @@ for id, node in enumerate(hom_nodes):
     local_transform = node.localTransform()
     transform_node = Node("Transform")
     transform_node.attributes.append(Attribute("Matrix", DataType.FLOAT, local_transform.asTuple()))
-    transform_node.attributes.append(Attribute("ParentID", DataType.UINT, node_id_to_parent_id[id], True))
+    transform_node.attributes.append(Attribute("ParentID", DataType.UID, node_id_to_parent_id[id], True))
     nodes[id].nodes.append(transform_node)
     # find lights
     if node.type().name() == "hlight::2.0":
@@ -190,11 +200,11 @@ for id, node in enumerate(hom_nodes):
         renderer_node = Node("Renderer")
         renderer_node.attributes.append(Attribute("DrawType", DataType.BYTE, DrawType.FILL, True))
         renderer_node.attributes.append(Attribute("Enabled", DataType.BYTE, 1, True))
-        renderer_node.attributes.append(Attribute("MeshName", DataType.CHAR, node.name()))
+        renderer_node.attributes.append(Attribute("MeshReference", DataType.UID, geometry_node.unique_id, True))
 
         material_node = None
         # find material
-        material_name = "default"
+        material_id = 0
         if node.parm("shop_materialpath").eval():
             material_hom_node = hou.node(node.parm("shop_materialpath").eval())
             if material_hom_node.type().name() == "principledshader::2.0":
@@ -205,7 +215,8 @@ for id, node in enumerate(hom_nodes):
                     material_node.attributes.append(Attribute("ShaderName", DataType.CHAR, "default"))
                     material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, node.parmTuple("basecolor").eval()))
                     materials[material_name] = material_node
-        renderer_node.attributes.append(Attribute("MaterialName", DataType.CHAR, material_name))
+                    material_id = material_node.unique_id
+        renderer_node.attributes.append(Attribute("MaterialReference", DataType.UID, material_id, True))
 
         nodes[id].nodes.append(renderer_node)
 # add meshes 
@@ -256,7 +267,7 @@ def attribute_to_bytes(attr):
     for x in range(len(values)):
         if (attr.data_type == DataType.FLOAT):
             attr_data.extend(bytearray(struct.pack("f", values[x])))
-        if (attr.data_type == DataType.UINT):
+        if (attr.data_type == DataType.UINT or attr.data_type == DataType.UID):
             attr_data.extend(get_uint32_to_bytes(values[x]))
         if (attr.data_type == DataType.BYTE):
             attr_data.append(values[x] & 0xff)
@@ -269,7 +280,7 @@ def attribute_to_bytes(attr):
 def node_to_bytes(node):
     node_data = bytearray()
     node_data.append(node_begin)
-    # node_data.extend(get_uint32_to_bytes(node.id))
+    node_data.extend(get_uint32_to_bytes(node.unique_id))
     # node_data.append(node.type & 0xff)
     node_name = node.name[:character_limit]
     node_data.append(len(node_name) & 0xff)

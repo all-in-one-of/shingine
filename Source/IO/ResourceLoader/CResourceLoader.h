@@ -1,23 +1,14 @@
 #pragma once
 #include <vector>
-#include "IResourceLoader.h"
-
+class CString;
 class ISerialized;
 
-class CResourceLoader : public IResourceLoader
+class CResourceLoader
 {
 public:
-    virtual ~CResourceLoader();
-    static IResourceLoader* Load(const CString &fileName);
-    virtual bool IsLoaded();
-    virtual CString GetLastError();
-    virtual IScene* GenerateScene();
-
+    static bool Load(const CString &fileName);
+    static CString GetLastError();
 private:
-    CResourceLoader(CString fileName);
-
-    bool Loaded = false;
-    CString LastError = "";
-
-    class std::vector<ISerialized*> Nodes;
+    CResourceLoader() {};
+    static CString LastError;
 };

@@ -12,6 +12,8 @@ public:
     virtual std::vector<ISerialized*> GetAttributes();
     virtual std::vector<IDataNode*> GetNodes();
     virtual ISerialized* Deserialize();
+    virtual unsigned int GetUniqueID();
+    virtual void SetUniqueID(const unsigned int &newID);
 
     static void GetStride(const CString &typeName, unsigned char &stride);
 private:
@@ -20,4 +22,6 @@ private:
     CString NodeName;
     std::vector<ISerialized*> Attributes;
     std::vector<IDataNode*> Nodes;
+
+    unsigned int UniqueID;
 };

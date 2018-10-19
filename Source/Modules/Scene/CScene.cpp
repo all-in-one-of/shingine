@@ -26,11 +26,12 @@ void CScene::AddCreatedObject(IObject* object)
 
 IObject* CScene::AddObject(const CString &objectName)
 {
-    CSceneObject* object = new CSceneObject(NextID);
-    object->SetName(objectName);
-    Objects[NextID] = object;
-    NextID++;
-    return object;
+    //CObject* object = new CObject();
+    //object->SetName(objectName);
+    //Objects[NextID] = object;
+    //NextID++;
+    //return object;
+    return NULL;
 }
 
 IObject* CScene::GetObject(const unsigned int &id) const

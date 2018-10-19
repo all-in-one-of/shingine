@@ -50,3 +50,29 @@ private:
     CString AttributeName;
     CString AttributeType;
 };
+
+class CAttributeUniqueId : public ISerialized
+{
+public:
+    CAttributeUniqueId(CString name, unsigned int data)
+    {
+        AttributeName = name; 
+        Data = data;
+    };
+
+    virtual CString TypeName() 
+    {
+        return "uid"; 
+    }; 
+
+    virtual ~CAttributeUniqueId() {};
+    virtual CString SerializedName()
+    {
+        return AttributeName;
+    };
+    unsigned int Get() { return Data; }
+    void Set(unsigned int &data) { Data = data; }
+private:
+    unsigned int Data;
+    CString AttributeName;
+};

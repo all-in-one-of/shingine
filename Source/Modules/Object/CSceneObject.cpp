@@ -1,6 +1,6 @@
 #include "CSceneObject.h"
 
-CSceneObject::CSceneObject(unsigned int id) : CObject(id)
+CSceneObject::CSceneObject()
 {
 }
 

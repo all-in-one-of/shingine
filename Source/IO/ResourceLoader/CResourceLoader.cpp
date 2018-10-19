@@ -2,47 +2,21 @@
 #include <iostream>
 #include "CResourceLoader.h"
 #include "CResourceReaderFactory.h"
-#include "../../Modules/Scene/CSceneMaker.h"
+
 #include "../../Utility/Data/IDataNode.h"
 #include "../../Utility/Data/ISerialized.h"
+#include "../../Utility/Data/CUniqueIdSetter.h"
+
 #include "../../Modules/Object/IObject.h"
+#include "../../Modules/Scene/CSceneMaker.h"
 
-// code which creates IDataNode
-// code which will deserialize data node
+#include "../../Modules/Statics/CStatics.h"
 
-IScene * CResourceLoader::GenerateScene()
-{
-    if (!IsLoaded()) return NULL;
-
-    std::vector<IObject*> objects;
-    for (unsigned int x = 0; x < Nodes.size(); x++)
-        if(Nodes[x]->SerializedName() == "Object")
-        {
-            objects.push_back(
-                dynamic_cast<IObject*>(Nodes[x]));
-
-        }
-
-    return CSceneMaker::Create(objects);
-}
+CString CResourceLoader::LastError = "";
 
 CString CResourceLoader::GetLastError() { return LastError; }
 
-CResourceLoader::~CResourceLoader()
-{
-}
-
-bool CResourceLoader::IsLoaded() { return Loaded; }
-
-IResourceLoader* CResourceLoader::Load(const CString &fileName)
-{
-    CResourceLoader* ResourceLoader = new CResourceLoader(fileName);
-    if (!ResourceLoader->IsLoaded())
-        std::cout << ResourceLoader->LastError.GetStdString() << std::endl;
-    return ResourceLoader;
-}
-
-CResourceLoader::CResourceLoader(CString fileName)
+bool CResourceLoader::Load(const CString &fileName)
 {
     // 3 file types are supported
     // *.ssd - binary version
@@ -56,21 +30,52 @@ CResourceLoader::CResourceLoader(CString fileName)
     {
         LastError = "Couldn't open file : " + fileName;
         delete reader;
-        Loaded = false;
-        return;
+        return false;
     }
+
+    std::vector<ISerialized*> deserializedNodes;
     std::vector<IDataNode*> nodes;
     reader->ReadNodes(nodes);
+
+    // traverse through each node, create unique ids
+    CUniqueIdSetter::SetIds(nodes);
 
     for (unsigned int x = 0; x < nodes.size(); x++)
     {
         ISerialized* deserializedDataNode = nodes[x]->Deserialize();
         if (deserializedDataNode)
-            Nodes.push_back(deserializedDataNode);
+            deserializedNodes.push_back(deserializedDataNode);
         delete nodes[x];
     }
-
     reader->Close();
     delete reader;
-    Loaded = true;
+
+    // Scene assets creation
+    std::vector<IObject*> sceneObjects;
+    std::vector<ISerialized*> assets;
+    for (unsigned int x = 0; x < deserializedNodes.size(); x++)
+    {
+        if(deserializedNodes[x]->SerializedName() == "Object")
+            sceneObjects.push_back(
+                dynamic_cast<IObject*>(deserializedNodes[x]));
+        else
+            assets.push_back(deserializedNodes[x]);
+    }
+
+    if (sceneObjects.size() > 0)
+        CStatics::SceneManager()->AddScene(fileName, CSceneMaker::Create(sceneObjects));
+
+    for (unsigned int x = 0; x < assets.size(); x++)
+    {
+        ISerializedClass* assetSerializedClass = dynamic_cast<ISerializedClass*>(assets[x]);
+        if (!assetSerializedClass)
+        {
+            std::cout << "Object isn't recognized as an asset. Attempting to delete it" << std::endl;
+            delete assetSerializedClass;
+            continue;
+        }
+        CStatics::AssetManager()->AddAsset(assetSerializedClass);
+    }
+    
+    return true;
 }

@@ -34,6 +34,7 @@ namespace SSD
     {
         unsigned char NameLength;
         char* Name;
+        unsigned int UniqueID;
         unsigned char AttributeCount;
         unsigned char NodeCount;
         SAttribute** Attributes;

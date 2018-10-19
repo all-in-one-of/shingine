@@ -42,7 +42,22 @@ public:
 #define REGISTER_SERIALIZED_TYPE(TYPENAME) \
     virtual CString SerializedName(); \
     static const CString SerializedNameVar; \
-    static CSerializedRegistry<TYPENAME> reg;
+    static CSerializedRegistry<TYPENAME> reg; \
+    \
+    unsigned int SerializedUniqueID; \
+    bool SerializedIDSet = false; \
+    virtual unsigned int UniqueID() { return SerializedUniqueID; } \
+    virtual void SetUniqueID(unsigned int newId) \
+    { \
+        if (!SerializedIDSet) \
+        { \
+            SerializedUniqueID = newId; \
+            SerializedIDSet = true; \
+        } \
+        else \
+            throw 1; \
+    }
+    
 
 #define REGISTER_SERIALIZED_NAME(TYPENAME,NAME) \
     const CString TYPENAME::SerializedNameVar = #NAME; \

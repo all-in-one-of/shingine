@@ -7,7 +7,7 @@
 CDataNode::CDataNode(SSD::SNode* node)
 {
     NodeName = CString(node->Name);
-    
+    UniqueID = node->UniqueID;
     for (unsigned int x = 0; x < node->NodeCount; x++)
         Nodes.push_back(new CDataNode(node->Nodes[x]));
 
@@ -17,6 +17,16 @@ CDataNode::CDataNode(SSD::SNode* node)
         CString typeName = CString(attribute->DataType);
         Attributes.push_back(MakeTypedAttribute(attribute));
     }
+}
+
+unsigned int CDataNode::GetUniqueID()
+{
+    return UniqueID;
+}
+
+void CDataNode::SetUniqueID(const unsigned int &newID)
+{
+    UniqueID = newID;
 }
 
 CDataNode::~CDataNode() 
@@ -32,6 +42,9 @@ ISerialized* CDataNode::Deserialize()
 {
     ISerializedClass* serializedClass = dynamic_cast<ISerializedClass*>(
         CSerializedFactory::CreateInstance(Name().GetStdString()));
+
+    serializedClass->SetUniqueID(UniqueID);
+
     if (serializedClass == NULL) return serializedClass;
 
     for (unsigned char x = 0; x < Attributes.size(); x++)
@@ -85,6 +98,11 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
                 return new CTypedAttributeValue<int>(name, typeName, DataStruct::GetInt32(value));    
             data_int.push_back(DataStruct::GetInt32(value));
         
+        }
+        if (typeName == "uid")
+        {
+            unsigned int val = DataStruct::GetUInt32(value);
+            return new CAttributeUniqueId(name, val);
         }
         if (typeName == "unsigned int") 
         {

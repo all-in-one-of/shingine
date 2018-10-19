@@ -43,6 +43,17 @@ class ISerialized;
         attr = NAME; \
     }
 
+#define ATTRIBUTE_ID_REFERENCE(NAME) \
+    unsigned int NAME; \
+    void Attrib_Set_##NAME(ISerialized* &attr) \
+    { \
+        NAME = ((CAttributeUniqueId *)attr)->Get(); \
+    } \
+    void Attrib_Get_##NAME(ISerialized* &attr) \
+    { \
+        attr = new CAttributeUniqueId(#NAME, NAME); \
+    }
+
 #define ATTRIBUTE_VALUE_INFO(TYPE_NAME,NAME) \
     TYPE_NAME NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \

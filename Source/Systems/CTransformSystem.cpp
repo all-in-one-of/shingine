@@ -1,9 +1,9 @@
-#include <algorithm>
-#include <glm/gtx/matrix_decompose.hpp>
-
 #include "Systems/CTransformSystem.h"
 #include "Modules/Statics/CStatics.h"
 #include "Engine/Components/CTransformComponent.h"
+
+#include <algorithm>
+#include <glm/gtx/matrix_decompose.hpp>
 
 void CTransformSystem::Initialize()
 {

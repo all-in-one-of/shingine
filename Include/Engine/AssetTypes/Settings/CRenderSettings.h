@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../Utility/Data/Serialization.h"
+#include "Utility/Data/Serialization.h"
 
 class CRenderSettings : public ISerializedClass
 {

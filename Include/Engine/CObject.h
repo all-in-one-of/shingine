@@ -2,7 +2,7 @@
 
 #include <map>
 #include "IObject.h"
-#include "../Utility/Data/Serialization.h"
+#include "Utility/Data/Serialization.h"
 
 class CObject : public IObject, public ISerializedClass
 {
@@ -15,8 +15,8 @@ public:
     virtual IComponent* GetComponent(const CString &componentTypeName) const;
 
     REGISTER_SERIALIZED_TYPE(CObject)
+
     // ISerializedClass
-    
     virtual void SetAttribute(ISerialized* &attr);
     virtual void GetAttribute(ISerialized* &attr);
     virtual void GetAllAttributes(std::vector<ISerialized*> &attributes);

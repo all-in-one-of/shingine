@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include "ISystem.h"
+#include "Core.h"
 
 class CTransformComponent;
 class CTransformSystem : public ISystem

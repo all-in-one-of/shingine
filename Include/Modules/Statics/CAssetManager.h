@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "../../Utility/Data/ISerialized.h"
+#include "Utility/Data/ISerialized.h"
 class CAssetManager
 {
 public:

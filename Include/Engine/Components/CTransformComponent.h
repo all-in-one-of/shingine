@@ -1,6 +1,6 @@
 #pragma once
 #include "ComponentSetup.h"
-#include "../../Core.h"
+#include "Core.h"
 
 class CTransformComponent : public CComponent, public ISerializedClass
 {

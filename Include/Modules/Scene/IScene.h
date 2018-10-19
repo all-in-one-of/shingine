@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../../Engine/IObject.h"
+#include "Engine/IObject.h"
 #include "Common.h"
 
 class IScene // : public IObject

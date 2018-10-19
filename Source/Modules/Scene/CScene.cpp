@@ -57,7 +57,7 @@ IObject* CScene::AddObject(const CString &objectName)
 
 IObject* CScene::GetObject(const unsigned int &id) const
 {
-    auto it = Objects.find(id);
+    std::map<unsigned int, IObject*>::const_iterator it = Objects.find(id);
     if (it == Objects.end()) 
         return NULL;
     return it->second;

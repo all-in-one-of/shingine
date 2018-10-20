@@ -13,7 +13,7 @@ public:
     }
     virtual ~CObjectMetadataComponent() {};
 private:
-    ATTRIBUTE_VALUE_INFO(CString, Name)
-    ATTRIBUTE_VALUE_INFO(CString, Tag)
-    ATTRIBUTE_VALUE_INFO(CString, Layer)
+    ATTRIBUTE_VALUE(CString, Name)
+    ATTRIBUTE_VALUE(CString, Tag)
+    ATTRIBUTE_VALUE(CString, Layer)
 };

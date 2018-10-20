@@ -58,18 +58,7 @@ class ISerialized;
     }; \
     REGISTER_SERIALIZED_TYPE(CLASSNAME)
 
-#define ATTRIBUTE_CLASS_INFO(CLASSNAME,NAME) \
-    CLASSNAME* NAME; \
-    void Attrib_Set_##NAME(ISerialized* &attr) \
-    { \
-        NAME = dynamic_cast<CLASSNAME*>(attr); \
-    } \
-    void Attrib_Get_##NAME(ISerialized* &attr) \
-    { \
-        attr = NAME; \
-    }
-
-#define ATTRIBUTE_ID_REFERENCE(NAME) \
+#define ATTRIBUTE_ID(NAME) \
     unsigned int NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
@@ -80,7 +69,7 @@ class ISerialized;
         attr = new CAttributeUniqueId(#NAME, NAME); \
     }
 
-#define ATTRIBUTE_VALUE_INFO(TYPE_NAME,NAME) \
+#define ATTRIBUTE_VALUE(TYPE_NAME,NAME) \
     TYPE_NAME NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
@@ -91,7 +80,7 @@ class ISerialized;
         attr = new CTypedAttributeValue<TYPE_NAME>(#NAME, #TYPE_NAME, NAME); \
     }
 
-#define ATTRIBUTE_VECTOR_INFO(TYPE_NAME,NAME) \
+#define ATTRIBUTE_VECTOR(TYPE_NAME,NAME) \
     std::vector<TYPE_NAME> NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
@@ -104,7 +93,49 @@ class ISerialized;
         attr = new CTypedAttribute<TYPE_NAME>(#NAME, #TYPE_NAME, NAME); \
     } 
 
+#define ATTRIBUTE_CLASS(CLASSNAME,NAME) \
+    CLASSNAME* NAME; \
+    void Attrib_Set_##NAME(ISerialized* &attr) \
+    { \
+        NAME = dynamic_cast<CLASSNAME*>(attr); \
+    } \
+    void Attrib_Get_##NAME(ISerialized* &attr) \
+    { \
+        attr = NAME; \
+    }
+
+#define ATTRIBUTE_CLASS_VECTOR(CLASSNAME,NAME) \
+    std::vector<CLASSNAME*> NAME; \
+    void Attrib_Set_##NAME(ISerialized* &attr) \
+    { \
+        CAttributeClassVector* typedAttr = dynamic_cast<CAttributeClassVector*>(attr); \
+        if (typedAttr == NULL) \
+            return; \
+        std::vector<ISerialized*> data = typedAttr->Get(); \
+        NAME.clear(); \
+        for (size_t x = 0; x < data.size(); x++) \
+        { \
+            CLASSNAME* myObj = dynamic_cast<CLASSNAME*>(data[x]); \
+            if (!myObj) \
+                continue; \
+            NAME.push_back(myObj); \
+        } \
+    } \
+    void Attrib_Get_##NAME(ISerialized* &attr) \
+    { \
+        std::vector<ISerialized*> data; \
+        for (size_t x = 0; x < NAME.size(); x++) \
+        { \
+            ISerialized* myObj = dynamic_cast<ISerialized*>(NAME[x]); \
+            data.push_back(myObj); \
+        } \
+        attr = new CAttributeClassVector(#NAME, data); \
+    } 
+
 #define ATTRIBUTE_REGISTER(CLASSNAME,NAME) \
     AttributeNames.push_back(#NAME); \
     AttributeFunctionMap.insert( std::make_pair( std::string("Get_") + #NAME , &CLASSNAME::Attrib_Get_##NAME )); \
     AttributeFunctionMap.insert( std::make_pair( std::string("Set_") + #NAME , &CLASSNAME::Attrib_Set_##NAME )); 
+
+// #define 
+//     ATTRIBUTE_CLASS_VECTOR(CShaderSource, Source)

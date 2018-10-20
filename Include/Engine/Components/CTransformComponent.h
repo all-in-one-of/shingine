@@ -16,11 +16,11 @@ public:
     }
     virtual ~CTransformComponent() {};
 
-    ATTRIBUTE_ID_REFERENCE(ParentID)
-    ATTRIBUTE_VALUE_INFO(unsigned char, IsDynamic)
-    ATTRIBUTE_VECTOR_INFO(float, LocalPosition)
-    ATTRIBUTE_VECTOR_INFO(float, LocalScale)
-    ATTRIBUTE_VECTOR_INFO(float, LocalRotation)
+    ATTRIBUTE_ID(ParentID)
+    ATTRIBUTE_VALUE(unsigned char, IsDynamic)
+    ATTRIBUTE_VECTOR(float, LocalPosition)
+    ATTRIBUTE_VECTOR(float, LocalScale)
+    ATTRIBUTE_VECTOR(float, LocalRotation)
 
     glm::vec3 GetLocalPosition();
     glm::quat GetLocalRotation();

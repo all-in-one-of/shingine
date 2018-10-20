@@ -15,9 +15,9 @@ public:
     };
     virtual ~CMesh() {}
 private:
-    ATTRIBUTE_VALUE_INFO(CString, Name)
-    ATTRIBUTE_VECTOR_INFO(unsigned int, Indices)
-    ATTRIBUTE_VECTOR_INFO(float, Normals)
-    ATTRIBUTE_VECTOR_INFO(float, Positions)
-    ATTRIBUTE_VECTOR_INFO(float, TexCoord)
+    ATTRIBUTE_VALUE(CString, Name)
+    ATTRIBUTE_VECTOR(unsigned int, Indices)
+    ATTRIBUTE_VECTOR(float, Normals)
+    ATTRIBUTE_VECTOR(float, Positions)
+    ATTRIBUTE_VECTOR(float, TexCoord)
 };

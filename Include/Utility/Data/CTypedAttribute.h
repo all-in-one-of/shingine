@@ -3,6 +3,7 @@
 #include "../Common.h"
 #include "ISerialized.h"
 
+// for ATTRIBUTE_VECTOR
 template <class T>
 class CTypedAttribute : public ISerialized
 {
@@ -27,6 +28,7 @@ private:
     CString AttributeType;
 };
 
+// for ATTRIBUTE_VALUE
 template <class T>
 class CTypedAttributeValue : public ISerialized
 {
@@ -51,6 +53,29 @@ private:
     CString AttributeType;
 };
 
+// for ATTRIBUTE_CLASS_VECTOR
+class CAttributeClassVector : public ISerialized
+{
+public:
+    CAttributeClassVector(CString name, std::vector<ISerialized*> &data)
+    {
+        AttributeName = name; 
+        Data = data;
+    };
+
+    virtual ~CAttributeClassVector() {};
+    virtual CString SerializedName() { return AttributeName; }; 
+    virtual CString TypeName() { return "SerializedClass"; }; 
+
+    std::vector<ISerialized*> Get() { return Data; }
+    void Set(std::vector<ISerialized*> &data) { Data = data; }
+
+private:
+    std::vector<ISerialized*> Data;
+    CString AttributeName;
+};
+
+// for ATTRIBUTE_ID
 class CAttributeUniqueId : public ISerialized
 {
 public:

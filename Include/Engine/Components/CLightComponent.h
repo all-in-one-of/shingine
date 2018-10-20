@@ -13,7 +13,7 @@ public:
     };
     virtual ~CLightComponent();
 private:
-    ATTRIBUTE_VECTOR_INFO(float, Color)
-    ATTRIBUTE_VALUE_INFO(float, Exposure)
-    ATTRIBUTE_VALUE_INFO(float, Intensity)
+    ATTRIBUTE_VECTOR(float, Color)
+    ATTRIBUTE_VALUE(float, Exposure)
+    ATTRIBUTE_VALUE(float, Intensity)
 };

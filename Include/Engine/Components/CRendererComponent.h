@@ -14,8 +14,8 @@ public:
     }
     virtual ~CRendererComponent() {};
 private:
-    ATTRIBUTE_VALUE_INFO(unsigned char, Enabled)
-    ATTRIBUTE_VALUE_INFO(unsigned char, DrawType)
-    ATTRIBUTE_ID_REFERENCE(MaterialReference)
-    ATTRIBUTE_ID_REFERENCE(MeshReference)
+    ATTRIBUTE_VALUE(unsigned char, Enabled)
+    ATTRIBUTE_VALUE(unsigned char, DrawType)
+    ATTRIBUTE_ID(MaterialReference)
+    ATTRIBUTE_ID(MeshReference)
 };

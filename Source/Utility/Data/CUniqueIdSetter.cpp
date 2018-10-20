@@ -27,6 +27,23 @@ void CUniqueIdSetter::UpdateUid(IDataNode* node)
     std::vector<IDataNode*> childNodes = node->GetNodes();
     for (unsigned int x = 0; x < childNodes.size(); x++)
         UpdateUid(childNodes[x]);
+
+    std::vector<ISerialized*> attributes = node->GetAttributes();
+    for (size_t x = 0; x < attributes.size(); x++)
+    {
+        if ((attributes[x]->TypeName() == "SerializedClass") == false) 
+            continue;
+
+        CTypedAttribute<IDataNode*>* attributeNodes = 
+            dynamic_cast<CTypedAttribute<IDataNode*>*>(attributes[x]);
+
+        if (!attributeNodes) 
+            continue;
+            
+        std::vector<IDataNode*> attributeNodesVec = attributeNodes->Get();
+        for (size_t y = 0; y < attributeNodesVec.size(); y++)
+            UpdateUid(attributeNodesVec[y]);
+    }
 }
 
 void CUniqueIdSetter::UpdateAttributeUid(IDataNode* node)

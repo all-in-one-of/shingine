@@ -15,7 +15,7 @@ public:
         ScreenHeight = 720;
         WindowTitle = "shingine";
     }
-    ATTRIBUTE_VALUE_INFO(unsigned short, ScreenWidth)
-    ATTRIBUTE_VALUE_INFO(unsigned short, ScreenHeight)
-    ATTRIBUTE_VALUE_INFO(CString, WindowTitle)
+    ATTRIBUTE_VALUE(unsigned short, ScreenWidth)
+    ATTRIBUTE_VALUE(unsigned short, ScreenHeight)
+    ATTRIBUTE_VALUE(CString, WindowTitle)
 };

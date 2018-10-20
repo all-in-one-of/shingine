@@ -13,21 +13,20 @@ namespace SSD
         unsigned char Version;
     };
 
+    struct SNode;
+
     struct SAttribute
     {
         unsigned char NameLength;
         char* Name;
         unsigned char DataTypeLength;
         char* DataType;
+        unsigned int ByteCount;
         unsigned int ElementCount;
         unsigned char* Values;
+        SNode** Nodes;
+        ~SAttribute();
 
-        ~SAttribute()
-        {
-            delete[] Name;
-            delete[] DataType;
-            delete[] Values;
-        }
     };
 
     struct SNode
@@ -39,17 +38,6 @@ namespace SSD
         unsigned char NodeCount;
         SAttribute** Attributes;
         SNode** Nodes;
-
-        ~SNode()
-        {
-            delete[] Name;
-            for (unsigned char x = 0; x < AttributeCount; x++)
-                delete Attributes[x];
-            delete[] Attributes;
-
-            for (unsigned char x = 0; x < NodeCount; x++)
-                delete Nodes[x];
-            delete[] Nodes;
-        }
+        ~SNode();
     };
 };

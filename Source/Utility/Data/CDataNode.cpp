@@ -45,12 +45,32 @@ ISerialized* CDataNode::Deserialize()
 
     serializedClass->SetUniqueID(UniqueID);
 
-    if (serializedClass == NULL) return serializedClass;
+    if (serializedClass == NULL) 
+        return serializedClass;
 
-    for (unsigned char x = 0; x < Attributes.size(); x++)
-        serializedClass->SetAttribute(Attributes[x]);
+    for (size_t x = 0; x < Attributes.size(); x++)
+    {
+        // if it's a serialized class then deserialize each element
+        if (Attributes[x]->TypeName() == "SerializedClass")
+        {
+            // check if it's an array of a single value
+            CTypedAttribute<IDataNode*>* attr = dynamic_cast<CTypedAttribute<IDataNode*>*>(Attributes[x]);
+            // d
+            std::vector<IDataNode*> attributeNodes = attr->Get();
+            std::vector<ISerialized*> deserializedAttributeNodes;
+            for (size_t x = 0; x < attributeNodes.size(); x++)
+                deserializedAttributeNodes.push_back(attributeNodes[x]->Deserialize());
+            ISerialized* attributeClassVector = 
+                new CAttributeClassVector(attr->SerializedName(), deserializedAttributeNodes);
+            serializedClass->SetAttribute(attributeClassVector);
+        }
+        else
+        {
+            serializedClass->SetAttribute(Attributes[x]);
+        }
+    }
 
-    for (unsigned char x = 0; x < Nodes.size(); x++)
+    for (size_t x = 0; x < Nodes.size(); x++)
     {
         ISerialized* deserializedDataNode = Nodes[x]->Deserialize();
         serializedClass->SetAttribute(deserializedDataNode);
@@ -67,15 +87,46 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
 
     if (typeName == "char")
     {
-        char* temp = new char[attribute->ElementCount + 1];
-        for (unsigned x = 0; x < attribute->ElementCount; x++)
-            temp[x] = attribute->Values[x];
-        temp[attribute->ElementCount] = '\0';
-        CString tempStr = CString(temp);
-        delete[] temp;
-        return new CTypedAttributeValue<CString>(name, typeName, tempStr);
+        if (attribute->ElementCount == 1)
+        {
+            // single string
+            char* temp = new char[attribute->ByteCount];
+            for (size_t x = 0; x < attribute->ByteCount; x++)
+                temp[x] = attribute->Values[x];
+            CString tempStr = CString(temp);
+            delete[] temp;
+            return new CTypedAttributeValue<CString>(name, typeName, tempStr);
+        }
+        else
+        {
+            // an array of strings
+            std::vector<CString> strings;
+            size_t x = 0, stringChar = 0;
+            char* temp = new char[attribute->ByteCount];
+            while(x != attribute->ByteCount)
+            {
+                temp[stringChar++] = attribute->Values[x++];
+                if (temp[stringChar - 1] == '\0')
+                {
+                    strings.push_back(temp);
+                    stringChar = 0;
+                } 
+            }
+            delete[] temp;
+            return new CTypedAttribute<CString>(name, typeName, strings);
+        }   
     }
     
+    if (typeName == "SerializedClass")
+    {
+        std::vector<IDataNode*> nodes;
+        for (size_t x = 0; x < attribute->ElementCount; x++)
+        {
+            nodes.push_back(new CDataNode(attribute->Nodes[x]));
+        }
+        return new CTypedAttribute<IDataNode*>(name, typeName, nodes); 
+    }
+
     unsigned char stride;
     DataStruct::GetStride(typeName, stride);
 

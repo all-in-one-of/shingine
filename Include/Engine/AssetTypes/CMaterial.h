@@ -12,7 +12,7 @@ public:
     };
     virtual ~CMaterial() {};
 private:
-    ATTRIBUTE_VALUE_INFO(CString, Name)
-    ATTRIBUTE_VECTOR_INFO(float, DiffuseColor)
+    ATTRIBUTE_VALUE(CString, Name)
+    ATTRIBUTE_VECTOR(float, DiffuseColor)
 };
 

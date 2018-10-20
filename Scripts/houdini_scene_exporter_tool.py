@@ -26,6 +26,7 @@ ATTRIBUTE
     name U8[name_length]
     data_type_char_length U8
     data_type U8[data_type_char_length]
+    byte_count U32
     element_count U32
     value U8[element_count]
     attr_end U8
@@ -51,6 +52,7 @@ class DataType(IntEnum):
     UINT16 = 6
     CHAR = 7
     UID = 8
+    SERIALIZED_CLASS = 9
 
 class LightType(IntEnum):
     POINT = 0
@@ -72,7 +74,8 @@ data_type_name_map = {
     DataType.UINT16 : "unsigned short",
     DataType.FLOAT : "float",
     DataType.CHAR : "char",
-    DataType.UID : "uid"
+    DataType.UID : "uid",
+    DataType.SERIALIZED_CLASS : "SerializedClass"
 }
 
 NextID = 50
@@ -112,9 +115,9 @@ for id, node in enumerate(hou.node("/obj").children()):
     new_node.attributes.append(Attribute("Id", DataType.UINT, id + 1, True))
     # add object metadata
     metadata_node = Node("ObjectMetadata")
-    metadata_node.attributes.append(Attribute("Name", DataType.CHAR, node.name()))
-    metadata_node.attributes.append(Attribute("Tag", DataType.CHAR, "default"))
-    metadata_node.attributes.append(Attribute("Layer", DataType.CHAR, "default"))
+    metadata_node.attributes.append(Attribute("Name", DataType.CHAR, node.name(), True))
+    metadata_node.attributes.append(Attribute("Tag", DataType.CHAR, "default", True))
+    metadata_node.attributes.append(Attribute("Layer", DataType.CHAR, "default", True))
     new_node.nodes.append(metadata_node)
     nodes.append(new_node)
     node_name_to_ssd_node[node.name()] = new_node
@@ -193,7 +196,7 @@ for id, node in enumerate(hom_nodes):
         
         # add attributes
         geometry_node = Node("Mesh")
-        geometry_node.attributes.append(Attribute("Name", DataType.CHAR, node.name()))
+        geometry_node.attributes.append(Attribute("Name", DataType.CHAR, node.name(), True))
         geometry_node.attributes.append(Attribute("Indices", DataType.UINT, indices))
         geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, normals))
         geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, positions))
@@ -218,8 +221,8 @@ for id, node in enumerate(hom_nodes):
                 material_name = material_hom_node.name()
                 if material_name not in materials.keys():
                     material_node = Node("Material")
-                    material_node.attributes.append(Attribute("Name", DataType.CHAR, material_name))
-                    material_node.attributes.append(Attribute("ShaderName", DataType.CHAR, "default"))
+                    material_node.attributes.append(Attribute("Name", DataType.CHAR, material_name, True))
+                    material_node.attributes.append(Attribute("ShaderName", DataType.CHAR, "default", True))
                     material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, node.parmTuple("basecolor").eval()))
                     materials[material_name] = material_node
                     material_id = material_node.unique_id
@@ -229,6 +232,18 @@ for id, node in enumerate(hom_nodes):
 # add meshes 
 nodes.extend(meshes.values())
 nodes.extend(materials.values())
+
+# add shaders
+shader_node = Node("Shader")
+shader_node.attributes.append(Attribute("Language", DataType.CHAR, "GLSL", True))
+shader_source_vertex = Node("ShaderSource")
+shader_source_vertex.attributes.append(Attribute("Type", DataType.UINT16, 1, True))
+shader_source_vertex.attributes.append(Attribute("Source", DataType.CHAR, "int main() \n { \n return 0; \n }", True))
+shader_source_fragment = Node("ShaderSource")
+shader_source_fragment.attributes.append(Attribute("Type", DataType.UINT16, 1, True))
+shader_source_fragment.attributes.append(Attribute("Source", DataType.CHAR, "int mainMain() \n { \n int x = 2; \n return 0; \n }", True))
+shader_node.attributes.append(Attribute("Source", DataType.SERIALIZED_CLASS, [shader_source_vertex, shader_source_fragment]))
+nodes.append(shader_node)
 
 version = 1
 signature = "SSD"
@@ -251,35 +266,80 @@ def get_uint32_to_bytes(val):
         val & 0xff)
 
 def string_to_bytes(s):
-    return bytearray(s)
+    ba = bytearray(s)
+    ba.append(0)
+    return ba
     
 def attribute_to_bytes(attr):
     attr_data = bytearray()
     attr_data.append(attr_begin)
-    attr_name = attr.name[:character_limit]
+    attr_name = string_to_bytes(attr.name[:255])
     attr_data.append(len(attr_name) & 0xff)
-    attr_data.extend(bytearray(attr_name))
+    attr_data.extend(attr_name)
 
     # data type name
-    data_type_name = data_type_name_map[attr.data_type]
+    data_type_name = string_to_bytes(data_type_name_map[attr.data_type])
     attr_data.append(len(data_type_name) & 0xff)
-    attr_data.extend(bytearray(data_type_name))
-    
-    values = attr.value
-    if attr.single_element:
-        values = [attr.value,]
+    attr_data.extend(data_type_name)
 
-    attr_data.extend(get_uint32_to_bytes(len(values)))
-        
-    for x in range(len(values)):
-        if (attr.data_type == DataType.FLOAT):
-            attr_data.extend(bytearray(struct.pack("f", values[x])))
-        if (attr.data_type == DataType.UINT or attr.data_type == DataType.UID):
-            attr_data.extend(get_uint32_to_bytes(values[x]))
-        if (attr.data_type == DataType.BYTE):
-            attr_data.append(values[x] & 0xff)
-        if (attr.data_type == DataType.CHAR):
-            attr_data.extend(values[x])
+    # handle strings
+    if attr.data_type == DataType.CHAR:
+        if attr.single_element:
+            # byte count
+            attr_data.extend(get_uint32_to_bytes(len(attr.value) + 1))
+            # element count
+            attr_data.extend(get_uint32_to_bytes(1))
+            # value
+            attr_data.extend(attr.value)
+            attr_data.append('\0')
+        else:
+            element_count = len(attr.value)
+            values = bytearray()
+            for x in range(element_count):
+                values.extend(attr.value[x])
+                values.append('\0')
+            # byte count
+            attr_data.extend(get_uint32_to_bytes(len(values)))
+            # element count
+            attr_data.extend(get_uint32_to_bytes(element_count))
+            # value
+            attr_data.extend(values)
+    elif attr.data_type == DataType.SERIALIZED_CLASS:
+        element_count = len(attr.value)
+        # byte count
+        attr_data.extend(get_uint32_to_bytes(element_count))
+        # element count
+        attr_data.extend(get_uint32_to_bytes(element_count))
+        # value
+        for c in attr.value:
+            attr_data.extend(node_to_bytes(c))
+    else:
+        values = attr.value
+        if attr.single_element:
+            element_count = 1
+            values = [attr.value,]
+        element_count = len(values)
+        byte_count = element_count
+        unpacked_values = bytearray()
+        for x in range(len(values)):
+            if (attr.data_type == DataType.FLOAT):
+                byte_count = element_count * 4
+                unpacked_values.extend(bytearray(struct.pack("f", values[x])))
+            if (attr.data_type == DataType.UINT or attr.data_type == DataType.UID \
+                or attr.data_type == DataType.INT):
+                byte_count = element_count * 4
+                unpacked_values.extend(get_uint32_to_bytes(values[x]))
+            if (attr.data_type == DataType.UINT16 or attr.data_type == DataType.INT16):
+                byte_count = element_count * 2
+                unpacked_values.extend(get_uint16_to_bytes(values[x]))
+            if (attr.data_type == DataType.BYTE):
+                unpacked_values.append(values[x] & 0xff)
+        # byte count
+        attr_data.extend(get_uint32_to_bytes(byte_count))
+        # element count
+        attr_data.extend(get_uint32_to_bytes(element_count))
+        # value
+        attr_data.extend(unpacked_values)
 
     attr_data.append(attr_end)
     return attr_data
@@ -289,9 +349,11 @@ def node_to_bytes(node):
     node_data.append(node_begin)
     node_data.extend(get_uint32_to_bytes(node.unique_id))
     # node_data.append(node.type & 0xff)
-    node_name = node.name[:character_limit]
+
+    node_name = string_to_bytes(node.name[:255])
     node_data.append(len(node_name) & 0xff)
-    node_data.extend(bytearray(node_name))
+    node_data.extend(node_name)
+
     node_data.append(len(node.attributes) & 0xff)
     node_data.append(len(node.nodes) & 0xff)
 

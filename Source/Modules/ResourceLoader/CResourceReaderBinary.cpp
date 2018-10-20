@@ -57,9 +57,8 @@ SSD::SNode* CResourceReaderBinary::ReadNode()
     SSD::SNode* node = new SSD::SNode();
     ReadUInt32(node->UniqueID);
     ReadByte(node->NameLength);
-    node->Name = new char[node->NameLength + 1];
+    node->Name = new char[node->NameLength];
     FileStream.read(node->Name, node->NameLength);
-    node->Name[node->NameLength] = '\0';
     ReadByte(node->AttributeCount);
     ReadByte(node->NodeCount);
 
@@ -94,32 +93,46 @@ SSD::SAttribute* CResourceReaderBinary::ReadAttribute()
     SSD::SAttribute* attr = new SSD::SAttribute();
     ReadByte(attr->NameLength);
 
-    attr->Name = new char[attr->NameLength + 1];
+    attr->Name = new char[attr->NameLength];
     FileStream.read(attr->Name, attr->NameLength);
-    attr->Name[attr->NameLength] = '\0';
 
     ReadByte(attr->DataTypeLength);
-    attr->DataType = new char[attr->DataTypeLength + 1];
+    attr->DataType = new char[attr->DataTypeLength];
     FileStream.read(attr->DataType, attr->DataTypeLength);
-    attr->DataType[attr->DataTypeLength] = '\0';
 
+    ReadUInt32(attr->ByteCount);
     ReadUInt32(attr->ElementCount);
 
     CString dataTypeName = CString(attr->DataType);
-    if(dataTypeName == "uid") dataTypeName = "unsigned int";
-    // TODO get stride
-    unsigned char stride;   // = dataTypeName == "unsigned char" || dataTypeName == "char" ? 1 : 4;
-    DataStruct::GetStride(dataTypeName, stride);
-
-    unsigned int byteCount = attr->ElementCount * stride;
-
-
-    attr->Values = new unsigned char[byteCount];
-    for (unsigned int x = 0; x < byteCount; x++)
+    
+    if (dataTypeName == "SerializedClass")
     {
-        char v;
-        FileStream.read(&v, 1);
-        attr->Values[x] = v;
+        // attribute is an array of nodes
+        attr->Nodes = new SSD::SNode*[attr->ElementCount];
+        for (size_t x = 0; x < attr->ElementCount; x++)
+        {
+            attr->Nodes[x] = ReadNode();
+        }
+    }
+    else
+    {
+        // nodes
+        if(dataTypeName == "uid") dataTypeName = "unsigned int";
+
+        // TODO get stride
+        unsigned char stride;   // = dataTypeName == "unsigned char" || dataTypeName == "char" ? 1 : 4;
+        DataStruct::GetStride(dataTypeName, stride);
+
+        //unsigned int byteCount = attr->ElementCount * stride;
+        unsigned int byteCount = attr->ByteCount;
+
+        attr->Values = new unsigned char[byteCount];
+        for (unsigned int x = 0; x < byteCount; x++)
+        {
+            char v;
+            FileStream.read(&v, 1);
+            attr->Values[x] = v;
+        }
     }
     
     ReadByte(garbage);
@@ -168,6 +181,5 @@ void CResourceReaderBinary::Close()
 
 CResourceReaderBinary::~CResourceReaderBinary()
 {
-    
     Close();
 }

@@ -214,7 +214,7 @@ for uid, hom_node in uid_to_hom_node.items():
         geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, geometry_data.normals))
         geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, geometry_data.positions))
         geometry_node.attributes.append(Attribute("TexCoord", DataType.FLOAT, geometry_data.texcoord))
-        meshes[node.name()] = geometry_node
+        meshes[hom_node.name()] = geometry_node
         # add renderer component
         renderer_node = Node("Renderer")
         renderer_node.attributes.append(Attribute("DrawType", DataType.BYTE, DrawType.FILL, True))
@@ -224,7 +224,7 @@ for uid, hom_node in uid_to_hom_node.items():
         material_node = None
         # find material
         material_id = 0
-        if node.parm("shop_materialpath").eval():
+        if hom_node.parm("shop_materialpath").eval():
             material_hom_node = hou.node(hom_node.parm("shop_materialpath").eval())
             if material_hom_node.type().name() == "principledshader::2.0":
                 material_name = material_hom_node.name()
@@ -235,6 +235,8 @@ for uid, hom_node in uid_to_hom_node.items():
                     material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, hom_node.parmTuple("basecolor").eval()))
                     materials[material_name] = material_node
                     material_id = material_node.unique_id
+                else:
+                    material_id = materials[material_name]
         renderer_node.attributes.append(Attribute("MaterialReference", DataType.UID, material_id, True))
         components.append(renderer_node)
         uid_to_components[uid].append(renderer_node.unique_id)

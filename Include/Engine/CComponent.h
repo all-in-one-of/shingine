@@ -1,12 +1,18 @@
 #pragma once
 #include "IComponent.h"
+#include "Utility/Data/Serialization.h"
 
-class CComponent : public IComponent
+class CComponent : public IComponent, public ISerializedClass
 {
 public:
+    CComponent()
+    {
+    }
     virtual ~CComponent();
-    virtual IObject* Owner();
-    virtual void SetOwner(IObject* owner);
+    virtual unsigned int Id() { return UniqueID(); }
+    virtual unsigned int EntityId() { return ComponentEntityId; }
+    
+    virtual void SetEntityId(unsigned int entityId) { ComponentEntityId = entityId; }
 protected:
-    IObject* ObjectOwner = NULL;
+    unsigned int ComponentEntityId = 0;
 };

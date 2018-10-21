@@ -2,7 +2,7 @@
 #include "ComponentSetup.h"
 #include "Core.h"
 
-class CTransformComponent : public CComponent, public ISerializedClass
+class CTransformComponent : public CComponent
 {
 public:
     SERIALIZE_CLASS(CTransformComponent)

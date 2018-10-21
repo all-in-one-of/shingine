@@ -5,7 +5,7 @@
 int main()
 {
     bool didLoad = CResourceLoader::Load("Assets/Scenes/TestScene.ssd");
-    CAssetManager* assetManager = CStatics::AssetManager();
+    CInstanceManager* assetManager = CStatics::InstanceManager();
     CSceneManager* sceneManager = CStatics::SceneManager();
     return 0;
 }

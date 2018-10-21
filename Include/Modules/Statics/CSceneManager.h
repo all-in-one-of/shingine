@@ -7,20 +7,14 @@ class CSceneManager
 public:
     static CSceneManager* Get()
     {
-        if (!Instance)
-            Instance = new CSceneManager();
-        return Instance;
+        if (!CSceneManager::Instance)
+            CSceneManager::Instance = new CSceneManager();
+        return CSceneManager::Instance;
     }
-
-    void AddScene(const CString &fileName, IScene* scene)
-    {
-        Scenes[fileName] = scene;
-        CurrentSceneInstance = scene;
-    }
-
-    IScene* CurrentScene() { return CurrentSceneInstance; }
+    void AddScene(const CString &fileName, IScene* scene);
+    IScene* CurrentScene();
 private:
-    CSceneManager() {};
+    CSceneManager();
     static CSceneManager* Instance;
     std::map<CString, IScene*> Scenes;
     IScene* CurrentSceneInstance;

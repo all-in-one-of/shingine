@@ -1,7 +1,7 @@
 #pragma once
 #include "ComponentSetup.h"
 
-class CRendererComponent : public CComponent, public ISerializedClass
+class CRendererComponent : public CComponent
 {
 public:
     SERIALIZE_CLASS(CRendererComponent)

@@ -20,7 +20,7 @@ CUniqueIdSetter::CUniqueIdSetter(const std::vector<IDataNode*> &newNodes)
 
 void CUniqueIdSetter::UpdateUid(IDataNode* node)
 {
-    unsigned int newId = CStatics::GetUniqueId();
+    unsigned int newId = CStatics::InstanceManager()->GetUniqueId();
     LocalToGlobalUid[node->GetUniqueID()] = newId;
     node->SetUniqueID(newId);
 
@@ -51,22 +51,61 @@ void CUniqueIdSetter::UpdateAttributeUid(IDataNode* node)
     std::vector<ISerialized*> attributes = node->GetAttributes();
     for (unsigned int x = 0; x < attributes.size(); x++)
     {   
+        if(attributes[x]->TypeName() == "SerializedClass")
+        {
+
+            CTypedAttribute<IDataNode*>* attributeNodes =
+                dynamic_cast<CTypedAttribute<IDataNode*>*>(attributes[x]);
+
+            if(!attributeNodes)
+                continue;
+
+            std::vector<IDataNode*> attributeNodesVec = attributeNodes->Get();
+            for(size_t y = 0; y < attributeNodesVec.size(); y++)
+                UpdateAttributeUid(attributeNodesVec[y]);
+        }
+
         if (attributes[x]->TypeName() == "uid")
         {
-            CAttributeUniqueId* uniqueIdAttribute = dynamic_cast<CAttributeUniqueId*>(attributes[x]);
-            if (!uniqueIdAttribute) 
-                continue;
-            unsigned int currentId = uniqueIdAttribute->Get();
-            std::map<unsigned int, unsigned int>::iterator it = LocalToGlobalUid.find(uniqueIdAttribute->Get());
-            if (it == LocalToGlobalUid.end())
+            // it's a value attribute
+            CTypedAttributeValue<unsigned int>* uniqueIdAttribute = 
+                dynamic_cast<CTypedAttributeValue<unsigned int>*>(attributes[x]);
+            if (uniqueIdAttribute) 
             {
-                unsigned int id = 0;
-                uniqueIdAttribute->Set(id);
-                continue;
+
+                unsigned int currentId = uniqueIdAttribute->Get();
+                std::map<unsigned int, unsigned int>::iterator it = LocalToGlobalUid.find(currentId);
+                if (it == LocalToGlobalUid.end())
+                {
+                    unsigned int id = 0;
+                    uniqueIdAttribute->Set(id);
+                    continue;
+                }
+                else
+                {
+                    uniqueIdAttribute->Set(it->second);
+                }
             }
-            else
+            // it's a vector attribute
+            CTypedAttribute<unsigned int>* uniqueIdAttributeVector = dynamic_cast<CTypedAttribute<unsigned int>*>(attributes[x]);
+            if (uniqueIdAttributeVector) 
             {
-                uniqueIdAttribute->Set(it->second);
+                std::vector<unsigned int> ids = uniqueIdAttributeVector->Get();
+                for (size_t x = 0; x < ids.size(); x++)
+                {
+                    unsigned int currentId = ids[x];
+                    std::map<unsigned int, unsigned int>::iterator it = LocalToGlobalUid.find(currentId);
+                    if (it == LocalToGlobalUid.end())
+                    {
+                        ids[x] = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        ids[x] = it->second;
+                    }
+                }
+                uniqueIdAttributeVector->Set(ids);
             }
         }
     }

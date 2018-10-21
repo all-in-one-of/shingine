@@ -6,8 +6,7 @@
 #include "Utility/Data/IDataNode.h"
 #include "Utility/Data/ISerialized.h"
 #include "Utility/Data/CUniqueIdSetter.h"
-
-#include "Engine/IObject.h"
+#include "Utility/Data/CEntityComponentIdSetter.h"
 #include "Modules/Scene/CSceneMaker.h"
 
 #include "Modules/Statics/CStatics.h"
@@ -40,42 +39,38 @@ bool CResourceLoader::Load(const CString &fileName)
     // traverse through each node, create unique ids
     CUniqueIdSetter::SetIds(nodes);
 
-    for (unsigned int x = 0; x < nodes.size(); x++)
+    for (size_t x = 0; x < nodes.size(); x++)
     {
         ISerialized* deserializedDataNode = nodes[x]->Deserialize();
         if (deserializedDataNode)
             deserializedNodes.push_back(deserializedDataNode);
-        delete nodes[x];
     }
     reader->Close();
     delete reader;
 
-    // Scene assets creation
-    std::vector<IObject*> sceneObjects;
-    std::vector<ISerialized*> assets;
+    std::vector<ISerialized*> entities;
+    CInstanceManager* instanceManager = CStatics::InstanceManager();
+
     for (unsigned int x = 0; x < deserializedNodes.size(); x++)
     {
-        if(deserializedNodes[x]->SerializedName() == "Object")
-            sceneObjects.push_back(
-                dynamic_cast<IObject*>(deserializedNodes[x]));
-        else
-            assets.push_back(deserializedNodes[x]);
-    }
-
-    if (sceneObjects.size() > 0)
-        CStatics::SceneManager()->AddScene(fileName, CSceneMaker::Create(sceneObjects));
-
-    for (unsigned int x = 0; x < assets.size(); x++)
-    {
-        ISerializedClass* assetSerializedClass = dynamic_cast<ISerializedClass*>(assets[x]);
-        if (!assetSerializedClass)
+        if(deserializedNodes[x]->SerializedName() == "Entity")
         {
-            std::cout << "Object isn't recognized as an asset. Attempting to delete it" << std::endl;
-            delete assetSerializedClass;
-            continue;
+            entities.push_back(deserializedNodes[x]);
+            instanceManager->Destroy(dynamic_cast<ISerializedClass*>(deserializedNodes[x]));
         }
-        CStatics::AssetManager()->AddAsset(assetSerializedClass);
+
+        else if(deserializedNodes[x]->SerializedName() == "EntityIdCollection")
+        {
+            CEntityComponentIdSetter::UpdateIds(deserializedNodes[x]);
+            instanceManager->Destroy(dynamic_cast<ISerializedClass*>(deserializedNodes[x]));
+        }
     }
     
+    // check if the ssd file contains entities
+    if (entities.size() > 0)
+        CStatics::SceneManager()->AddScene(fileName, CSceneMaker::Create(nodes));
+    else
+        for (size_t x = 0; x < nodes.size(); x++)
+            delete nodes[x];
     return true;
 }

@@ -62,12 +62,12 @@ void CTransformSystem::Update()
 
 void CTransformSystem::UpdateComponentMap()
 {
-    Transforms.clear();
-    std::vector<IComponent*> genericComponents;
-    CStatics::SceneManager()->CurrentScene()->GetComponents("Transform", genericComponents);
-    for (size_t x = 0; x < genericComponents.size(); x++)
-    {
-        CTransformComponent* transformComponent = dynamic_cast<CTransformComponent*>(genericComponents[x]);
-        Transforms[transformComponent->Owner()->ID()] = transformComponent;
-    }
+    //Transforms.clear();
+    //std::vector<IComponent*> genericComponents;
+    //CStatics::SceneManager()->CurrentScene()->GetComponents("Transform", genericComponents);
+    //for (size_t x = 0; x < genericComponents.size(); x++)
+    //{
+    //    CTransformComponent* transformComponent = dynamic_cast<CTransformComponent*>(genericComponents[x]);
+    //    Transforms[transformComponent->Owner()->ID()] = transformComponent;
+    //}
 }

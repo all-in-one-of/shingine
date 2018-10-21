@@ -1,7 +1,7 @@
 #pragma once
 #include "ComponentSetup.h"
 
-class CObjectMetadataComponent : public CComponent, public ISerializedClass
+class CObjectMetadataComponent : public CComponent
 {
 public:
     SERIALIZE_CLASS(CObjectMetadataComponent)

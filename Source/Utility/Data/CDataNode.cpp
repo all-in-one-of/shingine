@@ -43,7 +43,7 @@ ISerialized* CDataNode::Deserialize()
     ISerializedClass* serializedClass = dynamic_cast<ISerializedClass*>(
         CSerializedFactory::CreateInstance(Name().GetStdString()));
 
-    serializedClass->SetUniqueID(UniqueID);
+    //serializedClass->SetUniqueID(UniqueID);
 
     if (serializedClass == NULL) 
         return serializedClass;
@@ -150,12 +150,12 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
             data_int.push_back(DataStruct::GetInt32(value));
         
         }
-        if (typeName == "uid")
-        {
-            unsigned int val = DataStruct::GetUInt32(value);
-            return new CAttributeUniqueId(name, val);
-        }
-        if (typeName == "unsigned int") 
+        // if (typeName == "uid")
+        // {
+        //     unsigned int val = DataStruct::GetUInt32(value);
+        //     return new CTypedAttributeValue<unsigned int>(name, typeName, val);
+        // }
+        if (typeName == "unsigned int" || typeName == "uid") 
         {
             if (attribute->ElementCount == 1)
                 return new CTypedAttributeValue<unsigned int>(name, typeName, DataStruct::GetUInt32(value));    
@@ -196,7 +196,7 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
 
     if (typeName == "int") 
         return new CTypedAttribute<int>(name, typeName, data_int);
-    if (typeName == "unsigned int") 
+    if (typeName == "unsigned int" || typeName == "uid") 
         return new CTypedAttribute<unsigned int>(name, typeName, data_uint);
     if (typeName == "unsigned short") 
         return new CTypedAttribute<unsigned short>(name, typeName, data_ushort);

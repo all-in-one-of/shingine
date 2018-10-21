@@ -4,11 +4,9 @@
 #include "Modules/Scene/CSceneMaker.h"
 #include "Modules/Scene/CScene.h"
 
-IScene* CSceneMaker::Create(const std::vector<IObject*> &objects)
+IScene* CSceneMaker::Create(const std::vector<IDataNode*> &nodes)
 {
     CScene* scene = new CScene();
-    // Create objects, attach components
-    for (unsigned int x = 0; x < objects.size(); x++)
-        scene->AddCreatedObject(objects[x]);
+    scene->SetSerializedData(nodes);
     return scene;
 }

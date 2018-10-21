@@ -1,10 +1,11 @@
 #pragma once
 #include "ComponentSetup.h"
 
-class CLightComponent : public CComponent, public ISerializedClass
+class CLightComponent : public CComponent
 {
 public:
     SERIALIZE_CLASS(CLightComponent)
+    
     CLightComponent()
     {
         ATTRIBUTE_REGISTER(CLightComponent, Color)

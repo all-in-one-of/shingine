@@ -1,19 +1,12 @@
 #pragma once
 #include "CSceneManager.h"
-#include "CAssetManager.h"
+#include "CInstanceManager.h"
 
 class CStatics
 {
 public:
-    static CSceneManager* SceneManager() { return CSceneManager::Get(); }
-    static CAssetManager* AssetManager() { return CAssetManager::Get(); }
-    static unsigned int GetUniqueId() 
-    { 
-        if (!Instance)
-            Instance = new CStatics();
-        return Instance->NextId++;
-    }
-    unsigned int NextId = 1000;
+    static CSceneManager* SceneManager();
+    static CInstanceManager* InstanceManager() { return CInstanceManager::Get(); }
 private:
     CStatics() {};
     static CStatics* Instance;

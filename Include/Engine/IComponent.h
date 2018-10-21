@@ -7,6 +7,7 @@ class IComponent
 {
 public:
     virtual ~IComponent() {};
-    virtual IObject* Owner() = 0;
-    virtual void SetOwner(IObject* owner) = 0;
+    virtual unsigned int Id() = 0;
+    virtual unsigned int EntityId() = 0;
+    virtual void SetEntityId(unsigned int entityId) = 0;
 };

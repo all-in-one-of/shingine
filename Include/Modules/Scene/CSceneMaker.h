@@ -4,5 +4,5 @@
 class CSceneMaker
 {
 public:
-    static IScene* Create(const std::vector<IObject*> &objects);
+    static IScene* Create(const std::vector<IDataNode*> &nodes);
 };

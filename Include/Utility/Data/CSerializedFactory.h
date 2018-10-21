@@ -5,26 +5,18 @@
 
 #include "ISerialized.h"
 
-template<typename T> ISerialized* createT() { return new T; }
+template<typename T> ISerialized* createT() 
+{ 
+    return new T; 
+}
 
 class CSerializedFactory
 {
 public:
     typedef std::map<std::string, ISerialized*(*)()> TSerializedTypeMap;
-
-    static ISerialized* CreateInstance(const std::string &s)
-    {
-        TSerializedTypeMap::iterator it = GetMap()->find(s);
-        if (it == GetMap()->end()) return NULL;
-        return it->second();
-    }
-
+    static ISerialized* CreateInstance(const std::string &s);
 protected:
-    static TSerializedTypeMap *GetMap()
-    {
-        if (!Map) Map = new TSerializedTypeMap;
-        return Map;
-    }
+    static TSerializedTypeMap* GetMap();
 private:
     static TSerializedTypeMap *Map;
 };

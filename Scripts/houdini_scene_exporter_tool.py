@@ -1,6 +1,3 @@
-# shingine scene exporter for houdini
-# *.ssd (shingine scene description)
-# format structure
 '''
 HEADER 
 {
@@ -54,9 +51,6 @@ class DataType(IntEnum):
     UID = 8
     SERIALIZED_CLASS = 9
 
-class LightType(IntEnum):
-    POINT = 0
-
 class NodeType(IntEnum):
     OBJECT = 0
     DATA = 1
@@ -78,89 +72,21 @@ data_type_name_map = {
     DataType.SERIALIZED_CLASS : "SerializedClass"
 }
 
-NextID = 50
+NextId = 50
 
-class Node:
-    def __init__(self, name="Node", type=NodeType.OBJECT):
-        # zero is the scene root
-        global NextID
-        self.name = name
-        self.unique_id = NextID
-        self.attributes = []
-        self.nodes = []
-        self.type = type
-        NextID += 1
+light_type_name = "hlight::2.0"
+null_type_name = "null"
+geo_type_name = "geo"
 
-class Attribute:
-    def __init__(self, name, data_type, value, single_element=False):
-        self.name = name
-        self.data_type = data_type
-        self.single_element = single_element
-        self.value = value
+allowed_hom_types = (light_type_name, null_type_name, geo_type_name)
 
-#node_name_to_id = {}
-node_id_to_parent_id = {}
-node_name_to_ssd_node = {}
-hom_nodes = []
-nodes = []
-meshes = {}
-materials = {}
+node_name_to_uid = {}
+uid_to_hom_node = {}
+uid_to_components = {}
+components = []
 
-# get all hom nodes
-for id, node in enumerate(hou.node("/obj").children()):
-    if node.type().name() not in ["light", "null", "geo"]:
-        continue
-    #node_name_to_id[node.name()] = id + 1
-    new_node = Node("Object", type=NodeType.OBJECT)
-    new_node.attributes.append(Attribute("Id", DataType.UINT, id + 1, True))
-    # add object metadata
-    metadata_node = Node("ObjectMetadata")
-    metadata_node.attributes.append(Attribute("Name", DataType.CHAR, node.name(), True))
-    metadata_node.attributes.append(Attribute("Tag", DataType.CHAR, "default", True))
-    metadata_node.attributes.append(Attribute("Layer", DataType.CHAR, "default", True))
-    new_node.nodes.append(metadata_node)
-    nodes.append(new_node)
-    node_name_to_ssd_node[node.name()] = new_node
-
-    hom_nodes.append(node)
-
-# set parent ids
-for id, hom_node in enumerate(hom_nodes):
-    parent_id = 0
-    if hom_node.inputs():
-        input_node = hom_node.inputs()[0]
-        if input_node.name() not in node_name_to_ssd_node.keys():
-            continue
-        parent_id = node_name_to_ssd_node[input_node.name()].unique_id
-    node_id_to_parent_id[id] = parent_id
-
-# read node attributes
-for id, node in enumerate(hom_nodes):
-    # collect the local transform matrix, write to the attribute
-    local_transform = node.localTransform()
-    position = local_transform.extractTranslates()
-    quat = hou.Quaternion(local_transform.extractRotationMatrix3())
-    scale = local_transform.extractScales()
-
-    transform_node = Node("Transform")
-    transform_node.attributes.append(Attribute("ParentID", DataType.UID, node_id_to_parent_id[id], True))
-    transform_node.attributes.append(Attribute("IsDynamic", DataType.BYTE, 0, True))
-    transform_node.attributes.append(Attribute("LocalPosition", DataType.FLOAT, position))
-    transform_node.attributes.append(Attribute("LocalRotation", DataType.FLOAT, quat))
-    transform_node.attributes.append(Attribute("LocalScale", DataType.FLOAT, scale))
-    nodes[id].nodes.append(transform_node)
-    # find lights
-    if node.type().name() == "hlight::2.0":
-        light_node = Node("Light")
-        light_node.attributes.append(Attribute("Color", DataType.FLOAT, node.parmTuple("light_color").eval()))
-        light_node.attributes.append(Attribute("Exposure", DataType.FLOAT, node.parm("light_exposure").eval(), True))
-        light_node.attributes.append(Attribute("Intensity", DataType.FLOAT, node.parm("light_intensity").eval(), True))
-        nodes[id].nodes.append(light_node)
-    
-    # find geo
-    if node.type().name() == "geo":
-        # the geo can contain non-tris
-        # triangulate it first and calculate point normals after
+class GeometryData:
+    def __init__(self, node):
         display = node.displayNode()
         divide = node.createNode("divide")
         normal = node.createNode("normal")
@@ -176,64 +102,160 @@ for id, node in enumerate(hom_nodes):
         indices = []
         texcoord = []
         for point in geometry.points():
+            # positions
             positions.append(point.position().x())
             positions.append(point.position().y())
             positions.append(point.position().z())
-
+            # normals as point normals
             normal_value = point.attribValue("N")
             normals.append(normal_value[0])
             normals.append(normal_value[1])
             normals.append(normal_value[2])
-
             # deal with uvs later
             texcoord.append(0.0)
             texcoord.append(0.0)
             texcoord.append(0.0)
-
         for face in geometry.prims():
             for vert in face.vertices():
                 indices.append(vert.point().number())
-        
-        # add attributes
-        geometry_node = Node("Mesh")
-        geometry_node.attributes.append(Attribute("Name", DataType.CHAR, node.name(), True))
-        geometry_node.attributes.append(Attribute("Indices", DataType.UINT, indices))
-        geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, normals))
-        geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, positions))
-        geometry_node.attributes.append(Attribute("TexCoord", DataType.FLOAT, texcoord))
-        meshes[node.name()] = geometry_node
-
         # delete temp houdini nodes
         normal.destroy()
         divide.destroy()
 
+        self.positions = positions
+        self.normals = normals
+        self.indices = indices
+        self.texcoord = texcoord
+        
+
+class Node:
+    def __init__(self, name="Node"):
+        self.name = name
+        self.unique_id = GetUid()
+        self.attributes = []
+        self.nodes = []
+
+class Attribute:
+    def __init__(self, name, data_type, value, single_element=False):
+        self.name = name
+        self.data_type = data_type
+        self.single_element = single_element
+        self.value = value
+
+def GetUid():
+    global NextId
+    uid = NextId
+    NextId += 1
+    return uid
+
+def parent_node_uid(hom_node):
+    global allowed_hom_types, node_name_to_uid
+    if hom_node.inputs():
+        input_node = hom_node.inputs()[0]
+        parent_name = input_node.name()
+        if parent_name not in node_name_to_uid.keys():
+            return 0
+        return node_name_to_uid[parent_name]
+    return 0
+
+# get all hom nodes of the needed type
+obj_nodes = [node for node in hou.node("/obj").children() if node.type().name() in allowed_hom_types]
+meshes = {}
+materials = {}
+
+nodes = []
+
+for node in obj_nodes:
+    entity = Node("Entity")
+    nodes.append(entity)
+    uid = entity.unique_id
+    uid_to_hom_node[uid] = node
+    node_name_to_uid[node.name()] = uid
+    uid_to_components[uid] = []
+
+for uid, hom_node in uid_to_hom_node.items():
+    # add object metadata component
+    current_node = Node("ObjectMetadata")
+    current_node.attributes.append(Attribute("Name", DataType.CHAR, hom_node.name(), True))
+    current_node.attributes.append(Attribute("Tag", DataType.CHAR, "default", True))
+    current_node.attributes.append(Attribute("Layer", DataType.CHAR, "default", True))
+    components.append(current_node)
+    uid_to_components[uid].append(current_node.unique_id)
+    # add transform component
+    # calculate transforms from the hom node
+    local_transform = hom_node.localTransform()
+    position = local_transform.extractTranslates()
+    quat = hou.Quaternion(local_transform.extractRotationMatrix3())
+    scale = local_transform.extractScales()
+    # transform node
+    current_node = Node("Transform")
+    current_node.attributes.append(Attribute("ParentID", DataType.UID, parent_node_uid(hom_node), True))
+    current_node.attributes.append(Attribute("IsDynamic", DataType.BYTE, 0, True))
+    current_node.attributes.append(Attribute("LocalPosition", DataType.FLOAT, position))
+    current_node.attributes.append(Attribute("LocalRotation", DataType.FLOAT, quat))
+    current_node.attributes.append(Attribute("LocalScale", DataType.FLOAT, scale))
+    components.append(current_node)
+    uid_to_components[uid].append(current_node.unique_id)
+    # handle light component
+    if hom_node.type().name() == light_type_name:
+        current_node = Node("Light")
+        current_node.attributes.append(Attribute("Color", DataType.FLOAT, hom_node.parmTuple("light_color").eval()))
+        current_node.attributes.append(Attribute("Exposure", DataType.FLOAT, hom_node.parm("light_exposure").eval(), True))
+        current_node.attributes.append(Attribute("Intensity", DataType.FLOAT, hom_node.parm("light_intensity").eval(), True))
+        components.append(current_node)
+        uid_to_components[uid].append(current_node.unique_id)
+    # handle mesh component
+    if hom_node.type().name() == geo_type_name:
+        geometry_data = GeometryData(hom_node)
+        # make mesh asset
+        geometry_node = Node("Mesh")
+        geometry_node.attributes.append(Attribute("Name", DataType.CHAR, hom_node.name(), True))
+        geometry_node.attributes.append(Attribute("Indices", DataType.UINT, geometry_data.indices))
+        geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, geometry_data.normals))
+        geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, geometry_data.positions))
+        geometry_node.attributes.append(Attribute("TexCoord", DataType.FLOAT, geometry_data.texcoord))
+        meshes[node.name()] = geometry_node
+        # add renderer component
         renderer_node = Node("Renderer")
         renderer_node.attributes.append(Attribute("DrawType", DataType.BYTE, DrawType.FILL, True))
         renderer_node.attributes.append(Attribute("Enabled", DataType.BYTE, 1, True))
         renderer_node.attributes.append(Attribute("MeshReference", DataType.UID, geometry_node.unique_id, True))
-
+        # find material
         material_node = None
         # find material
         material_id = 0
         if node.parm("shop_materialpath").eval():
-            material_hom_node = hou.node(node.parm("shop_materialpath").eval())
+            material_hom_node = hou.node(hom_node.parm("shop_materialpath").eval())
             if material_hom_node.type().name() == "principledshader::2.0":
                 material_name = material_hom_node.name()
                 if material_name not in materials.keys():
                     material_node = Node("Material")
                     material_node.attributes.append(Attribute("Name", DataType.CHAR, material_name, True))
                     material_node.attributes.append(Attribute("ShaderName", DataType.CHAR, "default", True))
-                    material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, node.parmTuple("basecolor").eval()))
+                    material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, hom_node.parmTuple("basecolor").eval()))
                     materials[material_name] = material_node
                     material_id = material_node.unique_id
         renderer_node.attributes.append(Attribute("MaterialReference", DataType.UID, material_id, True))
-
-        nodes[id].nodes.append(renderer_node)
-# add meshes 
+        components.append(renderer_node)
+        uid_to_components[uid].append(renderer_node.unique_id)
+# create nodes collection
+# make entity/component id collection
+id_collection_node = Node("EntityIdCollection")
+id_collection_node.attributes.append(Attribute("Ids", DataType.UID, uid_to_components.keys()))
+comid_collection = []
+for uid, component_ids in uid_to_components.items():
+    cmid = Node("ComponentIdCollection")
+    cmid.attributes.append(Attribute("Ids", DataType.UID, uid_to_components[uid]))
+    comid_collection.append(cmid)
+id_collection_node.attributes.append(Attribute("Components", DataType.SERIALIZED_CLASS, comid_collection))
+nodes.append(id_collection_node)
+# add components
+nodes.extend(components)
+# add mesh assets
 nodes.extend(meshes.values())
+# add material assets
 nodes.extend(materials.values())
-
-# add shaders
+# add test shader asset
 shader_node = Node("Shader")
 shader_node.attributes.append(Attribute("Language", DataType.CHAR, "GLSL", True))
 shader_source_vertex = Node("ShaderSource")

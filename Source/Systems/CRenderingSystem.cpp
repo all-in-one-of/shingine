@@ -6,12 +6,12 @@
 void CRenderingSystem::Initialize()
 {
     // get render settings
-    CRenderSettings* renderSettings = dynamic_cast<CRenderSettings*> (CStatics::AssetManager()->GetAssetOfType("RenderSettings"));
+    CRenderSettings* renderSettings = dynamic_cast<CRenderSettings*> (CStatics::InstanceManager()->GetAssetOfType("RenderSettings"));
     if (!renderSettings)
     {
         // default render settings;
         renderSettings = new CRenderSettings();
-        CStatics::AssetManager()->AddAsset(renderSettings);
+        CStatics::InstanceManager()->AddInstance(renderSettings);
     }
 
     if (!Renderer)

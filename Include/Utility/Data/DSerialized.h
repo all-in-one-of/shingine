@@ -3,7 +3,7 @@
 
 class ISerialized;
 
-#define REGISTER_SERIALIZED_TYPE(TYPENAME) \
+#define ____REGISTER_SERIALIZED_TYPE(TYPENAME) \
     virtual CString SerializedName(); \
     static const CString SerializedNameVar; \
     static CSerializedRegistry<TYPENAME> reg; \
@@ -56,17 +56,28 @@ class ISerialized;
             attributes.push_back(newAttr); \
         } \
     }; \
-    REGISTER_SERIALIZED_TYPE(CLASSNAME)
+    ____REGISTER_SERIALIZED_TYPE(CLASSNAME)
 
 #define ATTRIBUTE_ID(NAME) \
     unsigned int NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
-        NAME = ((CAttributeUniqueId *)attr)->Get(); \
+        NAME = ((CTypedAttributeValue<unsigned int> *)attr)->Get(); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
-        attr = new CAttributeUniqueId(#NAME, NAME); \
+        attr = new CTypedAttributeValue<unsigned int>(#NAME, "uid", NAME); \
+    }
+
+#define ATTRIBUTE_ID_VECTOR(NAME) \
+    std::vector<unsigned int> NAME; \
+    void Attrib_Set_##NAME(ISerialized* &attr) \
+    { \
+        NAME = ((CTypedAttribute<unsigned int> *)attr)->Get(); \
+    } \
+    void Attrib_Get_##NAME(ISerialized* &attr) \
+    { \
+        attr = new CTypedAttribute<unsigned int>(#NAME, "uid", NAME); \
     }
 
 #define ATTRIBUTE_VALUE(TYPE_NAME,NAME) \

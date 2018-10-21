@@ -12,7 +12,7 @@ public:
     virtual unsigned int Id() { return UniqueID(); }
     virtual unsigned int EntityId() { return ComponentEntityId; }
     
-    virtual void SetEntityId(unsigned int entityId) { ComponentEntityId = entityId; }
+    virtual void SetEntityId(unsigned int entityId);
 protected:
     unsigned int ComponentEntityId = 0;
 };

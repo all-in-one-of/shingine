@@ -18,24 +18,64 @@ void CInstanceManager::AddInstance(ISerializedClass* newAsset)
         Assets[newAsset->SerializedName().GetStdString()][newAsset->UniqueID()] = newAsset;
 }
 
+void CInstanceManager::UpdateComponentEntityId(IComponent* component)
+{
+    // get component name
+    ISerializedClass* serializedComponent = dynamic_cast<ISerializedClass*>(component);
+    unsigned int uniqueId = serializedComponent->UniqueID();
+    Components[serializedComponent->SerializedName().GetStdString()].erase(uniqueId);
+    Components[serializedComponent->SerializedName().GetStdString()][component->EntityId()] = component;
+}
+
+void CInstanceManager::GetComponentIteratorOfType(CString typeName, std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>>::iterator &iterator)
+{
+    auto it = Components.find(typeName.GetStdString());
+    if (it == Components.end()) 
+        return;
+    iterator = it;
+}
+
 #define __GET_SOME_THING_OF_TYPE(THING) \
-    auto it = THING.find(typeName.GetStdString()); \
-    if (it == THING.end()) \
-        return NULL; \
-    if (it->second.begin() == it->second.end()) \
-        return NULL; \
-    return it->second.begin()->second;
 
-ISerializedClass* CInstanceManager::GetAssetOfType(CString typeName)
+ISerializedClass* CInstanceManager::GetAssetOfType(CString typeName, unsigned int assetId)
 {
-    __GET_SOME_THING_OF_TYPE(Assets)
+    auto it = Assets.find(typeName.GetStdString());
+    if (it == Assets.end())
+        return NULL;
+    if (it->second.begin() == it->second.end())
+        return NULL;
+    if (assetId == 0)
+        return it->second.begin()->second;
+
+    auto it2 = it->second.find(assetId);
+    if (it2 == it->second.end()) 
+        return NULL;
+    return it2->second;
 }
 
-IComponent* CInstanceManager::GetComponentOfType(CString typeName)
+
+unsigned int CInstanceManager::AddEntity()
 {
-    __GET_SOME_THING_OF_TYPE(Components)
+    unsigned int id = GetUniqueId();
+    AddEntityId(id);
+    return id;
 }
 
+IComponent* CInstanceManager::GetComponentOfType(CString typeName, unsigned int componentId)
+{
+    auto it = Components.find(typeName.GetStdString());
+    if (it == Components.end())
+        return NULL;
+    if (it->second.begin() == it->second.end())
+        return NULL;
+    if (componentId == 0)
+        return it->second.begin()->second;
+
+    auto it2 = it->second.find(componentId);
+    if (it2 == it->second.end()) 
+        return NULL;
+    return it2->second;
+}
 
 void CInstanceManager::AddEntityId(unsigned int entityId)
 {

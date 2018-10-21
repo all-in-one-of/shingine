@@ -6,6 +6,8 @@
 class IComponent;
 class ISerializedClass;
 
+typedef std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>>::iterator IComponentIterator;
+
 class CInstanceManager
 {
 public:
@@ -15,13 +17,21 @@ public:
             CInstanceManager::Instance = new CInstanceManager();
         return CInstanceManager::Instance;
     }
+
+    unsigned int AddEntity();
+
     void AddEntityId(unsigned int entityId);
     void AddInstance(ISerializedClass* newAsset);
 
     static unsigned int GetUniqueId();
-    ISerializedClass* GetAssetOfType(CString typeName);
-    IComponent* GetComponentOfType(CString typeName);
+    void UpdateComponentEntityId(IComponent* component);
+
+    ISerializedClass* GetAssetOfType(CString typeName, unsigned int assetId = 0);
+    IComponent* GetComponentOfType(CString typeName, unsigned int componentId = 0);
+
     void GetAllComponents(std::vector<IComponent*> &components);
+
+    void GetComponentIteratorOfType(CString typeName, IComponentIterator &iterator);
 
     void Destroy(ISerializedClass* obj);
     void Destroy(unsigned int entityId);

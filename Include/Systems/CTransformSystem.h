@@ -1,9 +1,10 @@
 #pragma once
-#include <map>
+#include <string>
+#include <unordered_map>
 #include "ISystem.h"
 #include "Core.h"
 
-class CTransformComponent;
+class IComponent;
 class CTransformSystem : public ISystem
 {
 public:
@@ -11,8 +12,6 @@ public:
     virtual void Initialize();
     virtual void Update();
 private:
-    void UpdateComponentMap();
     void CalculateTransforms(bool ignoreStatic=true);
-    glm::mat4 CalculateTransform(CTransformComponent* transform, bool ignoreStatic=true);
-    std::map<unsigned int, CTransformComponent*> Transforms;
+    glm::mat4 CalculateTransform(IComponent* transformComponent, IComponentIterator &transformCollectionIterator, bool ignoreStatic=true);
 };

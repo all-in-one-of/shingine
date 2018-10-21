@@ -1,5 +1,5 @@
 #include "Systems/CTransformSystem.h"
-#include "Modules/Statics/CStatics.h"
+#include "Modules/Statics/CComponentManager.h"
 #include "Engine/Components/CTransformComponent.h"
 
 #include <algorithm>
@@ -14,14 +14,15 @@ void CTransformSystem::Initialize()
 void CTransformSystem::CalculateTransforms(bool ignoreStatic)
 {
     // cache the iterator
-    IComponentIterator transformCollectionIterator;
-    CStatics::InstanceManager()->GetComponentIteratorOfType("Transform", transformCollectionIterator);
+    CComponentManager::StringMap::iterator transformCollectionIterator;
+    CComponentManager::Get()->GetComponentIteratorOfType("Transform", transformCollectionIterator);
     auto transformIterator = transformCollectionIterator->second.begin();
     for (transformIterator; transformIterator != transformCollectionIterator->second.end(); transformIterator++)
         CalculateTransform(transformIterator->second, transformCollectionIterator, ignoreStatic);
 }
 
-glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent, IComponentIterator &transformCollectionIterator, bool ignoreStatic)
+glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent, 
+    std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>>::iterator &transformCollectionIterator, bool ignoreStatic)
 {
     CTransformComponent* transform = dynamic_cast<CTransformComponent*>(transformComponent);
     if (ignoreStatic && !transform->IsDynamic) 
@@ -30,7 +31,7 @@ glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent, I
     glm::mat4 ident(1);
     glm::mat4 parentTransform = transform->ParentID == 0 
         ? ident 
-        : CalculateTransform(transformCollectionIterator->second.at(transform->ParentID), transformCollectionIterator);
+        : CalculateTransform(transformCollectionIterator->second.at(transform->ParentID), transformCollectionIterator, ignoreStatic);
 
     glm::mat4 transformNoScale = glm::translate(ident, 
         transform->GetLocalPosition()) * glm::toMat4(transform->GetLocalRotation());

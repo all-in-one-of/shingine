@@ -1,17 +1,22 @@
 #include "Systems/CRenderingSystem.h"
 #include "Engine/AssetTypes/Settings/CRenderSettings.h"
-#include "Modules/Statics/CStatics.h"
 #include "Modules/Graphics/COpenGLRenderer.h"
+
+
+#include "Modules/Statics/CAssetManager.h"
+#include "Modules/Statics/CComponentManager.h"
+#include "Modules/Statics/CEntityManager.h"
+
 
 void CRenderingSystem::Initialize()
 {
     // get render settings
-    CRenderSettings* renderSettings = dynamic_cast<CRenderSettings*> (CStatics::InstanceManager()->GetAssetOfType("RenderSettings"));
+    CRenderSettings* renderSettings = dynamic_cast<CRenderSettings*> (CAssetManager::Get()->GetAssetOfType("RenderSettings"));
     if (!renderSettings)
     {
         // default render settings;
         renderSettings = new CRenderSettings();
-        CStatics::InstanceManager()->AddInstance(renderSettings);
+        CAssetManager::Get()->AddInstance(renderSettings);
     }
 
     if (!Renderer)
@@ -23,27 +28,26 @@ void CRenderingSystem::Initialize()
 
 void CRenderingSystem::Update()
 {
-    IComponentIterator rendererIterator;
-    IComponentIterator transformIterator;
+    CComponentManager::StringMap::iterator rendererIterator;
+    CComponentManager::StringMap::iterator transformIterator;
 
-    CInstanceManager* instanceManager = CStatics::InstanceManager();
+    CComponentManager* componentManager = CComponentManager::Get();
     // iterate over renderer iterator
-    instanceManager->GetComponentIteratorOfType("Renderer", rendererIterator);
-    instanceManager->GetComponentIteratorOfType("Transform", transformIterator);
+    componentManager->GetComponentIteratorOfType("Renderer", rendererIterator);
+    componentManager->GetComponentIteratorOfType("Transform", transformIterator);
     // get camera component
-    IComponent* cameraComponent = instanceManager->GetComponentOfType("Camera");
+    IComponent* cameraComponent = componentManager->GetComponentOfType("Camera");
     if (!cameraComponent)
     {
-        unsigned int newId = instanceManager->AddEntity();
-        
-
+        unsigned int newId = 
+            CEntityManager::Get()->CreateEntity({"Transform", "Camera", "ObjectMetadata"});
+        cameraComponent = componentManager->GetComponentOfType("Camera", newId);
     }
 
     std::unordered_map<unsigned int, IComponent*>::iterator entityIterator;
     for (entityIterator = rendererIterator->second.begin(); entityIterator != rendererIterator->second.end(); entityIterator++)
     {
         unsigned int entityId = entityIterator->first;
-
         IComponent* transform = transformIterator->second.at(entityId);
 
     }

@@ -11,30 +11,30 @@ typedef std::unordered_map<std::string, std::unordered_map<unsigned int, ICompon
 class CInstanceManager
 {
 public:
-    static CInstanceManager* Get()
-    {
-        if (!CInstanceManager::Instance)
-            CInstanceManager::Instance = new CInstanceManager();
-        return CInstanceManager::Instance;
-    }
+    // static CInstanceManager* Get()
+    // {
+    //     if (!CInstanceManager::Instance)
+    //         CInstanceManager::Instance = new CInstanceManager();
+    //     return CInstanceManager::Instance;
+    // }
 
-    unsigned int AddEntity();
+    // unsigned int AddEntity();
 
-    void AddEntityId(unsigned int entityId);
-    void AddInstance(ISerializedClass* newAsset);
+    // void AddEntityId(unsigned int entityId);
+    // void AddInstance(ISerializedClass* newAsset);
 
-    static unsigned int GetUniqueId();
-    void UpdateComponentEntityId(IComponent* component);
+    // static unsigned int GetUniqueId();
+    // void UpdateComponentEntityId(IComponent* component);
 
-    ISerializedClass* GetAssetOfType(CString typeName, unsigned int assetId = 0);
-    IComponent* GetComponentOfType(CString typeName, unsigned int componentId = 0);
+    // ISerializedClass* GetAssetOfType(CString typeName, unsigned int assetId = 0);
+    // IComponent* GetComponentOfType(CString typeName, unsigned int componentId = 0);
 
-    void GetAllComponents(std::vector<IComponent*> &components);
+    // void GetAllComponents(std::vector<IComponent*> &components);
 
-    void GetComponentIteratorOfType(CString typeName, IComponentIterator &iterator);
+    // void GetComponentIteratorOfType(CString typeName, IComponentIterator &iterator);
 
-    void Destroy(ISerializedClass* obj);
-    void Destroy(unsigned int entityId);
+    // void Destroy(ISerializedClass* obj);
+    // void Destroy(unsigned int entityId);
 private:
     CInstanceManager();
     // ids

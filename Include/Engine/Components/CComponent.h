@@ -1,5 +1,5 @@
 #pragma once
-#include "IComponent.h"
+#include "Engine/IComponent.h"
 #include "Utility/Data/Serialization.h"
 
 class CComponent : public IComponent, public ISerializedClass

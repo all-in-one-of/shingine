@@ -20,7 +20,7 @@ CUniqueIdSetter::CUniqueIdSetter(const std::vector<IDataNode*> &newNodes)
 
 void CUniqueIdSetter::UpdateUid(IDataNode* node)
 {
-    unsigned int newId = CStatics::InstanceManager()->GetUniqueId();
+    unsigned int newId = CStatics::Get()->GetUniqueId();
     LocalToGlobalUid[node->GetUniqueID()] = newId;
     node->SetUniqueID(newId);
 

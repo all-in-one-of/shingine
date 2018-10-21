@@ -14,7 +14,7 @@ class CSerializedFactory
 {
 public:
     typedef std::map<std::string, ISerialized*(*)()> TSerializedTypeMap;
-    static ISerialized* CreateInstance(const std::string &s);
+    static ISerialized* CreateInstance(const std::string &s, bool setUid=true);
 protected:
     static TSerializedTypeMap* GetMap();
 private:

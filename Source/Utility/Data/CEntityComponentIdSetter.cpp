@@ -4,7 +4,8 @@
 #include "Engine/CEntity.h"
 #include "Engine/IComponent.h"
 
-#include "Modules/Statics/CInstanceManager.h"
+#include "Modules/Statics/CEntityManager.h"
+#include "Modules/Statics/CComponentManager.h"
 
 void CEntityComponentIdSetter::UpdateIds(ISerialized* idCollections)
 {
@@ -18,16 +19,17 @@ void CEntityComponentIdSetter::UpdateIds(ISerialized* idCollections)
 CEntityComponentIdSetter::CEntityComponentIdSetter(CEntityIdCollection* collection)
 {
     std::unordered_map<unsigned int, unsigned int> componentIdToEntityId;
-    CInstanceManager* instanceManager = CInstanceManager::Get();
+    // CInstanceManager* instanceManager = CInstanceManager::Get();
     for (size_t x = 0; x < collection->Ids.size(); x++)
     {
         unsigned int entityId = collection->Ids[x];
-        instanceManager->AddEntityId(entityId);
+        CEntityManager::Get()->CreateEntity(entityId);
         for (size_t y = 0; y < collection->Components[x]->Ids.size(); y++)
             componentIdToEntityId[collection->Components[x]->Ids[y]] = entityId;
     }
+    
     std::vector<IComponent*> components;
-    instanceManager->GetAllComponents(components);
+    CComponentManager::Get()->GetAllComponents(components);
     for (size_t x = 0; x < components.size(); x++)
     {
         unsigned int componentId = components[x]->Id();
@@ -35,5 +37,6 @@ CEntityComponentIdSetter::CEntityComponentIdSetter(CEntityIdCollection* collecti
         if (it == componentIdToEntityId.end())
             continue;
         components[x]->SetEntityId(it->second);
+        CComponentManager::Get()->UpdateComponentEntityId(components[x]);
     }
 }

@@ -41,9 +41,9 @@ CDataNode::~CDataNode()
 ISerialized* CDataNode::Deserialize()
 {
     ISerializedClass* serializedClass = dynamic_cast<ISerializedClass*>(
-        CSerializedFactory::CreateInstance(Name().GetStdString()));
+        CSerializedFactory::CreateInstance(Name().GetStdString(), false));
 
-    //serializedClass->SetUniqueID(UniqueID);
+    serializedClass->SetUniqueID(UniqueID);
 
     if (serializedClass == NULL) 
         return serializedClass;

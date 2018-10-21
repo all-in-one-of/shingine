@@ -10,6 +10,8 @@
 #include "Modules/Scene/CSceneMaker.h"
 
 #include "Modules/Statics/CStatics.h"
+#include "Modules/Statics/CSceneManager.h"
+#include "Modules/Statics/CAssetManager.h"
 
 CString CResourceLoader::LastError = "";
 
@@ -44,31 +46,40 @@ bool CResourceLoader::Load(const CString &fileName)
         ISerialized* deserializedDataNode = nodes[x]->Deserialize();
         if (deserializedDataNode)
             deserializedNodes.push_back(deserializedDataNode);
+
+        // add instance
+        ISerializedClass* serializedObject = dynamic_cast<ISerializedClass*>(deserializedDataNode);
+        CStatics::Get()->AddSerializedObject(serializedObject);
     }
+
     reader->Close();
     delete reader;
 
     std::vector<ISerialized*> entities;
-    CInstanceManager* instanceManager = CStatics::InstanceManager();
 
     for (unsigned int x = 0; x < deserializedNodes.size(); x++)
     {
         if(deserializedNodes[x]->SerializedName() == "Entity")
         {
             entities.push_back(deserializedNodes[x]);
-            instanceManager->Destroy(dynamic_cast<ISerializedClass*>(deserializedNodes[x]));
+            // won't return the unique id
+            delete deserializedNodes[x];
         }
 
         else if(deserializedNodes[x]->SerializedName() == "EntityIdCollection")
         {
             CEntityComponentIdSetter::UpdateIds(deserializedNodes[x]);
-            instanceManager->Destroy(dynamic_cast<ISerializedClass*>(deserializedNodes[x]));
+            // will return the unique id
+            CStatics::Get()->Destroy(dynamic_cast<ISerializedClass*>(deserializedNodes[x]));
         }
     }
+
+    CAssetManager::Get()->RemoveAssetType("Entity");
+    CAssetManager::Get()->RemoveAssetType("EntityIdCollection");
     
     // check if the ssd file contains entities
     if (entities.size() > 0)
-        CStatics::SceneManager()->AddScene(fileName, CSceneMaker::Create(nodes));
+        CSceneManager::Get()->AddScene(fileName, CSceneMaker::Create(nodes));
     else
         for (size_t x = 0; x < nodes.size(); x++)
             delete nodes[x];

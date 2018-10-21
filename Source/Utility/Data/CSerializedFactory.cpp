@@ -1,9 +1,9 @@
 #include "Utility/Data/CSerializedFactory.h"
-#include "Modules/Statics/CInstanceManager.h"
+#include "Modules/Statics/CStatics.h"
 
 CSerializedFactory::TSerializedTypeMap* CSerializedFactory::Map = NULL;
 
-ISerialized* CSerializedFactory::CreateInstance(const std::string &s)
+ISerialized* CSerializedFactory::CreateInstance(const std::string &s, bool setUid)
 {
     TSerializedTypeMap::iterator it = GetMap()->find(s);
     if (it == GetMap()->end()) 
@@ -12,10 +12,12 @@ ISerialized* CSerializedFactory::CreateInstance(const std::string &s)
     ISerialized* createdInstance = it->second();
     ISerializedClass* serializedClass = dynamic_cast<ISerializedClass*>(createdInstance);
     // set unique id
-    unsigned int uniqueId = CInstanceManager::Get()->GetUniqueId();
-    serializedClass->SetUniqueID(uniqueId);
+    if (setUid)
+    {
+        unsigned int uniqueId = CStatics::Get()->GetUniqueId();
+        serializedClass->SetUniqueID(uniqueId);
+    }
     // add to the instance manager
-    CInstanceManager::Get()->AddInstance(serializedClass);
     return createdInstance;
 }
 

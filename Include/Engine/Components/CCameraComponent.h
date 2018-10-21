@@ -3,6 +3,7 @@
 
 class CCameraComponent : public ISerializedClass
 {
+public:
     SERIALIZE_CLASS(CCameraComponent)
     CCameraComponent()
     {

@@ -13,5 +13,6 @@ public:
     virtual void Update();
 private:
     void CalculateTransforms(bool ignoreStatic=true);
-    glm::mat4 CalculateTransform(IComponent* transformComponent, IComponentIterator &transformCollectionIterator, bool ignoreStatic=true);
+    glm::mat4 CalculateTransform(IComponent* transformComponent, 
+        std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>>::iterator &transformCollectionIterator, bool ignoreStatic);
 };

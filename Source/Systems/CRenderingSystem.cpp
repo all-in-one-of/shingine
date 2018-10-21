@@ -19,20 +19,34 @@ void CRenderingSystem::Initialize()
         Renderer = new COpenGLRender();
         Renderer->Create(renderSettings->ScreenWidth, renderSettings->ScreenHeight, renderSettings->WindowTitle);
     }
-    // collect objects by rendering x transform object
-    IScene* currentScene = CStatics::SceneManager()->CurrentScene();
-    
-
 }
 
 void CRenderingSystem::Update()
 {
-    // takes each object in the list, gets its transform
-    // calculates resulting transform 
-        // if it did change
-        // goes through all parents to check that
-    // takes cached one
-    // renders (material id, mesh it, matrix)
+    IComponentIterator rendererIterator;
+    IComponentIterator transformIterator;
+
+    CInstanceManager* instanceManager = CStatics::InstanceManager();
+    // iterate over renderer iterator
+    instanceManager->GetComponentIteratorOfType("Renderer", rendererIterator);
+    instanceManager->GetComponentIteratorOfType("Transform", transformIterator);
+    // get camera component
+    IComponent* cameraComponent = instanceManager->GetComponentOfType("Camera");
+    if (!cameraComponent)
+    {
+        unsigned int newId = instanceManager->AddEntity();
+        
+
+    }
+
+    std::unordered_map<unsigned int, IComponent*>::iterator entityIterator;
+    for (entityIterator = rendererIterator->second.begin(); entityIterator != rendererIterator->second.end(); entityIterator++)
+    {
+        unsigned int entityId = entityIterator->first;
+
+        IComponent* transform = transformIterator->second.at(entityId);
+
+    }
 }
 
 CRenderingSystem::~CRenderingSystem()

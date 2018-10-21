@@ -7,28 +7,30 @@
 
 void CTransformSystem::Initialize()
 {
-    // gather map of transforms
-    UpdateComponentMap();
     // calculate transform component cache
     CalculateTransforms(false);
-
 }
 
 void CTransformSystem::CalculateTransforms(bool ignoreStatic)
 {
-    for (std::map<unsigned int, CTransformComponent*>::iterator it = Transforms.begin(); it != Transforms.end(); it++)
-    {
-        CalculateTransform(it->second, ignoreStatic);
-    }
+    // cache the iterator
+    IComponentIterator transformCollectionIterator;
+    CStatics::InstanceManager()->GetComponentIteratorOfType("Transform", transformCollectionIterator);
+    auto transformIterator = transformCollectionIterator->second.begin();
+    for (transformIterator; transformIterator != transformCollectionIterator->second.end(); transformIterator++)
+        CalculateTransform(transformIterator->second, transformCollectionIterator, ignoreStatic);
 }
 
-glm::mat4 CTransformSystem::CalculateTransform(CTransformComponent* transform, bool ignoreStatic)
+glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent, IComponentIterator &transformCollectionIterator, bool ignoreStatic)
 {
-    if (ignoreStatic && !transform->IsDynamic) return transform->LocalTransform;
+    CTransformComponent* transform = dynamic_cast<CTransformComponent*>(transformComponent);
+    if (ignoreStatic && !transform->IsDynamic) 
+        return transform->LocalTransform;
+    
     glm::mat4 ident(1);
     glm::mat4 parentTransform = transform->ParentID == 0 
         ? ident 
-        : CalculateTransform(Transforms.at(transform->ParentID));
+        : CalculateTransform(transformCollectionIterator->second.at(transform->ParentID), transformCollectionIterator);
 
     glm::mat4 transformNoScale = glm::translate(ident, 
         transform->GetLocalPosition()) * glm::toMat4(transform->GetLocalRotation());
@@ -58,16 +60,4 @@ glm::mat4 CTransformSystem::CalculateTransform(CTransformComponent* transform, b
 void CTransformSystem::Update()
 {
     CalculateTransforms();
-}
-
-void CTransformSystem::UpdateComponentMap()
-{
-    //Transforms.clear();
-    //std::vector<IComponent*> genericComponents;
-    //CStatics::SceneManager()->CurrentScene()->GetComponents("Transform", genericComponents);
-    //for (size_t x = 0; x < genericComponents.size(); x++)
-    //{
-    //    CTransformComponent* transformComponent = dynamic_cast<CTransformComponent*>(genericComponents[x]);
-    //    Transforms[transformComponent->Owner()->ID()] = transformComponent;
-    //}
 }

@@ -8,11 +8,13 @@ public:
     CMaterial()
     {
         ATTRIBUTE_REGISTER(CMaterial, Name)
+        ATTRIBUTE_REGISTER(CMaterial, ShaderId)
         ATTRIBUTE_REGISTER(CMaterial, DiffuseColor)
     };
     virtual ~CMaterial() {};
 private:
     ATTRIBUTE_VALUE(CString, Name)
+    ATTRIBUTE_ID(ShaderId)
     ATTRIBUTE_VECTOR(float, DiffuseColor)
 };
 

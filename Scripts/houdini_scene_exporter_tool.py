@@ -231,7 +231,7 @@ for uid, hom_node in uid_to_hom_node.items():
                 if material_name not in materials.keys():
                     material_node = Node("Material")
                     material_node.attributes.append(Attribute("Name", DataType.CHAR, material_name, True))
-                    material_node.attributes.append(Attribute("ShaderName", DataType.CHAR, "default", True))
+                    material_node.attributes.append(Attribute("ShaderId", DataType.UID, 0, True))
                     material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, hom_node.parmTuple("basecolor").eval()))
                     materials[material_name] = material_node
                     material_id = material_node.unique_id

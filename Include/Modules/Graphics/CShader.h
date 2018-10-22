@@ -1,15 +1,6 @@
 #pragma once
-#include "Core.h"
 #include "Utility/Data/Serialization.h"
-
-enum EShaderType
-{
-    UNKNOWN = 0,
-    VERTEX = 1, 
-    FRAGMENT = 2,
-    GEOMETRY = 3,
-    COMPUTE = 4
-};
+#include "IShader.h"
 
 class CShaderSource : public ISerializedClass
 {
@@ -24,7 +15,7 @@ public:
     ATTRIBUTE_VALUE(CString, Source)
 };
 
-class CShader : public ISerializedClass
+class CShader : public IShader, public ISerializedClass
 {
 public:
     SERIALIZE_CLASS(CShader)
@@ -35,6 +26,9 @@ public:
     }
     ATTRIBUTE_VALUE(CString, Language)
     ATTRIBUTE_CLASS_VECTOR(CShaderSource, Source)
+
+    virtual void AddSource(EShaderType type, const CString &source);
+    virtual bool GetSource(EShaderType type, CString &source);
 
     CString LastCompilationError;
     bool Valid = false;

@@ -3,6 +3,9 @@ class ISystem
 {
 public:
     virtual ~ISystem() {};
-    virtual void Initialize() = 0;
-    virtual void Update() = 0;
+    virtual bool Initialize() = 0;
+    virtual bool Update() = 0;
+    
+    virtual void SetActive(bool active) = 0;
+    virtual bool IsActive() = 0;
 };

@@ -1,7 +1,6 @@
-#include "Modules/Graphics/COpenGLRenderer.h"
-#include "Utility/Common.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "Modules/Graphics/OpenGL/COpenGLRenderer.h"
+#include "Core.h"
+#include "Utility/Graphics.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,7 +9,6 @@ static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
 }
-
 
 void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -22,6 +20,11 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 
 COpenGLRender::COpenGLRender()
 {
+}
+
+void COpenGLRender::DrawMesh(glm::mat4 matrix, unsigned int meshAssetId, unsigned int materialId)
+{
+    throw 1;
 }
 
 void COpenGLRender::Create(unsigned short width, unsigned short height, const CString& title)

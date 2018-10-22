@@ -13,7 +13,7 @@ public:
         ATTRIBUTE_REGISTER(CRendererComponent, MeshReference)
     }
     virtual ~CRendererComponent() {};
-private:
+
     ATTRIBUTE_VALUE(unsigned char, Enabled)
     ATTRIBUTE_VALUE(unsigned char, DrawType)
     ATTRIBUTE_ID(MaterialReference)

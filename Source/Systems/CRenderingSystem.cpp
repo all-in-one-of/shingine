@@ -1,32 +1,22 @@
 #include "Systems/CRenderingSystem.h"
-#include "Engine/AssetTypes/Settings/CRenderSettings.h"
-#include "Modules/Graphics/COpenGLRenderer.h"
 
+#include "Modules/Graphics/CGraphics.h"
 
 #include "Modules/Statics/CAssetManager.h"
 #include "Modules/Statics/CComponentManager.h"
 #include "Modules/Statics/CEntityManager.h"
 
+#include "Engine/Components/CTransformComponent.h"
+#include "Engine/Components/CRendererComponent.h"
 
-void CRenderingSystem::Initialize()
+REGISTER_SERIALIZED_NAME(CRenderingSystem, RenderingSystem)
+bool CRenderingSystem::Initialize()
 {
-    // get render settings
-    CRenderSettings* renderSettings = dynamic_cast<CRenderSettings*> (CAssetManager::Get()->GetAssetOfType("RenderSettings"));
-    if (!renderSettings)
-    {
-        // default render settings;
-        renderSettings = new CRenderSettings();
-        CAssetManager::Get()->AddInstance(renderSettings);
-    }
-
-    if (!Renderer)
-    {
-        Renderer = new COpenGLRender();
-        Renderer->Create(renderSettings->ScreenWidth, renderSettings->ScreenHeight, renderSettings->WindowTitle);
-    }
+    Renderer = CGraphics::GetContext();
+    return true;
 }
 
-void CRenderingSystem::Update()
+bool CRenderingSystem::Update()
 {
     CComponentManager::StringMap::iterator rendererIterator;
     CComponentManager::StringMap::iterator transformIterator;
@@ -48,9 +38,15 @@ void CRenderingSystem::Update()
     for (entityIterator = rendererIterator->second.begin(); entityIterator != rendererIterator->second.end(); entityIterator++)
     {
         unsigned int entityId = entityIterator->first;
-        IComponent* transform = transformIterator->second.at(entityId);
-
+        CTransformComponent* transform = dynamic_cast<CTransformComponent*>(transformIterator->second.at(entityId));
+        CRendererComponent* renderer = dynamic_cast<CRendererComponent*>(entityIterator->second);
+        if (!transform || !renderer) 
+            continue;
+            
+        Renderer->DrawMesh(transform->WorldTransform, renderer->MeshReference, renderer->MaterialReference);
+        //
     }
+    return true;
 }
 
 CRenderingSystem::~CRenderingSystem()

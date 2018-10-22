@@ -1,16 +1,19 @@
 #pragma once
 #include <string>
 #include <unordered_map>
-#include "ISystem.h"
 #include "Core.h"
+#include "CSystem.h"
+#include "Utility/Data/Serialization.h"
 
 class IComponent;
-class CTransformSystem : public ISystem
+class CTransformSystem : public CSystem, public ISerializedClass
 {
 public:
+    SERIALIZE_CLASS(CTransformSystem)
+    CTransformSystem(){};
     virtual ~CTransformSystem() {};
-    virtual void Initialize();
-    virtual void Update();
+    virtual bool Initialize();
+    virtual bool Update();
 private:
     void CalculateTransforms(bool ignoreStatic=true);
     glm::mat4 CalculateTransform(IComponent* transformComponent, 

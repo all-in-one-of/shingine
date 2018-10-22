@@ -5,10 +5,13 @@
 #include <algorithm>
 #include <glm/gtx/matrix_decompose.hpp>
 
-void CTransformSystem::Initialize()
+REGISTER_SERIALIZED_NAME(CTransformSystem, TransformSystem)
+
+bool CTransformSystem::Initialize()
 {
     // calculate transform component cache
     CalculateTransforms(false);
+    return true;
 }
 
 void CTransformSystem::CalculateTransforms(bool ignoreStatic)
@@ -58,7 +61,8 @@ glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent,
     return transform->LocalTransform;
 }
 
-void CTransformSystem::Update()
+bool CTransformSystem::Update()
 {
     CalculateTransforms();
+    return true;
 }

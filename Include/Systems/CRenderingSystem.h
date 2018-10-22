@@ -1,12 +1,15 @@
-#include "ISystem.h"
+#include "CSystem.h"
+#include "Utility/Data/Serialization.h"
 
 class IRenderContext;
-class CRenderingSystem : public ISystem
+class CRenderingSystem : public CSystem, public ISerializedClass
 {
 public:
+    SERIALIZE_CLASS(CRenderingSystem)
+    CRenderingSystem(){};
     virtual ~CRenderingSystem();
-    virtual void Initialize();
-    virtual void Update();
+    virtual bool Initialize();
+    virtual bool Update();
 
 private:
     IRenderContext* Renderer;

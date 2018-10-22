@@ -14,8 +14,33 @@
 #include "Modules/Statics/CAssetManager.h"
 
 CString CResourceLoader::LastError = "";
-
 CString CResourceLoader::GetLastError() { return LastError; }
+
+bool CResourceLoader::LoadText(const CString &fileName, CString &data)
+{
+    FILE *file;
+    errno_t err;
+
+    if((err = fopen_s(&file, fileName.GetCharArray(), "rb")) != 0)
+    {
+        LastError = "Couldn't open file : " + fileName;
+        return false;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char* str = new char[fileSize + 1];
+    fread(str, fileSize, 1, file);
+    fclose(file);
+
+    str[fileSize] = '\0';
+    data = CString(str);
+
+    delete[] str;
+    return true;
+}
 
 bool CResourceLoader::Load(const CString &fileName)
 {

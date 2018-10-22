@@ -7,6 +7,7 @@ class CResourceLoader
 {
 public:
     static bool Load(const CString &fileName);
+    static bool LoadText(const CString &fileName, CString &data);
     static CString GetLastError();
 private:
     CResourceLoader() {};

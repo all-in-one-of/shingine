@@ -18,10 +18,8 @@ public:
     static void GetStride(const CString &typeName, unsigned char &stride);
 private:
     ISerialized* MakeTypedAttribute(SSD::SAttribute* attribute);
-
     CString NodeName;
     std::vector<ISerialized*> Attributes;
     std::vector<IDataNode*> Nodes;
-
     unsigned int UniqueID;
 };

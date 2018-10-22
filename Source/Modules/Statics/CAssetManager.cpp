@@ -1,5 +1,6 @@
 #include "Modules/Statics/CAssetManager.h"
 #include "Utility/Data/ISerialized.h"
+#include "Utility/Data/CSerializedFactory.h"
 
 CAssetManager* CAssetManager::Instance = NULL;
 ISerializedClass* CAssetManager::GetAssetOfType(CString typeName, unsigned int assetId)
@@ -16,6 +17,14 @@ ISerializedClass* CAssetManager::GetAssetOfType(CString typeName, unsigned int a
     if (it2 == it->second.end()) 
         return NULL;
     return it2->second;
+}
+
+
+ISerializedClass* CAssetManager::AddAssetOfType(CString typeName)
+{
+    ISerializedClass* newAsset = dynamic_cast<ISerializedClass*>(CSerializedFactory::CreateInstance(typeName.GetStdString()));
+    AddInstance(newAsset);
+    return newAsset;
 }
 
 void CAssetManager::AddInstance(ISerializedClass* newAsset)

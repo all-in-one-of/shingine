@@ -5,17 +5,21 @@
 CAssetManager* CAssetManager::Instance = NULL;
 ISerializedClass* CAssetManager::GetAssetOfType(const CString &typeName, unsigned int assetId)
 {
-    StringMap::iterator it = Assets.find(typeName.GetStdString());
-    if (it == Assets.end())
+    StringMap::iterator it;
+    if (!GetAssetIteratorOfType(typeName, it))
         return NULL;
-    if (it->second.begin() == it->second.end())
-        return NULL;
-    if (assetId == 0)
-        return it->second.begin()->second;
 
-    IdMap::iterator idIterator = it->second.find(assetId);
-    if (idIterator == it->second.end()) 
+    IdMap &idMap = it->second;
+    if (idMap.size() == 0)
         return NULL;
+
+    IdMap::iterator idIterator = idMap.begin();
+    if (assetId == 0) return idIterator->second;
+
+    idIterator = idMap.find(assetId);
+    if (idIterator == idMap.end()) 
+        return NULL;
+    
     return idIterator->second;
 }
 
@@ -37,10 +41,11 @@ void CAssetManager::RemoveAssetType(CString assetType)
     Assets.erase(assetType.GetStdString());
 }
 
-void CAssetManager::GetAssetIteratorOfType(const CString &typeName, StringMap::iterator &iterator)
+bool CAssetManager::GetAssetIteratorOfType(const CString &typeName, StringMap::iterator &iterator)
 {
     StringMap::iterator it = Assets.find(typeName.GetStdString());
     if (it == Assets.end()) 
-        return;
+        return false;
     iterator = it;
+    return true;
 }

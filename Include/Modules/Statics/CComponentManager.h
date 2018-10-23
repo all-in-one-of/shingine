@@ -22,7 +22,7 @@ public:
     IComponent* GetComponentOfType(CString typeName, unsigned int componentId = 0);
     
     void GetAllComponents(std::vector<IComponent*> &components);
-    void GetComponentIteratorOfType(CString typeName, StringMap::iterator &iterator);
+    bool GetComponentIteratorOfType(CString typeName, StringMap::iterator &iterator);
 
     template<class T>
     T* GetComponentOfType(CString typeName, unsigned int componentId = 0)

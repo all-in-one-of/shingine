@@ -45,27 +45,35 @@ IComponent* CComponentManager::GetComponentOfType(CString typeName, unsigned int
     StringMap::iterator it = Components.find(typeName.GetStdString());
     if (it == Components.end())
         return NULL;
-    if (it->second.begin() == it->second.end())
+
+    IdMap &idMap = it->second;
+
+    if (idMap.begin() == idMap.end())
         return NULL;
     if (componentId == 0)
-        return it->second.begin()->second;
+        return idMap.begin()->second;
 
-    IdMap::iterator it2 = it->second.find(componentId);
-    if (it2 == it->second.end()) 
+    IdMap::iterator idMapIterator = idMap.find(componentId);
+    if (idMapIterator == idMap.end()) 
         return NULL;
-    return it2->second;
+
+    return idMapIterator->second;
 }
 
 void CComponentManager::GetAllComponents(std::vector<IComponent*> &components)
 {
     for (StringMap::iterator it = Components.begin(); it != Components.end(); it++)
-        for (IdMap::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-            components.push_back(it2->second);
+    {
+        IdMap &idMap = it->second;
+        for (IdMap::iterator idMapIt = idMap.begin(); idMapIt != idMap.end(); idMapIt++)
+            components.push_back(idMapIt->second);
+    }
 }
-void CComponentManager::GetComponentIteratorOfType(CString typeName, StringMap::iterator &iterator)
+bool CComponentManager::GetComponentIteratorOfType(CString typeName, StringMap::iterator &iterator)
 {
     StringMap::iterator it = Components.find(typeName.GetStdString());
     if (it == Components.end()) 
-        return;
+        return false;
     iterator = it;
+    return true;
 }

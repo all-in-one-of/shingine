@@ -1,13 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(shingine)
 
-if(WIN32)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
-
-if(APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo")
-endif()
 
 include_directories(External/include)
 include_directories(Include)
@@ -23,5 +17,5 @@ target_link_libraries(shingine ${CMAKE_SOURCE_DIR}/External/lib/x64/glfw3.lib)
 endif()
 
 if(APPLE)
-target_link_libraries(shingine ${CMAKE_SOURCE_DIR}/External/lib/x64/libglfw3.a)
+target_link_libraries(shingine "-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo" "${CMAKE_SOURCE_DIR}/External/lib/x64/libglfw3.a")
 endif()

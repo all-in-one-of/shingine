@@ -18,14 +18,24 @@
 CString CResourceLoader::LastError = "";
 CString CResourceLoader::GetLastError() { return LastError; }
 
+
+void CResourceLoader::SetupPath(const CString &localPath, CString& outPath)
+{
+    const CString basePath = "";
+    outPath = basePath + localPath;
+}
+
 bool CResourceLoader::LoadText(const CString &fileName, CString &data)
 {
+    CString updatedFileName;
+    SetupPath(fileName, updatedFileName);
+    
     FILE *file;
     #if defined _WIN32 || defined _WIN64
         errno_t err;
-        if((err = fopen_s(&file, fileName.GetCharArray(), "rb")) != 0)
+        if((err = fopen_s(&file, updatedFileName.GetCharArray(), "rb")) != 0)
     #else
-        file = fopen(fileName.GetCharArray(), "rb");
+        file = fopen(updatedFileName.GetCharArray(), "rb");
         if(!file)
     #endif
         {
@@ -55,8 +65,11 @@ bool CResourceLoader::Load(const CString &fileName)
     // *.ssda - ascii version
     // *.ssd_json - json
 
+    CString updatedFileName;
+    SetupPath(fileName, updatedFileName);
+    
     CResourceReaderFactory ResourceReaderFactory;
-    IResourceReader* reader = ResourceReaderFactory.CreateReader(fileName);
+    IResourceReader* reader = ResourceReaderFactory.CreateReader(updatedFileName);
 
     if (!reader->Open())
     {

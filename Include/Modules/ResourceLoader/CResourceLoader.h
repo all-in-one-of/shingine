@@ -11,5 +11,6 @@ public:
     static CString GetLastError();
 private:
     CResourceLoader() {};
+    static void SetupPath(const CString &localPath, CString& outPath);
     static CString LastError;
 };

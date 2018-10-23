@@ -6,14 +6,7 @@ class CTransformComponent : public CComponent
 {
 public:
     SERIALIZE_CLASS(CTransformComponent)
-    CTransformComponent()
-    {
-        ATTRIBUTE_REGISTER(CTransformComponent, ParentID)
-        ATTRIBUTE_REGISTER(CTransformComponent, IsDynamic)
-        ATTRIBUTE_REGISTER(CTransformComponent, LocalPosition)
-        ATTRIBUTE_REGISTER(CTransformComponent, LocalScale)
-        ATTRIBUTE_REGISTER(CTransformComponent, LocalRotation)
-    }
+    CTransformComponent();
     virtual ~CTransformComponent() {};
 
     ATTRIBUTE_ID(ParentID)
@@ -33,6 +26,7 @@ public:
     // cached values
     glm::mat4 LocalTransform;
     glm::mat4 WorldTransform;
+    glm::mat4 WorldTransformInv;
     glm::mat4 WorldTransformUniformScale;
 
     glm::vec3 Position;

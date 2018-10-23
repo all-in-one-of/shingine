@@ -1,6 +1,7 @@
 #pragma once
 #include "IRenderContext.h"
 class IShader;
+class CRenderSettings;
 class CGraphics
 {
 public:

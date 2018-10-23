@@ -43,6 +43,7 @@ glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent,
         glm::scale(ident, transform->GetLocalScale());
 
     transform->WorldTransform = transform->LocalTransform * parentTransform;
+    transform->WorldTransformInv = glm::inverse(glm::transpose(transform->WorldTransform));
 
     float maxScaleAxis = *std::max_element(
             transform->LocalScale.begin(), transform->LocalScale.end());

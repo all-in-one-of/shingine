@@ -36,3 +36,11 @@ void CAssetManager::RemoveAssetType(CString assetType)
 {
     Assets.erase(assetType.GetStdString());
 }
+
+void CAssetManager::GetAssetIteratorOfType(CString typeName, StringMap::iterator &iterator)
+{
+    auto it = Assets.find(typeName.GetStdString());
+    if (it == Assets.end()) 
+        return;
+    iterator = it;
+}

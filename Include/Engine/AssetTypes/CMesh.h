@@ -14,10 +14,13 @@ public:
         ATTRIBUTE_REGISTER(CMesh, TexCoord)
     };
     virtual ~CMesh() {}
-private:
+    
     ATTRIBUTE_VALUE(CString, Name)
-    ATTRIBUTE_VECTOR(unsigned int, Indices)
-    ATTRIBUTE_VECTOR(float, Normals)
-    ATTRIBUTE_VECTOR(float, Positions)
-    ATTRIBUTE_VECTOR(float, TexCoord)
+    ATTRIBUTE_VECTOR(unsigned int, Indices) // n
+    ATTRIBUTE_VECTOR(float, Normals)        // n * 3
+    ATTRIBUTE_VECTOR(float, Positions)      // n * 3
+    ATTRIBUTE_VECTOR(float, TexCoord)       // n * 3
+
+    // TODO add bounding box calculation
+    
 };

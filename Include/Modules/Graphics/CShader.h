@@ -27,6 +27,7 @@ public:
     ATTRIBUTE_VALUE(CString, Language)
     ATTRIBUTE_CLASS_VECTOR(CShaderSource, Source)
 
+    virtual unsigned int AssetId();
     virtual void AddSource(EShaderType type, const CString &source);
     virtual bool GetSource(EShaderType type, CString &source);
 

@@ -27,3 +27,8 @@ bool CShader::GetSource(EShaderType type, CString &source)
     }
     return false;
 }
+
+unsigned int CShader::AssetId()
+{
+    return UniqueID();
+}

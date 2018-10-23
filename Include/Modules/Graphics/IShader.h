@@ -14,6 +14,7 @@ class IShader
 {
 public:
     virtual ~IShader() {};
+    virtual unsigned int AssetId() = 0;
     virtual void AddSource(EShaderType type, const CString &source) = 0;
     virtual bool GetSource(EShaderType type, CString &source) = 0;
 };

@@ -48,17 +48,17 @@ void CVaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId, u
         for (unsigned int x = 0; x < vertexCount; x++)
         {
             unsigned int vertexIndex = x * 3;
-            vboVertices[x].x = mesh->Positions[x + 0];
-            vboVertices[x].y = mesh->Positions[x + 1];
-            vboVertices[x].z = mesh->Positions[x + 2];
+            vboVertices[x].x = mesh->Positions[vertexIndex + 0];
+            vboVertices[x].y = mesh->Positions[vertexIndex + 1];
+            vboVertices[x].z = mesh->Positions[vertexIndex + 2];
 
-            vboVertices[x].nx = mesh->Normals[x + 0];
-            vboVertices[x].ny = mesh->Normals[x + 1];
-            vboVertices[x].nz = mesh->Normals[x + 2];
+            vboVertices[x].nx = mesh->Normals[vertexIndex + 0];
+            vboVertices[x].ny = mesh->Normals[vertexIndex + 1];
+            vboVertices[x].nz = mesh->Normals[vertexIndex + 2];
 
-            vboVertices[x].tx = mesh->TexCoord[x + 0];
-            vboVertices[x].ty = mesh->TexCoord[x + 1];
-            vboVertices[x].tz = mesh->TexCoord[x + 2];
+            vboVertices[x].tx = mesh->TexCoord[vertexIndex + 0];
+            vboVertices[x].ty = mesh->TexCoord[vertexIndex + 1];
+            vboVertices[x].tz = mesh->TexCoord[vertexIndex + 2];
         }
 
         // static draw

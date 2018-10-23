@@ -1,7 +1,7 @@
 #pragma once
-#include "Utility/Data/Serialization.h"
+#include "ComponentSetup.h"
 
-class CCameraComponent : public ISerializedClass
+class CCameraComponent : public CComponent
 {
 public:
     SERIALIZE_CLASS(CCameraComponent)
@@ -10,6 +10,10 @@ public:
         ATTRIBUTE_REGISTER(CCameraComponent, FOV)
         ATTRIBUTE_REGISTER(CCameraComponent, NearPlane)
         ATTRIBUTE_REGISTER(CCameraComponent, FarPlane)
+
+        FOV = .6f;
+        NearPlane = .1f;
+        FarPlane = 1000.f;
     }
     ATTRIBUTE_VALUE(float, FOV)
     ATTRIBUTE_VALUE(float, NearPlane)

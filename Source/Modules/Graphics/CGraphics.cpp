@@ -1,4 +1,4 @@
-#include "Modules/Graphics/OpenGL/COpenGLRenderer.h"
+#include "Modules/Graphics/OpenGL/COpenGLRender.h"
 #include "Modules/Graphics/CGraphics.h"
 #include "Engine/AssetTypes/Settings/CRenderSettings.h"
 #include "Modules/Statics/CAssetManager.h"
@@ -24,19 +24,19 @@ IRenderContext* CGraphics::Context()
     }
     // TODO make a factory class for making render context
     if (!RenderContext)
-    {
         RenderContext = new COpenGLRender();
-        RenderContext->Create(renderSettings->ScreenWidth, renderSettings->ScreenHeight, renderSettings->WindowTitle);
-    }
-        return RenderContext;
+        
+    return RenderContext;
 }
 
 void CGraphics::SetDefaultShader(IShader* shader)
 {
+    if(Instance == NULL) Instance = new CGraphics();
     Instance->defaultShader = shader;
 }
 
 IShader* CGraphics::DefaultShader()
 {
+    if(Instance == NULL) Instance = new CGraphics();
     return Instance->defaultShader;
 }

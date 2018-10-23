@@ -1,4 +1,5 @@
 #include "Utility/Data/SSD.h"
+#include <stddef.h>
 
 namespace SSD
 {
@@ -19,7 +20,10 @@ namespace SSD
         delete[] Name;
         delete[] DataType;
         delete[] Values;
-        if(!Nodes) return;
+        
+        if(!Nodes) 
+            return;
+
         for(size_t x = 0; x < ElementCount; x++)
         {
             if(!Nodes[x]) continue;

@@ -34,7 +34,7 @@ void COglShaderManager::SetMaterialUniforms(IMaterial* material, int programId)
 void COglShaderManager::GetUniformId(const std::string &uniformName, int programId, int &uniformLoc)
 {
     uniformLoc = 0;
-    auto it = UniformLocations[programId].find(uniformName);
+    std::unordered_map<std::string, int>::iterator it = UniformLocations[programId].find(uniformName);
     if (it == UniformLocations[programId].end())
     {
         // find uniform location
@@ -72,7 +72,7 @@ int COglShaderManager::GetShaderProgramId(unsigned int shaderId)
     if (shaderId == 0)
         shaderId = CGraphics::DefaultShader()->AssetId();
 
-    auto it = AssetIdToShaderProgramId.find(shaderId);
+    std::unordered_map<unsigned int, int>::iterator it = AssetIdToShaderProgramId.find(shaderId);
     if (it != AssetIdToShaderProgramId.end())
         return it->second;
 

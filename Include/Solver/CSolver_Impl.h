@@ -10,6 +10,7 @@ class ISystem;
 class CSolver_Impl
 {
 public:
+    typedef std::unordered_map<std::string, ISystem*> SystemsMap;
     CSolver_Impl();
     void AddSystem(const CString& systemTypeName);
     void SetActive(bool active, const CString& systemTypeName);
@@ -18,5 +19,5 @@ public:
     bool IsValid();
 private:
     bool Valid = true;
-    std::unordered_map<std::string, ISystem*> Systems;
+    SystemsMap Systems;
 };

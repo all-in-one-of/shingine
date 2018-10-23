@@ -19,7 +19,7 @@ void CVaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId, u
 {
     // nested map
     // program_id -> map -> mesh_asset_id 
-    auto it = VaoMap[programId].find(meshAssetId);
+    std::unordered_map<unsigned int, unsigned int>::iterator it = VaoMap[programId].find(meshAssetId);
     if (it == VaoMap[programId].end())
     {
         // get mesh

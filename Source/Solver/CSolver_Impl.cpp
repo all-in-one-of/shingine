@@ -26,7 +26,7 @@ void CSolver_Impl::SetActive(bool active, const CString& systemTypeName)
 
 void CSolver_Impl::InitializeSystems()
 {
-    for (auto it = Systems.begin(); it != Systems.end(); it++)
+    for (SystemsMap::iterator it = Systems.begin(); it != Systems.end(); it++)
     {
         if(!it->second->Initialize())
         {
@@ -43,7 +43,7 @@ bool CSolver_Impl::Simulate()
         return false;
     
     bool solverActive = true;
-    for (auto it = Systems.begin(); it != Systems.end(); it++)
+    for (SystemsMap::iterator it = Systems.begin(); it != Systems.end(); it++)
     {
         solverActive = solverActive && it->second->Update();
     }

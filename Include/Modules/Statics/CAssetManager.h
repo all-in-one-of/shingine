@@ -16,24 +16,24 @@ public:
     }
 
     void RemoveAssetType(CString assetType);
-    ISerializedClass* GetAssetOfType(CString typeName, unsigned int assetId = 0);
-    ISerializedClass* AddAssetOfType(CString typeName);
+    ISerializedClass* GetAssetOfType(const CString &typeName, unsigned int assetId = 0);
+    ISerializedClass* AddAssetOfType(const CString &typeName);
 
     template<class T>
-    T* GetAssetOfType(CString typeName, unsigned int assetId = 0)
+    T* GetAssetOfType(const CString &typeName, unsigned int assetId = 0)
     {
         ISerializedClass* asset = GetAssetOfType(typeName, assetId);
         return dynamic_cast<T*>(asset);
     }
 
     template<class T>
-    T* AddAssetOfType(CString typeName)
+    T* AddAssetOfType(const CString &typeName)
     {
         ISerializedClass* asset = AddAssetOfType(typeName);
         return dynamic_cast<T*>(asset);
     }
 
-    void GetAssetIteratorOfType(CString typeName, StringMap::iterator &iterator);
+    void GetAssetIteratorOfType(const CString &typeName, StringMap::iterator &iterator);
 
     void AddInstance(ISerializedClass* newAsset);
 private:

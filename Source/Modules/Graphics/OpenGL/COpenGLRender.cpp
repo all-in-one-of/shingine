@@ -103,8 +103,10 @@ void COpenGLRender::Create(unsigned short width, unsigned short height, const CS
         exit(EXIT_FAILURE);
 	}
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     Window = glfwCreateWindow(width, height, title.GetCharArray(), NULL, NULL);
     if (!Window)

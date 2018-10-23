@@ -32,7 +32,7 @@ void Initialize()
 int main()
 {
     Initialize();
-    bool didLoad = CResourceLoader::Load("Assets/Scenes/TestScene.ssd");
+    CResourceLoader::Load("Assets/Scenes/TestScene.ssd");
     CSolver* solver = new CSolver();
     solver->AddSystem("TransformSystem");
     solver->AddSystem("RenderingSystem");

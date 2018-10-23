@@ -1,5 +1,7 @@
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
+
 #include "Modules/ResourceLoader/CResourceLoader.h"
 #include "Modules/ResourceLoader/CResourceReaderFactory.h"
 
@@ -19,13 +21,17 @@ CString CResourceLoader::GetLastError() { return LastError; }
 bool CResourceLoader::LoadText(const CString &fileName, CString &data)
 {
     FILE *file;
-    errno_t err;
-
-    if((err = fopen_s(&file, fileName.GetCharArray(), "rb")) != 0)
-    {
-        LastError = "Couldn't open file : " + fileName;
-        return false;
-    }
+    #if defined _WIN32 || defined _WIN64
+        errno_t err;
+        if((err = fopen_s(&file, fileName.GetCharArray(), "rb")) != 0)
+    #else
+        file = fopen(fileName.GetCharArray(), "rb");
+        if(!file)
+    #endif
+        {
+            LastError = "Couldn't open file : " + fileName;
+            return false;
+        }
 
     fseek(file, 0, SEEK_END);
     long fileSize = ftell(file);

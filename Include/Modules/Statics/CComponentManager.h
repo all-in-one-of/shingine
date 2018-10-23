@@ -17,7 +17,7 @@ public:
     }
 
     void AddComponent(IComponent* component);
-    void AddComponent(CString type, unsigned int entityId = 0);
+    IComponent* AddComponent(CString type, unsigned int entityId = 0);
     void UpdateComponentEntityId(IComponent* component);
     IComponent* GetComponentOfType(CString typeName, unsigned int componentId = 0);
     

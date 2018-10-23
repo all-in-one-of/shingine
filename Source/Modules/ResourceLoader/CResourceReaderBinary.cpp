@@ -156,7 +156,7 @@ void CResourceReaderBinary::ReadUInt32(unsigned int &val)
     unsigned char* bytes = new unsigned char[4];
     FileStream.read((char*)bytes, 4);
     DataStruct::UnpackUInt32(val, bytes);
-    delete bytes;
+    delete[] bytes;
 }
 
 void CResourceReaderBinary::ReadUShort(unsigned short &val)
@@ -165,7 +165,7 @@ void CResourceReaderBinary::ReadUShort(unsigned short &val)
     unsigned char* bytes = new unsigned char[2];
     FileStream.read((char*)bytes, 2);
     DataStruct::UnpackUShort(val, bytes);
-    delete bytes;
+    delete[] bytes;
 }
 
 void CResourceReaderBinary::ReadByte(unsigned char &val)

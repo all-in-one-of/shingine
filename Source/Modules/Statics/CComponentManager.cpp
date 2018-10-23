@@ -18,15 +18,17 @@ void CComponentManager::AddComponent(IComponent* component)
         SerializedName().GetStdString()][entityId] = component;
 }
 
-void CComponentManager::AddComponent(CString type, unsigned int entityId)
+IComponent* CComponentManager::AddComponent(CString type, unsigned int entityId)
 {
     ISerialized* serializedObject = CSerializedFactory::CreateInstance(type.GetStdString());
-    if (!serializedObject) return;
+    if (!serializedObject) 
+        return NULL;
     IComponent* component = dynamic_cast<IComponent*>(serializedObject);
 
     if (entityId != 0) 
         component->SetEntityId(entityId);
     AddComponent(component);
+    return component;
 }
 
 void CComponentManager::UpdateComponentEntityId(IComponent* component)
@@ -40,7 +42,7 @@ void CComponentManager::UpdateComponentEntityId(IComponent* component)
 
 IComponent* CComponentManager::GetComponentOfType(CString typeName, unsigned int componentId)
 {
-    auto it = Components.find(typeName.GetStdString());
+    StringMap::iterator it = Components.find(typeName.GetStdString());
     if (it == Components.end())
         return NULL;
     if (it->second.begin() == it->second.end())
@@ -48,7 +50,7 @@ IComponent* CComponentManager::GetComponentOfType(CString typeName, unsigned int
     if (componentId == 0)
         return it->second.begin()->second;
 
-    auto it2 = it->second.find(componentId);
+    IdMap::iterator it2 = it->second.find(componentId);
     if (it2 == it->second.end()) 
         return NULL;
     return it2->second;
@@ -56,19 +58,13 @@ IComponent* CComponentManager::GetComponentOfType(CString typeName, unsigned int
 
 void CComponentManager::GetAllComponents(std::vector<IComponent*> &components)
 {
-    auto it = Components.begin();
-    for (it; it != Components.end(); it++)
-    {
-        auto it2 = it->second.begin();
-        for (it2; it2 != it->second.end(); it2++)
-        {
+    for (StringMap::iterator it = Components.begin(); it != Components.end(); it++)
+        for (IdMap::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
             components.push_back(it2->second);
-        }
-    }
 }
 void CComponentManager::GetComponentIteratorOfType(CString typeName, StringMap::iterator &iterator)
 {
-    auto it = Components.find(typeName.GetStdString());
+    StringMap::iterator it = Components.find(typeName.GetStdString());
     if (it == Components.end()) 
         return;
     iterator = it;

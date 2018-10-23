@@ -3,9 +3,9 @@
 #include "Utility/Data/CSerializedFactory.h"
 
 CAssetManager* CAssetManager::Instance = NULL;
-ISerializedClass* CAssetManager::GetAssetOfType(CString typeName, unsigned int assetId)
+ISerializedClass* CAssetManager::GetAssetOfType(const CString &typeName, unsigned int assetId)
 {
-    auto it = Assets.find(typeName.GetStdString());
+    StringMap::iterator it = Assets.find(typeName.GetStdString());
     if (it == Assets.end())
         return NULL;
     if (it->second.begin() == it->second.end())
@@ -13,14 +13,14 @@ ISerializedClass* CAssetManager::GetAssetOfType(CString typeName, unsigned int a
     if (assetId == 0)
         return it->second.begin()->second;
 
-    auto it2 = it->second.find(assetId);
-    if (it2 == it->second.end()) 
+    IdMap::iterator idIterator = it->second.find(assetId);
+    if (idIterator == it->second.end()) 
         return NULL;
-    return it2->second;
+    return idIterator->second;
 }
 
 
-ISerializedClass* CAssetManager::AddAssetOfType(CString typeName)
+ISerializedClass* CAssetManager::AddAssetOfType(const CString &typeName)
 {
     ISerializedClass* newAsset = dynamic_cast<ISerializedClass*>(CSerializedFactory::CreateInstance(typeName.GetStdString()));
     AddInstance(newAsset);
@@ -37,9 +37,9 @@ void CAssetManager::RemoveAssetType(CString assetType)
     Assets.erase(assetType.GetStdString());
 }
 
-void CAssetManager::GetAssetIteratorOfType(CString typeName, StringMap::iterator &iterator)
+void CAssetManager::GetAssetIteratorOfType(const CString &typeName, StringMap::iterator &iterator)
 {
-    auto it = Assets.find(typeName.GetStdString());
+    StringMap::iterator it = Assets.find(typeName.GetStdString());
     if (it == Assets.end()) 
         return;
     iterator = it;

@@ -33,7 +33,8 @@ CEntityComponentIdSetter::CEntityComponentIdSetter(CEntityIdCollection* collecti
     for (size_t x = 0; x < components.size(); x++)
     {
         unsigned int componentId = components[x]->Id();
-        auto it = componentIdToEntityId.find(componentId);
+        std::unordered_map<unsigned int, unsigned int>::iterator it = 
+            componentIdToEntityId.find(componentId);
         if (it == componentIdToEntityId.end())
             continue;
         components[x]->SetEntityId(it->second);

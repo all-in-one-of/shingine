@@ -20,8 +20,8 @@ void CTransformSystem::CalculateTransforms(bool ignoreStatic)
     // cache the iterator
     CComponentManager::StringMap::iterator transformCollectionIterator;
     CComponentManager::Get()->GetComponentIteratorOfType("Transform", transformCollectionIterator);
-    auto transformIterator = transformCollectionIterator->second.begin();
-    for (transformIterator; transformIterator != transformCollectionIterator->second.end(); transformIterator++)
+    CComponentManager::IdMap::iterator transformIterator;
+    for (transformIterator = transformCollectionIterator->second.begin(); transformIterator != transformCollectionIterator->second.end(); transformIterator++)
         CalculateTransform(transformIterator->second, transformCollectionIterator, ignoreStatic);
 }
 

@@ -1,6 +1,18 @@
 #include "Engine/Components/CTransformComponent.h"
 REGISTER_SERIALIZED_NAME(CTransformComponent,Transform)
 
+CTransformComponent::CTransformComponent()
+{
+    ATTRIBUTE_REGISTER(CTransformComponent, ParentID)
+    ATTRIBUTE_REGISTER(CTransformComponent, IsDynamic)
+    ATTRIBUTE_REGISTER(CTransformComponent, LocalPosition)
+    ATTRIBUTE_REGISTER(CTransformComponent, LocalScale)
+    ATTRIBUTE_REGISTER(CTransformComponent, LocalRotation)
+    LocalPosition = {0.f, 0.f, 0.f};
+    LocalRotation = {0.f, 0.f, 0.f, 1.f}; // 0 quat
+    LocalScale = {1.f, 1.f, 1.f};
+}
+
 glm::vec3 CTransformComponent::GetLocalPosition()
 {
     return glm::vec3(LocalPosition[0], LocalPosition[1], LocalPosition[2]);

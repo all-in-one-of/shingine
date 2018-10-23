@@ -23,6 +23,21 @@ public:
     
     void GetAllComponents(std::vector<IComponent*> &components);
     void GetComponentIteratorOfType(CString typeName, StringMap::iterator &iterator);
+
+    template<class T>
+    T* GetComponentOfType(CString typeName, unsigned int componentId = 0)
+    {
+        IComponent* component = GetComponentOfType(typeName, componentId);
+        return dynamic_cast<T*>(component);
+    }
+
+    template<class T>
+    T* AddComponent(CString typeName)
+    {
+        IComponent* component = AddComponent(typeName);
+        return dynamic_cast<T*>(component);
+    }
+
 private:
     CComponentManager();
     static CComponentManager* Instance;

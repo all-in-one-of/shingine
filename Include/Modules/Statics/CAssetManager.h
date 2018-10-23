@@ -33,6 +33,7 @@ public:
         return dynamic_cast<T*>(asset);
     }
 
+    void GetAssetIteratorOfType(CString typeName, StringMap::iterator &iterator);
 
     void AddInstance(ISerializedClass* newAsset);
 private:

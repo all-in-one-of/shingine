@@ -26,13 +26,20 @@ void Initialize()
 
     // set camera
     CTransformComponent* transformComponent = CActiveCamera::Get()->GetTransformComponent();
-    transformComponent->SetLocalPosition(0, 0, -5.f);
+    transformComponent->SetLocalPosition(0, 1, -15.f);
+    // add render settings
+    CAssetManager::Get()->AddAssetOfType("RenderSettings");
 }
 
 int main()
 {
     Initialize();
-    CResourceLoader::Load("Assets/Scenes/TestScene.ssd");
+    bool didLoad = CResourceLoader::Load("Assets/Scenes/TestScene.ssd");
+    if (!didLoad)
+    {
+        std::cout << "Couldn't load the scene" << std::endl;
+        return 1;
+    }
     CSolver* solver = new CSolver();
     solver->AddSystem("TransformSystem");
     solver->AddSystem("RenderingSystem");

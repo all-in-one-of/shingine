@@ -12,14 +12,12 @@ void CEntityComponentIdSetter::UpdateIds(ISerialized* idCollections)
     CEntityIdCollection* collection = dynamic_cast<CEntityIdCollection*>(idCollections);
     if (!collection) 
         return;
-    CEntityComponentIdSetter s = CEntityComponentIdSetter(collection);
-
+    (void)CEntityComponentIdSetter(collection);
 }
 
 CEntityComponentIdSetter::CEntityComponentIdSetter(CEntityIdCollection* collection)
 {
     std::unordered_map<unsigned int, unsigned int> componentIdToEntityId;
-    // CInstanceManager* instanceManager = CInstanceManager::Get();
     for (size_t x = 0; x < collection->Ids.size(); x++)
     {
         unsigned int entityId = collection->Ids[x];

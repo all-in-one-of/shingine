@@ -1,4 +1,4 @@
-#version 420 
+#version 410 
 
 uniform mat4 _ModelMatrix;
 uniform mat4 _ModelMatrixInverseTransposed;
@@ -21,5 +21,5 @@ void main()
 
 	_WorldPosition = _ModelMatrix * vec4(position, 1.0);
 	_Normal = vec3(_ModelMatrixInverseTransposed * vec4(normalize(_NormalAttribute), 1.0f));
-    _Color = _Normal;
+    _Color = abs(_Normal);
 }

@@ -8,6 +8,10 @@
 #include "Modules/Graphics/CGraphics.h"
 #include "Solver/CSolver.h"
 
+#include "Modules/Statics/CActiveCamera.h"
+
+#include "Engine/Components/CTransformComponent.h"
+
 void Initialize()
 {
     // set default shader
@@ -20,18 +24,19 @@ void Initialize()
     defaultShader->AddSource(EShaderType::FRAGMENT, fragSrc);
     CGraphics::SetDefaultShader(defaultShader);
 
+    // set camera
+    CTransformComponent* transformComponent = CActiveCamera::Get()->GetTransformComponent();
+    transformComponent->LocalPosition = {0, 0, -5.f};
 }
 
 int main()
 {
-
+    Initialize();
     bool didLoad = CResourceLoader::Load("Assets/Scenes/TestScene.ssd");
     CSolver* solver = new CSolver();
     solver->AddSystem("TransformSystem");
     solver->AddSystem("RenderingSystem");
     solver->InitializeSystems();
     while (solver->Simulate());
-
-
     return 0;
 }

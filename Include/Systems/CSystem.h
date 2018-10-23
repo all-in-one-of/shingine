@@ -8,5 +8,5 @@ public:
     virtual void SetActive(bool active);
     virtual bool IsActive();
 protected:
-    bool Active = true;
+    bool Active = false;
 };

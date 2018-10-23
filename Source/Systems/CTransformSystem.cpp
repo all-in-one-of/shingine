@@ -11,7 +11,8 @@ bool CTransformSystem::Initialize()
 {
     // calculate transform component cache
     CalculateTransforms(false);
-    return true;
+    Active = true;
+    return Active;
 }
 
 void CTransformSystem::CalculateTransforms(bool ignoreStatic)
@@ -36,7 +37,7 @@ glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent,
         ? ident 
         : CalculateTransform(transformCollectionIterator->second.at(transform->ParentID), transformCollectionIterator, ignoreStatic);
 
-    glm::mat4 transformNoScale = glm::translate(ident, 
+    glm::mat4 transformNoScale = glm::translate(ident,
         transform->GetLocalPosition()) * glm::toMat4(transform->GetLocalRotation());
 
     transform->LocalTransform = transformNoScale *

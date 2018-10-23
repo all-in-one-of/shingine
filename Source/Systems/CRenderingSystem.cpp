@@ -34,20 +34,30 @@ bool CRenderingSystem::Update()
 
     CComponentManager* componentManager = CComponentManager::Get();
     // iterate over renderer iterator
-    componentManager->GetComponentIteratorOfType("Renderer", rendererIterator);
-    componentManager->GetComponentIteratorOfType("Transform", transformIterator);
+    bool drawMeshes = true;
+    drawMeshes = drawMeshes && componentManager->GetComponentIteratorOfType("Renderer", rendererIterator);
+    drawMeshes = drawMeshes && componentManager->GetComponentIteratorOfType("Transform", transformIterator);
 
-    std::unordered_map<unsigned int, IComponent*>::iterator entityIterator;
-    for (entityIterator = rendererIterator->second.begin(); entityIterator != rendererIterator->second.end(); entityIterator++)
+    if (drawMeshes)
     {
-        unsigned int entityId = entityIterator->first;
-        CTransformComponent* transform = dynamic_cast<CTransformComponent*>(transformIterator->second.at(entityId));
-        CRendererComponent* renderer = dynamic_cast<CRendererComponent*>(entityIterator->second);
-        if (!transform || !renderer) 
-            continue;
+        typedef std::unordered_map<unsigned int, IComponent*> IComponentMap;
+
+        IComponentMap &rendererComponentMap = rendererIterator->second;
+        IComponentMap::iterator entityIterator;
+        
+        for (entityIterator = rendererComponentMap.begin(); entityIterator != rendererComponentMap.end(); entityIterator++)
+        {
+            unsigned int entityId = entityIterator->first;
+            IComponentMap &transformComponentMap = transformIterator->second;
+            CTransformComponent* transform = dynamic_cast<CTransformComponent*>(transformComponentMap.at(entityId));
+            CRendererComponent* renderer = dynamic_cast<CRendererComponent*>(entityIterator->second);
+            if (!transform || !renderer)
+                continue;
             
-        Renderer->DrawMesh(transform->WorldTransform, transform->WorldTransformInv, renderer->MeshReference, renderer->MaterialReference);
+            Renderer->DrawMesh(transform->WorldTransform, transform->WorldTransformInv, renderer->MeshReference, renderer->MaterialReference);
+        }
     }
+    
     
     Renderer->EndDrawingLoop();
     return true;

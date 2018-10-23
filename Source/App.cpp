@@ -26,7 +26,7 @@ void Initialize()
 
     // set camera
     CTransformComponent* transformComponent = CActiveCamera::Get()->GetTransformComponent();
-    transformComponent->LocalPosition = {0, 0, -5.f};
+    transformComponent->SetLocalPosition(0, 0, -5.f);
 }
 
 int main()

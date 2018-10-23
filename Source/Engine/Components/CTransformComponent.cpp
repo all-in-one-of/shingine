@@ -26,6 +26,11 @@ glm::vec3 CTransformComponent::GetLocalScale()
     return glm::vec3(LocalScale[0], LocalScale[1], LocalScale[2]);
 }
 
+void CTransformComponent::SetLocalPosition(float x, float y, float z)
+{
+    LocalPosition = {x, y, z};
+}
+
 void CTransformComponent::SetLocalPosition(glm::vec3 &val)
 {
     LocalPosition = {val.x, val.y, val.z};

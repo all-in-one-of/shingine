@@ -11,14 +11,12 @@ public:
 
     ATTRIBUTE_ID(ParentID)
     ATTRIBUTE_VALUE(unsigned char, IsDynamic)
-    ATTRIBUTE_VECTOR(float, LocalPosition)
-    ATTRIBUTE_VECTOR(float, LocalScale)
-    ATTRIBUTE_VECTOR(float, LocalRotation)
 
     glm::vec3 GetLocalPosition();
     glm::quat GetLocalRotation();
     glm::vec3 GetLocalScale();
 
+    void SetLocalPosition(float x, float y, float z);
     void SetLocalPosition(glm::vec3 &val);
     void SetLocalRotation(glm::quat &val);
     void SetLocalScale(glm::vec3 &val);
@@ -32,4 +30,8 @@ public:
     glm::vec3 Position;
     glm::quat Rotation;
     glm::vec3 Scale;
+private:
+    ATTRIBUTE_VECTOR(float, LocalPosition)
+    ATTRIBUTE_VECTOR(float, LocalScale)
+    ATTRIBUTE_VECTOR(float, LocalRotation)
 };

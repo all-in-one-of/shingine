@@ -16,8 +16,6 @@ namespace DataStruct
         if (typeName == "float") stride = 4;
         // if (typeName == "unsigned char") stride = 1;
         if(typeName == "uid") stride = 4;
-
-
     }
     void UnpackUInt32(unsigned int &val, unsigned char *bytes)
     {

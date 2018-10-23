@@ -59,7 +59,7 @@ class ISerialized;
     ____REGISTER_SERIALIZED_TYPE(CLASSNAME)
 
 #define ATTRIBUTE_ID(NAME) \
-    unsigned int NAME; \
+    unsigned int NAME = 0; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
         NAME = ((CTypedAttributeValue<unsigned int> *)attr)->Get(); \
@@ -147,6 +147,3 @@ class ISerialized;
     AttributeNames.push_back(#NAME); \
     AttributeFunctionMap.insert( std::make_pair( std::string("Get_") + #NAME , &CLASSNAME::Attrib_Get_##NAME )); \
     AttributeFunctionMap.insert( std::make_pair( std::string("Set_") + #NAME , &CLASSNAME::Attrib_Set_##NAME )); 
-
-// #define 
-//     ATTRIBUTE_CLASS_VECTOR(CShaderSource, Source)

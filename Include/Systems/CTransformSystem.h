@@ -16,6 +16,7 @@ public:
     virtual bool Update();
 private:
     void CalculateTransforms(bool ignoreStatic=true);
+    typedef std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>> StringMap;
     glm::mat4 CalculateTransform(IComponent* transformComponent, 
-        std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>>::iterator &transformCollectionIterator, bool ignoreStatic);
+        StringMap::iterator &transformCollectionIterator, bool ignoreStatic);
 };

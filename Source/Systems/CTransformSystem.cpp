@@ -20,22 +20,23 @@ void CTransformSystem::CalculateTransforms(bool ignoreStatic)
     // cache the iterator
     CComponentManager::StringMap::iterator transformCollectionIterator;
     CComponentManager::Get()->GetComponentIteratorOfType("Transform", transformCollectionIterator);
+    CComponentManager::IdMap &idMap = transformCollectionIterator->second;
     CComponentManager::IdMap::iterator transformIterator;
-    for (transformIterator = transformCollectionIterator->second.begin(); transformIterator != transformCollectionIterator->second.end(); transformIterator++)
+    for (transformIterator = idMap.begin(); transformIterator != idMap.end(); transformIterator++)
         CalculateTransform(transformIterator->second, transformCollectionIterator, ignoreStatic);
 }
 
-glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent, 
-    std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>>::iterator &transformCollectionIterator, bool ignoreStatic)
+glm::mat4 CTransformSystem::CalculateTransform(IComponent* transformComponent, StringMap::iterator &transformCollectionIterator, bool ignoreStatic)
 {
     CTransformComponent* transform = dynamic_cast<CTransformComponent*>(transformComponent);
     if (ignoreStatic && !transform->IsDynamic) 
         return transform->LocalTransform;
     
+    CComponentManager::IdMap &idMap = transformCollectionIterator->second;
     glm::mat4 ident(1);
     glm::mat4 parentTransform = transform->ParentID == 0 
         ? ident 
-        : CalculateTransform(transformCollectionIterator->second.at(transform->ParentID), transformCollectionIterator, ignoreStatic);
+        : CalculateTransform(idMap.at(transform->ParentID), transformCollectionIterator, ignoreStatic);
 
     glm::mat4 transformNoScale = glm::translate(ident,
         transform->GetLocalPosition()) * glm::toMat4(transform->GetLocalRotation());

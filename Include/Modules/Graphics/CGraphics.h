@@ -18,5 +18,5 @@ public:
 private:
     CGraphics();
     static CGraphics* Instance;
-    IRenderContext* RenderContext;
+    IRenderContext* RenderContext = NULL;
 };

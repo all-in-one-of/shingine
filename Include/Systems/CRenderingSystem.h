@@ -11,5 +11,5 @@ public:
     virtual bool Initialize();
     virtual bool Update();
 private:
-    IRenderContext* Renderer;
+    IRenderContext* Renderer = NULL;
 };

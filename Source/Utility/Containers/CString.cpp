@@ -94,6 +94,12 @@ CString operator+(const char* chars, const CString& str)
     return CString(chars) += str;
 }
 
+
+CString operator+ (const CString& a, const CString& b)
+{
+    return CString(a) += b;
+}
+
 char& CString::operator[] (unsigned index) const
 {
     if (index >= ArrayLength) throw 1;

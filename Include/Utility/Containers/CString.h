@@ -30,6 +30,7 @@ public:
 
     CString& operator+=(const CString &str);
     friend CString operator+(const char* chars, const CString& str);
+    friend CString operator+(const CString& a, const CString& b);
 
     std::string GetStdString() const;
     const char* GetCharArray() const;

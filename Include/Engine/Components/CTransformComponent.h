@@ -12,24 +12,26 @@ public:
     ATTRIBUTE_ID(ParentID)
     ATTRIBUTE_VALUE(unsigned char, IsDynamic)
 
-    glm::vec3 GetLocalPosition();
-    glm::quat GetLocalRotation();
-    glm::vec3 GetLocalScale();
+    glm::vec3 GetPosition();
+    glm::quat GetRotation();
+    glm::vec3 GetScale();
 
-    void SetLocalPosition(float x, float y, float z);
-    void SetLocalPosition(glm::vec3 &val);
-    void SetLocalRotation(glm::quat &val);
-    void SetLocalScale(glm::vec3 &val);
+    void SetPosition(float x, float y, float z);
+    void SetPosition(glm::vec3 &val);
+    void SetRotation(glm::quat &val);
+    void SetScale(glm::vec3 &val);
 
     // cached values
     glm::mat4 LocalTransform;
+    glm::mat4 LocalTransformUniformScale;
+
     glm::mat4 WorldTransform;
     glm::mat4 WorldTransformInv;
     glm::mat4 WorldTransformUniformScale;
 
-    glm::vec3 Position;
-    glm::quat Rotation;
-    glm::vec3 Scale;
+    glm::vec3 WorldPosition;
+    glm::quat WorldRotation;
+    glm::vec3 WorldScale;
 private:
     ATTRIBUTE_VECTOR(float, LocalPosition)
     ATTRIBUTE_VECTOR(float, LocalScale)

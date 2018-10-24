@@ -13,33 +13,33 @@ CTransformComponent::CTransformComponent()
     LocalScale = {1.f, 1.f, 1.f};
 }
 
-glm::vec3 CTransformComponent::GetLocalPosition()
+glm::vec3 CTransformComponent::GetPosition()
 {
     return glm::vec3(LocalPosition[0], LocalPosition[1], LocalPosition[2]);
 }
-glm::quat CTransformComponent::GetLocalRotation()
+glm::quat CTransformComponent::GetRotation()
 {
     return glm::quat(LocalRotation[0], LocalRotation[1], LocalRotation[2], LocalRotation[3]);
 }
-glm::vec3 CTransformComponent::GetLocalScale()
+glm::vec3 CTransformComponent::GetScale()
 {
     return glm::vec3(LocalScale[0], LocalScale[1], LocalScale[2]);
 }
 
-void CTransformComponent::SetLocalPosition(float x, float y, float z)
+void CTransformComponent::SetPosition(float x, float y, float z)
 {
     LocalPosition = {x, y, z};
 }
 
-void CTransformComponent::SetLocalPosition(glm::vec3 &val)
+void CTransformComponent::SetPosition(glm::vec3 &val)
 {
     LocalPosition = {val.x, val.y, val.z};
 }
-void CTransformComponent::SetLocalRotation(glm::quat &val)
+void CTransformComponent::SetRotation(glm::quat &val)
 {
     LocalRotation = {val.x, val.y, val.z, val.w};
 }
-void CTransformComponent::SetLocalScale(glm::vec3 &val)
+void CTransformComponent::SetScale(glm::vec3 &val)
 {
     LocalScale = {val.x, val.y, val.z};
 }

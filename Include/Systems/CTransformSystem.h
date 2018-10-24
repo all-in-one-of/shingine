@@ -15,8 +15,10 @@ public:
     virtual bool Initialize();
     virtual bool Update();
 private:
+    void CalculateLocalTransforms(bool ignoreStatic=true);
     void CalculateTransforms(bool ignoreStatic=true);
+    glm::mat4 GetRotationMatrix(glm::quat q);
     typedef std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>> StringMap;
-    glm::mat4 CalculateTransform(IComponent* transformComponent, 
-        StringMap::iterator &transformCollectionIterator, bool ignoreStatic);
+    glm::mat4 CalculateWorldTransforms(bool ignoreStatic);
+    StringMap::iterator TransformCollectionIterator;
 };

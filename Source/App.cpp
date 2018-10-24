@@ -26,7 +26,7 @@ void Initialize()
 
     // set camera
     CTransformComponent* transformComponent = CActiveCamera::Get()->GetTransformComponent();
-    transformComponent->SetLocalPosition(0, 1, -15.f);
+    transformComponent->SetPosition(0, 1, -6.f);
     // add render settings
     CAssetManager::Get()->AddAssetOfType("RenderSettings");
 }
@@ -43,6 +43,7 @@ int main()
     CSolver* solver = new CSolver();
     solver->AddSystem("TransformSystem");
     solver->AddSystem("RenderingSystem");
+    solver->AddSystem("PlayerControllerSystem");
     solver->InitializeSystems();
     while (solver->Simulate());
     return 0;

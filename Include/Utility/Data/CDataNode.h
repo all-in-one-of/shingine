@@ -21,5 +21,5 @@ private:
     CString NodeName;
     std::vector<ISerialized*> Attributes;
     std::vector<IDataNode*> Nodes;
-    unsigned int UniqueID;
+    unsigned int UniqueID = -1;
 };

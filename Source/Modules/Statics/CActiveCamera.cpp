@@ -21,17 +21,12 @@ CTransformComponent* CActiveCamera::GetTransformComponent()
 
 glm::mat4 CActiveCamera::ProjectionMatrix()
 {
-    CCameraComponent* cameraComponent = CActiveCamera::Get()->GetCameraComponent();
-    int width, height;
-    CGraphics::GetContext()->GetWindowFramebufferSize(width, height);
-    return glm::perspective(cameraComponent->FOV, width / (float) height,
-        cameraComponent->NearPlane, cameraComponent->FarPlane);
+    return Instance->CameraComponent->ProjectionMatrix;
 }
 
 glm::mat4 CActiveCamera::ViewMatrix()
 {
-    CTransformComponent* transformComponent = CActiveCamera::Get()->GetTransformComponent();
-    return transformComponent->WorldTransform;
+    return Instance->CameraComponent->ViewMatrix;
 }
 
 CActiveCamera::CActiveCamera()

@@ -37,40 +37,33 @@ FILE
 }
 '''
 
-from enum import IntEnum
 import struct
 
-class DataType(IntEnum):
-    NONE = 0
-    BYTE = 1
-    UINT = 2
-    FLOAT = 3
-    INT = 4
-    INT16 = 5
-    UINT16 = 6
-    CHAR = 7
-    UID = 8
-    SERIALIZED_CLASS = 9
+DataType_NONE = 0
+DataType_BYTE = 1
+DataType_UINT = 2
+DataType_FLOAT = 3
+DataType_INT = 4
+DataType_INT16 = 5
+DataType_UINT16 = 6
+DataType_CHAR = 7
+DataType_UID = 8
+DataType_SERIALIZED_CLASS = 9
 
-class NodeType(IntEnum):
-    OBJECT = 0
-    DATA = 1
-
-class DrawType(IntEnum):
-    WIRE_FRAME = 0
-    FILL = 1
-    POINTS = 2
+DrawType_WIRE_FRAME = 0
+DrawType_FILL = 1
+DrawType_POINTS = 2
 
 data_type_name_map = {
-    DataType.BYTE : "unsigned char",
-    DataType.INT : "int",
-    DataType.INT16 : "short",
-    DataType.UINT : "unsigned int",
-    DataType.UINT16 : "unsigned short",
-    DataType.FLOAT : "float",
-    DataType.CHAR : "char",
-    DataType.UID : "uid",
-    DataType.SERIALIZED_CLASS : "SerializedClass"
+    DataType_BYTE : "unsigned char",
+    DataType_INT : "int",
+    DataType_INT16 : "short",
+    DataType_UINT : "unsigned int",
+    DataType_UINT16 : "unsigned short",
+    DataType_FLOAT : "float",
+    DataType_CHAR : "char",
+    DataType_UID : "uid",
+    DataType_SERIALIZED_CLASS : "SerializedClass"
 }
 
 NextId = 50
@@ -117,7 +110,8 @@ class GeometryData:
             texcoord.append(0.0)
             texcoord.append(0.0)
         for face in geometry.prims():
-            for vert in face.vertices():
+            vertices = reversed(face.vertices())
+            for vert in vertices:
                 indices.append(vert.point().number())
         # delete temp houdini nodes
         normal.destroy()
@@ -177,9 +171,9 @@ for node in obj_nodes:
 for uid, hom_node in uid_to_hom_node.items():
     # add object metadata component
     current_node = Node("ObjectMetadata")
-    current_node.attributes.append(Attribute("Name", DataType.CHAR, hom_node.name(), True))
-    current_node.attributes.append(Attribute("Tag", DataType.CHAR, "default", True))
-    current_node.attributes.append(Attribute("Layer", DataType.CHAR, "default", True))
+    current_node.attributes.append(Attribute("Name", DataType_CHAR, hom_node.name(), True))
+    current_node.attributes.append(Attribute("Tag", DataType_CHAR, "default", True))
+    current_node.attributes.append(Attribute("Layer", DataType_CHAR, "default", True))
     components.append(current_node)
     uid_to_components[uid].append(current_node.unique_id)
     # add transform component
@@ -190,19 +184,19 @@ for uid, hom_node in uid_to_hom_node.items():
     scale = local_transform.extractScales()
     # transform node
     current_node = Node("Transform")
-    current_node.attributes.append(Attribute("ParentID", DataType.UID, parent_node_uid(hom_node), True))
-    current_node.attributes.append(Attribute("IsDynamic", DataType.BYTE, 0, True))
-    current_node.attributes.append(Attribute("LocalPosition", DataType.FLOAT, position))
-    current_node.attributes.append(Attribute("LocalRotation", DataType.FLOAT, quat))
-    current_node.attributes.append(Attribute("LocalScale", DataType.FLOAT, scale))
+    current_node.attributes.append(Attribute("ParentID", DataType_UID, parent_node_uid(hom_node), True))
+    current_node.attributes.append(Attribute("IsDynamic", DataType_BYTE, 0, True))
+    current_node.attributes.append(Attribute("LocalPosition", DataType_FLOAT, position))
+    current_node.attributes.append(Attribute("LocalRotation", DataType_FLOAT, quat))
+    current_node.attributes.append(Attribute("LocalScale", DataType_FLOAT, scale))
     components.append(current_node)
     uid_to_components[uid].append(current_node.unique_id)
     # handle light component
     if hom_node.type().name() == light_type_name:
         current_node = Node("Light")
-        current_node.attributes.append(Attribute("Color", DataType.FLOAT, hom_node.parmTuple("light_color").eval()))
-        current_node.attributes.append(Attribute("Exposure", DataType.FLOAT, hom_node.parm("light_exposure").eval(), True))
-        current_node.attributes.append(Attribute("Intensity", DataType.FLOAT, hom_node.parm("light_intensity").eval(), True))
+        current_node.attributes.append(Attribute("Color", DataType_FLOAT, hom_node.parmTuple("light_color").eval()))
+        current_node.attributes.append(Attribute("Exposure", DataType_FLOAT, hom_node.parm("light_exposure").eval(), True))
+        current_node.attributes.append(Attribute("Intensity", DataType_FLOAT, hom_node.parm("light_intensity").eval(), True))
         components.append(current_node)
         uid_to_components[uid].append(current_node.unique_id)
     # handle mesh component
@@ -210,17 +204,17 @@ for uid, hom_node in uid_to_hom_node.items():
         geometry_data = GeometryData(hom_node)
         # make mesh asset
         geometry_node = Node("Mesh")
-        geometry_node.attributes.append(Attribute("Name", DataType.CHAR, hom_node.name(), True))
-        geometry_node.attributes.append(Attribute("Indices", DataType.UINT, geometry_data.indices))
-        geometry_node.attributes.append(Attribute("Normals", DataType.FLOAT, geometry_data.normals))
-        geometry_node.attributes.append(Attribute("Positions", DataType.FLOAT, geometry_data.positions))
-        geometry_node.attributes.append(Attribute("TexCoord", DataType.FLOAT, geometry_data.texcoord))
+        geometry_node.attributes.append(Attribute("Name", DataType_CHAR, hom_node.name(), True))
+        geometry_node.attributes.append(Attribute("Indices", DataType_UINT, geometry_data.indices))
+        geometry_node.attributes.append(Attribute("Normals", DataType_FLOAT, geometry_data.normals))
+        geometry_node.attributes.append(Attribute("Positions", DataType_FLOAT, geometry_data.positions))
+        geometry_node.attributes.append(Attribute("TexCoord", DataType_FLOAT, geometry_data.texcoord))
         meshes[hom_node.name()] = geometry_node
         # add renderer component
         renderer_node = Node("Renderer")
-        renderer_node.attributes.append(Attribute("DrawType", DataType.BYTE, DrawType.FILL, True))
-        renderer_node.attributes.append(Attribute("Enabled", DataType.BYTE, 1, True))
-        renderer_node.attributes.append(Attribute("MeshReference", DataType.UID, geometry_node.unique_id, True))
+        renderer_node.attributes.append(Attribute("DrawType", DataType_BYTE, DrawType_FILL, True))
+        renderer_node.attributes.append(Attribute("Enabled", DataType_BYTE, 1, True))
+        renderer_node.attributes.append(Attribute("MeshReference", DataType_UID, geometry_node.unique_id, True))
         # find material
         material_node = None
         # find material
@@ -231,26 +225,26 @@ for uid, hom_node in uid_to_hom_node.items():
                 material_name = material_hom_node.name()
                 if material_name not in materials.keys():
                     material_node = Node("Material")
-                    material_node.attributes.append(Attribute("Name", DataType.CHAR, material_name, True))
-                    material_node.attributes.append(Attribute("ShaderId", DataType.UID, 0, True))
-                    material_node.attributes.append(Attribute("DiffuseColor", DataType.FLOAT, hom_node.parmTuple("basecolor").eval()))
+                    material_node.attributes.append(Attribute("Name", DataType_CHAR, material_name, True))
+                    material_node.attributes.append(Attribute("ShaderId", DataType_UID, 0, True))
+                    material_node.attributes.append(Attribute("DiffuseColor", DataType_FLOAT, hom_node.parmTuple("basecolor").eval()))
                     materials[material_name] = material_node
                     material_id = material_node.unique_id
                 else:
                     material_id = materials[material_name]
-        renderer_node.attributes.append(Attribute("MaterialReference", DataType.UID, material_id, True))
+        renderer_node.attributes.append(Attribute("MaterialReference", DataType_UID, material_id, True))
         components.append(renderer_node)
         uid_to_components[uid].append(renderer_node.unique_id)
 # create nodes collection
 # make entity/component id collection
 id_collection_node = Node("EntityIdCollection")
-id_collection_node.attributes.append(Attribute("Ids", DataType.UID, uid_to_components.keys()))
+id_collection_node.attributes.append(Attribute("Ids", DataType_UID, uid_to_components.keys()))
 comid_collection = []
 for uid, component_ids in uid_to_components.items():
     cmid = Node("ComponentIdCollection")
-    cmid.attributes.append(Attribute("Ids", DataType.UID, uid_to_components[uid]))
+    cmid.attributes.append(Attribute("Ids", DataType_UID, uid_to_components[uid]))
     comid_collection.append(cmid)
-id_collection_node.attributes.append(Attribute("Components", DataType.SERIALIZED_CLASS, comid_collection))
+id_collection_node.attributes.append(Attribute("Components", DataType_SERIALIZED_CLASS, comid_collection))
 nodes.append(id_collection_node)
 # add components
 nodes.extend(components)
@@ -260,14 +254,14 @@ nodes.extend(meshes.values())
 nodes.extend(materials.values())
 # add test shader asset
 shader_node = Node("Shader")
-shader_node.attributes.append(Attribute("Language", DataType.CHAR, "GLSL", True))
+shader_node.attributes.append(Attribute("Language", DataType_CHAR, "GLSL", True))
 shader_source_vertex = Node("ShaderSource")
-shader_source_vertex.attributes.append(Attribute("Type", DataType.UINT16, 1, True))
-shader_source_vertex.attributes.append(Attribute("Source", DataType.CHAR, "int main() \n { \n return 0; \n }", True))
+shader_source_vertex.attributes.append(Attribute("Type", DataType_UINT16, 1, True))
+shader_source_vertex.attributes.append(Attribute("Source", DataType_CHAR, "int main() \n { \n return 0; \n }", True))
 shader_source_fragment = Node("ShaderSource")
-shader_source_fragment.attributes.append(Attribute("Type", DataType.UINT16, 1, True))
-shader_source_fragment.attributes.append(Attribute("Source", DataType.CHAR, "int mainMain() \n { \n int x = 2; \n return 0; \n }", True))
-shader_node.attributes.append(Attribute("Source", DataType.SERIALIZED_CLASS, [shader_source_vertex, shader_source_fragment]))
+shader_source_fragment.attributes.append(Attribute("Type", DataType_UINT16, 1, True))
+shader_source_fragment.attributes.append(Attribute("Source", DataType_CHAR, "int mainMain() \n { \n int x = 2; \n return 0; \n }", True))
+shader_node.attributes.append(Attribute("Source", DataType_SERIALIZED_CLASS, [shader_source_vertex, shader_source_fragment]))
 nodes.append(shader_node)
 
 version = 1
@@ -316,7 +310,7 @@ def attribute_to_bytes(attr):
     attr_data.append(single_element_value & 0xff)
 
     # handle strings
-    if attr.data_type == DataType.CHAR:
+    if attr.data_type == DataType_CHAR:
         if attr.single_element:
             # byte count
             attr_data.extend(get_uint32_to_bytes(len(attr.value) + 1))
@@ -337,7 +331,7 @@ def attribute_to_bytes(attr):
             attr_data.extend(get_uint32_to_bytes(element_count))
             # value
             attr_data.extend(values)
-    elif attr.data_type == DataType.SERIALIZED_CLASS:
+    elif attr.data_type == DataType_SERIALIZED_CLASS:
         element_count = len(attr.value)
         # byte count
         attr_data.extend(get_uint32_to_bytes(element_count))
@@ -355,17 +349,17 @@ def attribute_to_bytes(attr):
         byte_count = element_count
         unpacked_values = bytearray()
         for x in range(len(values)):
-            if (attr.data_type == DataType.FLOAT):
+            if (attr.data_type == DataType_FLOAT):
                 byte_count = element_count * 4
                 unpacked_values.extend(bytearray(struct.pack("f", values[x])))
-            if (attr.data_type == DataType.UINT or attr.data_type == DataType.UID \
-                or attr.data_type == DataType.INT):
+            if (attr.data_type == DataType_UINT or attr.data_type == DataType_UID \
+                or attr.data_type == DataType_INT):
                 byte_count = element_count * 4
                 unpacked_values.extend(get_uint32_to_bytes(values[x]))
-            if (attr.data_type == DataType.UINT16 or attr.data_type == DataType.INT16):
+            if (attr.data_type == DataType_UINT16 or attr.data_type == DataType_INT16):
                 byte_count = element_count * 2
                 unpacked_values.extend(get_uint16_to_bytes(values[x]))
-            if (attr.data_type == DataType.BYTE):
+            if (attr.data_type == DataType_BYTE):
                 unpacked_values.append(values[x] & 0xff)
         # byte count
         attr_data.extend(get_uint32_to_bytes(byte_count))

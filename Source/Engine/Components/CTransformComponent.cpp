@@ -19,7 +19,12 @@ glm::vec3 CTransformComponent::GetPosition()
 }
 glm::quat CTransformComponent::GetRotation()
 {
-    return glm::quat(LocalRotation[0], LocalRotation[1], LocalRotation[2], LocalRotation[3]);
+    glm::quat q;
+    q.x = LocalRotation[0];
+    q.y = LocalRotation[1]; 
+    q.z = LocalRotation[2];
+    q.w = LocalRotation[3];
+    return q;
 }
 glm::vec3 CTransformComponent::GetScale()
 {

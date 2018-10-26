@@ -17,5 +17,5 @@ private:
     CSceneManager();
     static CSceneManager* Instance;
     std::map<CString, IScene*> Scenes;
-    IScene* CurrentSceneInstance;
+    IScene* CurrentSceneInstance = NULL;
 };

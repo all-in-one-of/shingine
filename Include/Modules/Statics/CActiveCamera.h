@@ -19,6 +19,6 @@ public:
 private: 
     CActiveCamera();
     static CActiveCamera* Instance;
-    CTransformComponent* TransformComponent;
-    CCameraComponent* CameraComponent;
+    CTransformComponent* TransformComponent = NULL;
+    CCameraComponent* CameraComponent = NULL;
 };

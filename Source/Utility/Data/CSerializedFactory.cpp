@@ -16,6 +16,10 @@ ISerialized* CSerializedFactory::CreateInstance(const std::string &s, bool setUi
     {
         unsigned int uniqueId = CStatics::Get()->GetUniqueId();
         serializedClass->SetUniqueID(uniqueId);
+
+        // initialize classes
+        std::vector<ISerialized*> serializedAttributes;
+        serializedClass->GetAllAttributes(serializedAttributes);
     }
     // add to the instance manager
     return createdInstance;

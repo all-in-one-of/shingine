@@ -1,5 +1,6 @@
 #include <string>
 #include <map>
+#include <iostream>
 
 class ISerialized;
 
@@ -25,7 +26,7 @@ class ISerialized;
 #define REGISTER_SERIALIZED_NAME(TYPENAME,NAME) \
     const CString TYPENAME::SerializedNameVar = #NAME; \
     CString TYPENAME::SerializedName() { return TYPENAME::SerializedNameVar; } \
-    CSerializedRegistry<TYPENAME> TYPENAME::reg(TYPENAME::SerializedNameVar); \
+    CSerializedRegistry<TYPENAME> TYPENAME::reg(TYPENAME::SerializedNameVar, #TYPENAME); \
 
 #define SERIALIZE_CLASS(CLASSNAME) \
     typedef void (CLASSNAME::*MFP)(ISerialized* &attr); \
@@ -33,7 +34,11 @@ class ISerialized;
     std::vector<std::string> AttributeNames; \
     virtual void SetAttribute(ISerialized* &attr) \
     { \
-        std::string mapName = std::string("Set_") + attr->SerializedName().GetStdString(); \
+        SetAttribute(attr->SerializedName(), attr); \
+    }; \
+    virtual void SetAttribute(const CString& serializedName, ISerialized* &attr) \
+    { \
+        std::string mapName = std::string("Set_") + serializedName.GetStdString(); \
         if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end()) \
             return; \
         MFP fp = AttributeFunctionMap[mapName]; \
@@ -105,16 +110,23 @@ class ISerialized;
     } 
 
 #define ATTRIBUTE_CLASS(CLASSNAME,NAME) \
-    CLASSNAME* NAME; \
+    CLASSNAME* NAME = NULL; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
         NAME = dynamic_cast<CLASSNAME*>(attr); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
+        if (NAME == NULL) \
+        { \
+            attr = CSerializedFactory::CreateInstance(std::string("Class:") + #CLASSNAME); \
+            NAME = dynamic_cast<CLASSNAME*>(attr); \
+            return; \
+        } \
         attr = NAME; \
     }
-
+// create an empty IDataNode
+// create C
 #define ATTRIBUTE_CLASS_VECTOR(CLASSNAME,NAME) \
     std::vector<CLASSNAME*> NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \

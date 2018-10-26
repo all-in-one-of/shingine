@@ -12,6 +12,8 @@
 
 #include "Engine/Components/CTransformComponent.h"
 
+#include "Game/FirstPersonController/CFirstPersonComponent.h"
+
 void Initialize()
 {
     // set default shader
@@ -29,22 +31,36 @@ void Initialize()
     transformComponent->SetPosition(0, 1, -6.f);
     // add render settings
     CAssetManager::Get()->AddAssetOfType("RenderSettings");
+
+    // add first person component
+    IComponent *a = CComponentManager::Get()->AddComponent("FirstPersonComponent",
+        transformComponent->EntityId());
+    FirstPersonController::CFirstPersonComponent *comp = dynamic_cast<FirstPersonController::CFirstPersonComponent*>(a);
+    comp->MovementSettings->RunMultiplier = 20.f;
+    transformComponent->IsDynamic = 1;
 }
 
 int main()
 {
     Initialize();
-    bool didLoad = CResourceLoader::Load("Assets/Scenes/TestScene.ssd");
+    bool didLoad = CResourceLoader::Load("Assets/Scenes/Test.ssd");
+
     if (!didLoad)
     {
         std::cout << "Couldn't load the scene" << std::endl;
         return 1;
     }
+    
     CSolver* solver = new CSolver();
     solver->AddSystem("TransformSystem");
     solver->AddSystem("RenderingSystem");
-    solver->AddSystem("PlayerControllerSystem");
+    solver->AddSystem("FirstPersonSystem");
     solver->InitializeSystems();
-    while (solver->Simulate());
+
+    while (solver->Simulate())
+    {
+         if (!CGraphics::Render())
+             break;
+    }
     return 0;
 }

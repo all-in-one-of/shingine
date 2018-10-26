@@ -22,13 +22,14 @@ void COglShaderManager::SetMaterialUniforms(IMaterial* material, int programId)
     std::vector<float> floatValues;
     material->GetFloatUniforms(names, floatValues);
     for (size_t x = 0; x < names.size(); x++)
-        SetFloat(names[x], programId, floatValues[x]);
+        throw 1;
+        //SetFloat(names[x], programId, floatValues[x]);
     // vector uniforms
     std::vector<glm::vec4> vectorValues;
     material->GetVectorUniforms(names, vectorValues);
     for (size_t x = 0; x < names.size(); x++)
-        SetVector(names[x], programId, vectorValues[x]);
-    // TODO add matrices
+        throw 1;
+        //SetVector(names[x], programId, vectorValues[x]);
 }
 
 void COglShaderManager::GetUniformId(const std::string &uniformName, int programId, int &uniformLoc)
@@ -38,32 +39,12 @@ void COglShaderManager::GetUniformId(const std::string &uniformName, int program
     if (it == UniformLocations[programId].end())
     {
         // find uniform location
+        glUseProgram(programId);
 	    uniformLoc = glGetUniformLocation(programId, uniformName.c_str());
         UniformLocations[programId][uniformName] = uniformLoc;
     }
     else
         uniformLoc = it->second;
-}
-
-void COglShaderManager::SetMatrix(const std::string &uniformName, int programId, glm::mat4 matrix)
-{
-    int uniformLoc;
-    GetUniformId(uniformName, programId, uniformLoc);
-	glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(matrix));
-}
-
-void COglShaderManager::SetVector(const std::string &uniformName, int programId, glm::vec4 vector)
-{
-    int uniformLoc;
-    GetUniformId(uniformName, programId, uniformLoc);
-	glUniform4f(uniformLoc, vector.x, vector.y, vector.z, vector.w);
-}
-
-void COglShaderManager::SetFloat(const std::string &uniformName, int programId, float value)
-{
-    int uniformLoc;
-    GetUniformId(uniformName, programId, uniformLoc);
-	glUniform1f(uniformLoc, value);
 }
 
 int COglShaderManager::GetShaderProgramId(unsigned int shaderId)

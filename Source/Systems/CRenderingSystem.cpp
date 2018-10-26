@@ -8,26 +8,35 @@
 
 #include "Engine/Components/CTransformComponent.h"
 #include "Engine/Components/CRendererComponent.h"
+#include "Engine/Components/CCameraComponent.h"
 
 #include "Engine/AssetTypes/Settings/CRenderSettings.h"
+
+#include "Modules/Statics/CActiveCamera.h"
+#include "Modules/Graphics/ICommandBuffer.h"
+
+#include "Utility/Typedefs.h"
 
 REGISTER_SERIALIZED_NAME(CRenderingSystem, RenderingSystem)
 bool CRenderingSystem::Initialize()
 {
-    // creates a window
-    Renderer = CGraphics::GetContext();
-    CRenderSettings* renderSettings = CAssetManager::Get()->GetAssetOfType<CRenderSettings>("RenderSettings");
-    Renderer->Create(renderSettings->ScreenWidth, renderSettings->ScreenHeight, renderSettings->WindowTitle);
-    Active = Renderer->IsWindowCreated();
+    Active = true;
     return Active;
 }
 
 bool CRenderingSystem::Update()
 {
-    if (Renderer->WindowShouldClose())
-        return false;
+    ICommandBuffer* buf = CGraphics::CommandBuffer();
 
-    Renderer->BeginDrawingLoop();
+    buf->EnableDepth();
+    buf->EnableCullFace();
+    buf->Clear();
+
+    // Update projection matrix, then draw meshes
+    CCameraComponent* camera = CActiveCamera::Get()->GetCameraComponent();
+    float aspect = CGraphics::GetContext()->GetFrameAspectRatio();
+    camera->ProjectionMatrix = glm::perspective(camera->FOV, 
+        CGraphics::GetContext()->GetFrameAspectRatio(), camera->NearPlane, camera->FarPlane);
 
     CComponentManager::StringMap::iterator rendererIterator;
     CComponentManager::StringMap::iterator transformIterator;
@@ -54,18 +63,14 @@ bool CRenderingSystem::Update()
             if (!transform || !renderer)
                 continue;
             
-            Renderer->DrawMesh(transform->WorldTransform, transform->WorldTransformInv, renderer->MeshReference, renderer->MaterialReference);
+            buf->DrawMesh(transform->WorldTransform, transform->WorldTransformInv, renderer->MeshReference, renderer->MaterialReference);
         }
     }
-    
-    
-    Renderer->EndDrawingLoop();
     return true;
 }
 
 CRenderingSystem::~CRenderingSystem()
 {
-    delete Renderer;
 }
 
 // the rendering backend

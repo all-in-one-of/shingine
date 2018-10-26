@@ -9,8 +9,12 @@
 #include "Modules/Statics/CActiveCamera.h"
 #include "Modules/Graphics/CGraphics.h"
 
+#include "Modules/Statics/CInput.h"
+
 #include <stdlib.h>
 #include <stdio.h>
+
+#include <iostream>
 
 std::string COpenGLRender::PositionAttributeName = "_PositionAttribute"; 
 std::string COpenGLRender::NormalAttributeName = "_NormalAttribute"; 
@@ -21,31 +25,54 @@ std::string COpenGLRender::ModelMatrixInverseName = "_ModelMatrixInverseTranspos
 std::string COpenGLRender::ViewMatrixName = "_ViewMatrix"; 
 std::string COpenGLRender::ProjectionMatrixName = "_ProjectionMatrix"; 
 
-static void error_callback(int error, const char* description)
+namespace COpenGLRenderStatics
 {
-    fprintf(stderr, "Error: %s\n", description);
-}
+    static void ErrorCallback(int error, const char* description)
+    {
+        fprintf(stderr, "Error: %s\n", description);
+    }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-	{
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-	}
-}
+    void KeyCallback(GLFWwindow* window, int key, int scanCode, int action, int mods)
+    {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
+        CInput::Get()->SetKeyEvent(key, scanCode, action, mods);
+    }
+
+    void MouseCallback(GLFWwindow* window, int key, int action, int mods)
+    {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
+
+        CInput::Get()->SetMouseEvent(key, action, mods);
+    }
+
+    void MouseMove(GLFWwindow *window, double mouseX, double mouseY)
+    {
+        CInput::Get()->SetMousePosition(mouseX, mouseY);
+    }
+
+    void ResizeWindow(GLFWwindow *window, GLsizei width, GLsizei height)
+    {
+        CGraphics::GetContext()->SetFramebufferSize(width, height);
+    }
+};
 
 COpenGLRender::COpenGLRender()
 {
-    MeshManager = new CVaoMeshManager();
     ShaderManager = new COglShaderManager();
-    CAssetManager::Get()->GetAssetIteratorOfType("Material", MaterialIterator);
+    MeshManager = new CVaoMeshManager();
 }
 
 COpenGLRender::~COpenGLRender()
 {
-    delete MeshManager;
     delete ShaderManager;
-
+    delete MeshManager;
+    
     glfwDestroyWindow(Window);
     glfwTerminate();
     exit(EXIT_SUCCESS);
@@ -56,80 +83,67 @@ bool COpenGLRender::WindowShouldClose()
     return glfwWindowShouldClose(Window);
 }
 
-void COpenGLRender::DrawMesh(glm::mat4 &matrix, unsigned int &meshAssetId, unsigned int &materialId)
-{
-    glm::mat4 matrixInv = glm::inverse(glm::transpose(matrix));
-    DrawMesh(matrix, matrixInv, meshAssetId, materialId);
-}
-
-void COpenGLRender::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv, unsigned int &meshAssetId, unsigned int &materialId)
-{
-    CMaterial* material;
-    if (materialId == 0)
-        materialId = MaterialIterator->second.begin()->first;
-
-    material = dynamic_cast<CMaterial*>(MaterialIterator->second.at(materialId));
-
-    // set material uniforms
-    int programId = ShaderManager->GetShaderProgramId(material->ShaderId);
-    // define static default uniform names +
-    glUseProgram(programId);
-    // TODO cache camera matrix 
-    ShaderManager->SetMatrix(ModelMatrixName, programId, matrix);
-    ShaderManager->SetMatrix(ModelMatrixInverseName, programId, matrixInv);
-    ShaderManager->SetMatrix(ProjectionMatrixName, programId, CActiveCamera::ProjectionMatrix());
-    ShaderManager->SetMatrix(ViewMatrixName, programId, CActiveCamera::ViewMatrix());
-    // set material uniforms
-    ShaderManager->SetMaterialUniforms(material, programId);
-    // handle mesh vao management
-    unsigned int vaoId, indexCount;
-    MeshManager->GetVAOForMeshId(programId, meshAssetId, vaoId, indexCount);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    
-    glEnable(GL_CULL_FACE);
-    // bind/unbind vao
-    glBindVertexArray(vaoId); 
-    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0); 
-}
-
 void COpenGLRender::Create(unsigned short width, unsigned short height, const CString& title)
 {
-    glfwSetErrorCallback(error_callback);
+    glfwSetErrorCallback(COpenGLRenderStatics::ErrorCallback);
 
-    if (!glfwInit())
-	{
+    if (!glfwInit()) 
         exit(EXIT_FAILURE);
-	}
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    Window = glfwCreateWindow(width, height, title.GetCharArray(), NULL, NULL);
+    FrameWidth = width;
+    FrameHeight = height;
+
+    Window = glfwCreateWindow(FrameWidth, FrameHeight, title.GetCharArray(), NULL, NULL);
     if (!Window)
     {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+    // UI callbacks
+    glfwSetWindowSizeCallback(Window, COpenGLRenderStatics::ResizeWindow);
+    glfwSetKeyCallback(Window, COpenGLRenderStatics::KeyCallback);
+    glfwSetCursorPosCallback(Window, COpenGLRenderStatics::MouseMove); 
+    glfwSetMouseButtonCallback(Window, COpenGLRenderStatics::MouseCallback);
 
-    glfwSetKeyCallback(Window, key_callback);
     glfwMakeContextCurrent(Window);
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     glfwSwapInterval(1);
-}
-
-void COpenGLRender::UpdateFrame()
-{
-    glfwSwapBuffers(Window);		// Shows what we drew
-    glfwPollEvents();
+    
+    // glViewport(0, 0, width, height);
 }
 
 void COpenGLRender::GetWindowFramebufferSize(int &width, int &height)
 {
-    glfwGetFramebufferSize(Window, &width, &height);
+    // glfwGetFramebufferSize(Window, &width, &height);
+    width = FrameWidth;
+    height = FrameHeight;
+}
+
+float COpenGLRender::GetFrameAspectRatio()
+{
+    return FrameAspectRatio;
+}
+
+void COpenGLRender::SetFramebufferSize(int &width, int &height)
+{
+    FrameWidth = width;
+    FrameHeight = height;
+    FrameAspectRatio = width / (float) height;
+}
+
+CVaoMeshManager* COpenGLRender::GetMeshManager()
+{
+    return MeshManager;
+}
+
+COglShaderManager* COpenGLRender::GetShaderManager()
+{
+    return ShaderManager;
 }
 
 bool COpenGLRender::IsWindowCreated()
@@ -137,16 +151,9 @@ bool COpenGLRender::IsWindowCreated()
     return Window != NULL;    
 }
 
-void COpenGLRender::BeginDrawingLoop()
+void COpenGLRender::Update()
 {
-    glEnable(GL_DEPTH);	
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void COpenGLRender::EndDrawingLoop()
-{
+    CInput::Get()->Update();
     glfwSwapBuffers(Window);
     glfwPollEvents();
 }

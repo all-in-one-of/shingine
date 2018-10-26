@@ -13,17 +13,15 @@ public:
     COpenGLRender();
     virtual ~COpenGLRender();
     virtual void Create(unsigned short width, unsigned short height, const CString& title);
-    virtual void DrawMesh(glm::mat4 &matrix, unsigned int &meshAssetId, unsigned int &materialId);
-    virtual void DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv, unsigned int &meshAssetId, unsigned int &materialId);
 
-    virtual void UpdateFrame();
     virtual bool WindowShouldClose();
     virtual void GetWindowFramebufferSize(int &width, int &height);
+    virtual float GetFrameAspectRatio();
+    virtual void SetFramebufferSize(int &width, int &height);
     virtual bool IsWindowCreated();
-    virtual void BeginDrawingLoop();
-    virtual void EndDrawingLoop();
+    virtual void Update();
 
-    // pre-defined uniform names 
+    // // pre-defined uniform names 
     static std::string ModelMatrixName;
     static std::string ModelMatrixInverseName;
     static std::string ViewMatrixName; 
@@ -32,10 +30,19 @@ public:
     static std::string PositionAttributeName; 
     static std::string NormalAttributeName; 
     static std::string TexCoordAttributeName;
+
+    CVaoMeshManager* GetMeshManager();
+    COglShaderManager* GetShaderManager();
 private:
     struct GLFWwindow* Window;
-    CVaoMeshManager* MeshManager;
-    COglShaderManager* ShaderManager;
-    std::unordered_map<std::string, 
-        std::unordered_map<unsigned int, ISerializedClass*>>::iterator MaterialIterator;
+
+    int FrameWidth = -1;
+    int FrameHeight = -1;
+    float FrameAspectRatio = 1.f;
+
+    CVaoMeshManager* MeshManager = NULL;
+    COglShaderManager* ShaderManager = NULL;
+
+
+        
 };

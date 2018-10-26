@@ -10,6 +10,4 @@ public:
     virtual ~CRenderingSystem();
     virtual bool Initialize();
     virtual bool Update();
-private:
-    IRenderContext* Renderer = NULL;
 };

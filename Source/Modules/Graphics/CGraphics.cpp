@@ -2,16 +2,31 @@
 #include "Modules/Graphics/CGraphics.h"
 #include "Engine/AssetTypes/Settings/CRenderSettings.h"
 #include "Modules/Statics/CAssetManager.h"
+#include "Modules/Graphics/OpenGL/COglCommandBuffer.h"
 
 CGraphics* CGraphics::Instance = NULL;
 
-CGraphics::CGraphics(){}
-
-IRenderContext* CGraphics::Context()
+bool CGraphics::Render()
 {
-    if (RenderContext)
-        return RenderContext;
+    // create window if not created
+    CGraphics* gr = GetInstance();
 
+    gr->DefaultCommandBuffer->Execute();
+    gr->DefaultCommandBuffer->ResetCommandBuffer();
+    // Finalize rendering
+    gr->RenderContext->Update();
+    return !gr->RenderContext->WindowShouldClose();
+}
+
+void CGraphics::SetupWindow()
+{
+    CRenderSettings* renderSettings = CAssetManager::Get()->GetAssetOfType<CRenderSettings>("RenderSettings");
+    RenderContext->Create(
+        renderSettings->ScreenWidth, renderSettings->ScreenHeight, renderSettings->WindowTitle);
+}
+
+CGraphics::CGraphics()
+{
     // get render settings
     CRenderSettings* renderSettings = 
         CAssetManager::Get()->GetAssetOfType<CRenderSettings>("RenderSettings");
@@ -23,20 +38,36 @@ IRenderContext* CGraphics::Context()
             CAssetManager::Get()->AddAssetOfType<CRenderSettings>("RenderSettings");
     }
     // TODO make a factory class for making render context
-    if (!RenderContext)
-        RenderContext = new COpenGLRender();
-        
-    return RenderContext;
+    RenderContext = new COpenGLRender();
+    DefaultCommandBuffer = new COglCommandBuffer();
+}
+
+CGraphics* CGraphics::GetInstance()
+{
+    if (!Instance) 
+    {
+        Instance = new CGraphics();
+        Instance->SetupWindow();
+    }
+    return Instance;
+}
+
+IRenderContext* CGraphics::GetContext()
+{
+    return GetInstance()->RenderContext;
+}
+
+ICommandBuffer* CGraphics::CommandBuffer()
+{
+    return GetInstance()->DefaultCommandBuffer;
 }
 
 void CGraphics::SetDefaultShader(IShader* shader)
 {
-    if(Instance == NULL) Instance = new CGraphics();
-    Instance->defaultShader = shader;
+    GetInstance()->defaultShader = shader;
 }
 
 IShader* CGraphics::DefaultShader()
 {
-    if(Instance == NULL) Instance = new CGraphics();
-    return Instance->defaultShader;
+    return GetInstance()->defaultShader;
 }

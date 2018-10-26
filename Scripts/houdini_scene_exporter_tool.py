@@ -23,6 +23,7 @@ ATTRIBUTE
     name U8[name_length]
     data_type_char_length U8
     data_type U8[data_type_char_length]
+    single_element U8
     byte_count U32
     element_count U32
     value U8[element_count]
@@ -302,9 +303,17 @@ def attribute_to_bytes(attr):
     attr_data.extend(attr_name)
 
     # data type name
+
     data_type_name = string_to_bytes(data_type_name_map[attr.data_type])
     attr_data.append(len(data_type_name) & 0xff)
     attr_data.extend(data_type_name)
+    # attr_data
+    single_element_value = 0 # attr.single_element
+    
+    if attr.single_element:
+        single_element_value = 1
+
+    attr_data.append(single_element_value & 0xff)
 
     # handle strings
     if attr.data_type == DataType.CHAR:

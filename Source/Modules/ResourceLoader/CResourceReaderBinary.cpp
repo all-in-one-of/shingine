@@ -100,6 +100,8 @@ SSD::SAttribute* CResourceReaderBinary::ReadAttribute()
     attr->DataType = new char[attr->DataTypeLength];
     FileStream.read(attr->DataType, attr->DataTypeLength);
 
+    ReadByte(attr->IsSingleElement);
+
     ReadUInt32(attr->ByteCount);
     ReadUInt32(attr->ElementCount);
 

@@ -21,6 +21,7 @@ namespace SSD
         char* Name;
         unsigned char DataTypeLength;
         char* DataType;
+        unsigned char IsSingleElement;
         unsigned int ByteCount;
         unsigned int ElementCount;
         unsigned char* Values;

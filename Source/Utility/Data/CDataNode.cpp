@@ -84,10 +84,10 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
     // unpack data here
     CString name = CString(attribute->Name);
     CString typeName = CString(attribute->DataType);
-
+    
     if (typeName == "char")
     {
-        if (attribute->ElementCount == 1)
+        if (attribute->IsSingleElement)
         {
             // single string
             char* temp = new char[attribute->ByteCount];
@@ -145,7 +145,7 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
 
         if (typeName == "int") 
         {
-            if (attribute->ElementCount == 1)
+            if (attribute->IsSingleElement)
                 return new CTypedAttributeValue<int>(name, typeName, DataStruct::GetInt32(value));    
             data_int.push_back(DataStruct::GetInt32(value));
         
@@ -157,35 +157,35 @@ ISerialized* CDataNode::MakeTypedAttribute(SSD::SAttribute* attribute)
         // }
         if (typeName == "unsigned int" || typeName == "uid") 
         {
-            if (attribute->ElementCount == 1)
+            if (attribute->IsSingleElement)
                 return new CTypedAttributeValue<unsigned int>(name, typeName, DataStruct::GetUInt32(value));    
             data_uint.push_back(DataStruct::GetUInt32(value));
         
         }
         if (typeName == "unsigned short") 
         {
-            if (attribute->ElementCount == 1)
+            if (attribute->IsSingleElement)
                 return new CTypedAttributeValue<unsigned short>(name, typeName, DataStruct::GetUShort(value));    
             data_ushort.push_back(DataStruct::GetUShort(value));
         
         }
         if (typeName == "short") 
         {
-            if (attribute->ElementCount == 1)
+            if (attribute->IsSingleElement)
                 return new CTypedAttributeValue<short>(name, typeName, DataStruct::GetShort(value));    
             data_short.push_back(DataStruct::GetShort(value));
         
         }
         if (typeName == "float") 
         {
-            if (attribute->ElementCount == 1)
+            if (attribute->IsSingleElement)
                 return new CTypedAttributeValue<float>(name, typeName, DataStruct::GetFloat(value));    
             data_float.push_back(DataStruct::GetFloat(value));
         
         }
         if (typeName == "unsigned char") 
         {
-            if (attribute->ElementCount == 1)
+            if (attribute->IsSingleElement)
                 return new CTypedAttributeValue<unsigned char>(name, typeName, value[0]);    
 
             data_uchar.push_back(value[0]);

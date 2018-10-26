@@ -25,8 +25,9 @@ template<typename T>
 class CSerializedRegistry : CSerializedFactory
 {
 public:
-    CSerializedRegistry(const CString &s)
+    CSerializedRegistry(const CString &friendlyName, const CString &typeName)
     {
-        GetMap()->insert(std::make_pair(s.GetStdString(), &createT<T>));
+        GetMap()->insert(std::make_pair("Class:" + typeName.GetStdString(), &createT<T>));
+        GetMap()->insert(std::make_pair(friendlyName.GetStdString(), &createT<T>));
     }
 };

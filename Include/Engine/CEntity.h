@@ -25,8 +25,8 @@ public:
     SERIALIZE_CLASS(CEntityIdCollection)
     CEntityIdCollection() 
     { 
-        ATTRIBUTE_REGISTER(CEntityIdCollection, Ids) 
-        ATTRIBUTE_REGISTER(CEntityIdCollection, Components) 
+        ATTRIBUTE_REGISTER(CEntityIdCollection,Ids) 
+        ATTRIBUTE_REGISTER(CEntityIdCollection,Components) 
     };
     virtual ~CEntityIdCollection() 
     {

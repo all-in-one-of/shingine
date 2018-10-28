@@ -19,6 +19,6 @@ private:
     void CalculateTransforms(bool ignoreStatic=true);
     glm::mat4 GetRotationMatrix(glm::quat q);
     typedef std::unordered_map<std::string, std::unordered_map<unsigned int, IComponent*>> StringMap;
-    glm::mat4 CalculateWorldTransforms(bool ignoreStatic);
+    void CalculateWorldTransforms(bool ignoreStatic);
     StringMap::iterator TransformCollectionIterator;
 };

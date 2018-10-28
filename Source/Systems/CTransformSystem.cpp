@@ -40,7 +40,7 @@ void CTransformSystem::CalculateLocalTransforms(bool ignoreStatic)
         glm::mat4 ident(1);
         // TODO ensure the rotation is calculated correctly
         glm::mat4 transformNoScale = glm::translate(ident,
-            transform->GetPosition()) * GetRotationMatrix(transform->GetRotation());
+            transform->GetPosition()) * glm::toMat4(transform->GetRotation());
 
         glm::vec3 localScale = transform->GetScale();
         std::vector<float> ls = {localScale.x, localScale.y, localScale.z};
@@ -54,7 +54,7 @@ void CTransformSystem::CalculateLocalTransforms(bool ignoreStatic)
     }    
 }
 
-glm::mat4 CTransformSystem::CalculateWorldTransforms(bool ignoreStatic)
+void CTransformSystem::CalculateWorldTransforms(bool ignoreStatic)
 {
     CComponentManager::IdMap &idMap = TransformCollectionIterator->second;
     CComponentManager::IdMap::iterator transformIterator;
@@ -84,15 +84,15 @@ glm::mat4 CTransformSystem::CalculateWorldTransforms(bool ignoreStatic)
                 break;
             currentTransform = dynamic_cast<CTransformComponent*>(parentIterator->second);
             // if static then use world matrix and break
-
-            parentTransform = parentTransform * currentTransform->LocalTransform;
-            parentTransformUniformScale = parentTransformUniformScale * currentTransform->LocalTransformUniformScale;
+            parentTransform = currentTransform->LocalTransform * parentTransform;
+            parentTransformUniformScale = currentTransform->LocalTransformUniformScale * parentTransformUniformScale;
             
             parentId = currentTransform->ParentID;
         }
-        transform->WorldTransform = transform->LocalTransform * parentTransform;
-        transform->WorldTransformUniformScale = 
-            transform->WorldTransformUniformScale * parentTransformUniformScale;
+
+        transform->WorldTransform = parentTransform * transform->LocalTransform;
+        transform->WorldTransformUniformScale = parentTransformUniformScale * 
+            transform->WorldTransformUniformScale ;
 
         transform->WorldTransformInv = glm::inverse(glm::transpose(transform->WorldTransform));
 

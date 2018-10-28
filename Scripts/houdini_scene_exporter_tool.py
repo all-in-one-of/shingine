@@ -221,17 +221,18 @@ for uid, hom_node in uid_to_hom_node.items():
         material_id = 0
         if hom_node.parm("shop_materialpath").eval():
             material_hom_node = hou.node(hom_node.parm("shop_materialpath").eval())
-            if material_hom_node.type().name() == "principledshader::2.0":
-                material_name = material_hom_node.name()
-                if material_name not in materials.keys():
-                    material_node = Node("Material")
-                    material_node.attributes.append(Attribute("Name", DataType_CHAR, material_name, True))
-                    material_node.attributes.append(Attribute("ShaderId", DataType_UID, 0, True))
-                    material_node.attributes.append(Attribute("DiffuseColor", DataType_FLOAT, hom_node.parmTuple("basecolor").eval()))
-                    materials[material_name] = material_node
-                    material_id = material_node.unique_id
-                else:
-                    material_id = materials[material_name]
+            if material_hom_node:
+                if material_hom_node.type().name() == "principledshader::2.0":
+                    material_name = material_hom_node.name()
+                    if material_name not in materials.keys():
+                        material_node = Node("Material")
+                        material_node.attributes.append(Attribute("Name", DataType_CHAR, material_name, True))
+                        material_node.attributes.append(Attribute("ShaderId", DataType_UID, 0, True))
+                        material_node.attributes.append(Attribute("DiffuseColor", DataType_FLOAT, hom_node.parmTuple("basecolor").eval()))
+                        materials[material_name] = material_node
+                        material_id = material_node.unique_id
+                    else:
+                        material_id = materials[material_name].unique_id
         renderer_node.attributes.append(Attribute("MaterialReference", DataType_UID, material_id, True))
         components.append(renderer_node)
         uid_to_components[uid].append(renderer_node.unique_id)

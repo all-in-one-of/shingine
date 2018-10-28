@@ -15,8 +15,9 @@ namespace FirstPersonController
         virtual bool Initialize();
         virtual bool Update();
     private:
-        void UpdateRotation(glm::quat &orientation);
-        void UpdateMovement(glm::vec3 &position, glm::quat &orientation);
+        void UpdateRotation(glm::vec3 &Front, glm::vec3 &Horizontal, glm::vec3 &cameraFront, 
+            glm::vec3 &cameraUp);
+        void UpdateMovement(glm::vec3 &position, glm::vec3 &Front, glm::vec3 &Horizontal);
         class CFirstPersonComponent* FirstPersonComponent = NULL;
 
         CTransformComponent* PlayerTransform = NULL;

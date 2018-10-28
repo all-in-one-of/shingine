@@ -37,7 +37,8 @@ void Initialize()
     IComponent *a = CComponentManager::Get()->AddComponent("FirstPersonComponent",
         transformComponent->EntityId());
     FirstPersonController::CFirstPersonComponent *comp = dynamic_cast<FirstPersonController::CFirstPersonComponent*>(a);
-    comp->MovementSettings->RunMultiplier = 20.f;
+    comp->MovementSettings->RunMultiplier = 5.f;
+    comp->MovementSettings->ForwardSpeed = 13.f;
     transformComponent->IsDynamic = 1;
 }
 
@@ -51,7 +52,7 @@ int main()
         std::cout << "Couldn't load the scene" << std::endl;
         return 1;
     }
-    
+
     CSolver* solver = new CSolver();
     solver->AddSystem("TransformSystem");
     solver->AddSystem("RenderingSystem");

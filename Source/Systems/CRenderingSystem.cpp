@@ -71,9 +71,3 @@ bool CRenderingSystem::Update()
 CRenderingSystem::~CRenderingSystem()
 {
 }
-
-// the rendering backend
-// checks shader first
-// compiles if not backs to default
-// find mesh bind to this material id
-// renders it with the matrix and shader uniforms collected from material

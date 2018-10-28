@@ -39,6 +39,9 @@ public:
     bool GetKeyPressed(int keyCode);
     bool GetMousePressed(int keyCode);
     
+    void SetScreenReferenceSize(unsigned int width, unsigned int height);
+
+
 private: 
     CInput();
     static CInput* Instance;
@@ -56,6 +59,11 @@ private:
 
     double MousePrevX = .0;
     double MousePrevY = .0;
+    
+    unsigned int ScreenWidth = 320;
+    unsigned int ScreenHeight = 240;
+    
+    bool FirstMousePositionRecorded = false;
 
     int MouseMods = -1;
 };

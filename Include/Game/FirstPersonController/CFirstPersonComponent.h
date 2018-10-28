@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Components/ComponentSetup.h"
+#include <glm/glm.hpp>
 
 namespace FirstPersonController
 {
@@ -19,8 +20,8 @@ namespace FirstPersonController
             
             IsSmoothed = false;
             SmoothTime = 5.f;
-            SensitivityX = 2.f;
-            SensitivityY = 2.f;
+            SensitivityX = .05f;
+            SensitivityY = .05f;
             MinX = -90.f;
             MaxX = 90.f;
         };
@@ -67,9 +68,22 @@ namespace FirstPersonController
         {
             ATTRIBUTE_REGISTER(CFirstPersonComponent, ViewSettings)
             ATTRIBUTE_REGISTER(CFirstPersonComponent, MovementSettings)
+            
+            Front = glm::vec3(0);
+            Horizontal = glm::vec3(0);
+            CameraUp = glm::vec3(0,1,0);
+            CameraFront = glm::vec3(0,0,1);
         };
         virtual ~CFirstPersonComponent();
         ATTRIBUTE_CLASS(CViewSettings, ViewSettings)
         ATTRIBUTE_CLASS(CMovementSettings, MovementSettings)
+
+        float Yaw = 0.f;
+        float Pitch = 0.f;
+
+        glm::vec3 Front;
+        glm::vec3 Horizontal;
+        glm::vec3 CameraUp;
+        glm::vec3 CameraFront;
     };
 };

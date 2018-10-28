@@ -1,4 +1,5 @@
 #include "Modules/Statics/CInput.h"
+#include <iostream>
 
 CInput* CInput::Instance = NULL;
 CInput::CInput()
@@ -9,7 +10,20 @@ CInput::CInput()
     }
 }
 
-  
+void CInput::SetScreenReferenceSize(unsigned int width, unsigned int height)
+{
+    ScreenWidth = width;
+    ScreenHeight = height;
+
+    if (!FirstMousePositionRecorded)
+    {
+        MousePositionX = MousePrevX = ScreenWidth * .5f;
+        MousePositionY = MousePrevX = ScreenHeight * .5f;
+
+        FirstMousePositionRecorded = true;
+    }
+}
+
 bool CInput::GetMousePressed(int keyCode)
 {
     KeyMap::iterator it = MouseKeys.find(keyCode);
@@ -36,9 +50,8 @@ bool CInput::GetKeyPressed(int keyCode)
 
 void CInput::Update()
 {
-    
-    MousePositionX = MousePrevX;
-    MousePositionY = MousePrevY;
+    // MousePositionX = MousePrevX;
+    // MousePositionY = MousePrevY;
 }
 
 void CInput::SetKeyEvent(int key, int scanCode, int action, int mods)
@@ -51,17 +64,16 @@ float CInput::GetAxis(AxisType axis)
     switch (axis)
     {
         case AxisType::MouseX:
-            return (MousePositionX - MousePrevX) / 1280;
+            return (MousePositionX - MousePrevX);
         case AxisType::MouseY:
-            return (MousePositionY - MousePrevY) / 720;
+            return (MousePositionY - MousePrevY);
         default:
-            return .0;
+            return .0f;
     };
 }
 
 void CInput::SetMousePosition(double x, double y)
 {
-
     MousePrevX = MousePositionX;
     MousePrevY = MousePositionY;
     MousePositionX = x;

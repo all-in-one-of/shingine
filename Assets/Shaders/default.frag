@@ -8,5 +8,5 @@ out vec4 _OutColor;
 
 void main()
 {
-	_OutColor = vec4(_Color, 1.0);
+	_OutColor = vec4(normalize(_Color), 1.0);
 }

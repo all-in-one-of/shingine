@@ -1,6 +1,21 @@
 #include "Engine/AssetTypes/CMaterial.h"
 REGISTER_SERIALIZED_NAME(CMaterial,Material)
 
+CMaterial::CMaterial()
+{
+    ATTRIBUTE_REGISTER(CMaterial, Name)
+    ATTRIBUTE_REGISTER(CMaterial, ShaderId)
+    
+    ATTRIBUTE_REGISTER(CMaterial, FloatUniformNames)
+    ATTRIBUTE_REGISTER(CMaterial, FloatUniformValues)
+    
+    ATTRIBUTE_REGISTER(CMaterial, VectorUniformNames)
+    ATTRIBUTE_REGISTER(CMaterial, VectorUniformValues)
+    
+    ShaderId = 0;
+    Name = "defaultMaterial";
+}
+
 void CMaterial::GetFloatUniforms(std::vector<std::string> &names, std::vector<float> &values)
 {
     names.clear();

@@ -6,17 +6,7 @@ class CMaterial : public IMaterial, public ISerializedClass
 {
 public:
     SERIALIZE_CLASS(CMaterial)
-    CMaterial()
-    {
-        ATTRIBUTE_REGISTER(CMaterial, Name)
-        ATTRIBUTE_REGISTER(CMaterial, ShaderId)
-
-        ATTRIBUTE_REGISTER(CMaterial, FloatUniformNames)
-        ATTRIBUTE_REGISTER(CMaterial, FloatUniformValues)
-
-        ATTRIBUTE_REGISTER(CMaterial, VectorUniformNames)
-        ATTRIBUTE_REGISTER(CMaterial, VectorUniformValues)
-    };
+    CMaterial();
     virtual ~CMaterial() {};
     
     ATTRIBUTE_VALUE(CString, Name)

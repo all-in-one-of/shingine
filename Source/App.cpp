@@ -16,6 +16,7 @@
 
 void Initialize()
 {
+    CAssetManager::Get()->AddAssetOfType("Material");
     // set default shader
     IShader* defaultShader = dynamic_cast<IShader*>(
         CAssetManager::Get()->AddAssetOfType("Shader"));

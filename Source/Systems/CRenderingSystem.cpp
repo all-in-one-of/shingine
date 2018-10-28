@@ -34,8 +34,7 @@ bool CRenderingSystem::Update()
 
     // Update projection matrix, then draw meshes
     CCameraComponent* camera = CActiveCamera::Get()->GetCameraComponent();
-    float aspect = CGraphics::GetContext()->GetFrameAspectRatio();
-    camera->ProjectionMatrix = glm::perspective(camera->FOV, 
+    camera->ProjectionMatrix = glm::perspective(camera->FOV,
         CGraphics::GetContext()->GetFrameAspectRatio(), camera->NearPlane, camera->FarPlane);
 
     CComponentManager::StringMap::iterator rendererIterator;

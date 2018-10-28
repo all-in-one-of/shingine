@@ -14,7 +14,6 @@
 
 #include <iostream>
 
-
 COglCommandBuffer::COglCommandBuffer()
 {
 }

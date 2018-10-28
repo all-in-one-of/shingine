@@ -16,51 +16,51 @@
 
 #include <iostream>
 
-std::string COpenGLRender::PositionAttributeName = "_PositionAttribute"; 
-std::string COpenGLRender::NormalAttributeName = "_NormalAttribute"; 
-std::string COpenGLRender::TexCoordAttributeName = "_TexCoordAttribute"; 
+std::string COpenGLRender::PositionAttributeName = "_PositionAttribute";
+std::string COpenGLRender::NormalAttributeName = "_NormalAttribute";
+std::string COpenGLRender::TexCoordAttributeName = "_TexCoordAttribute";
 
 std::string COpenGLRender::ModelMatrixName = "_ModelMatrix";
 std::string COpenGLRender::ModelMatrixInverseName = "_ModelMatrixInverseTransposed";
-std::string COpenGLRender::ViewMatrixName = "_ViewMatrix"; 
-std::string COpenGLRender::ProjectionMatrixName = "_ProjectionMatrix"; 
+std::string COpenGLRender::ViewMatrixName = "_ViewMatrix";
+std::string COpenGLRender::ProjectionMatrixName = "_ProjectionMatrix";
 
 namespace COpenGLRenderStatics
 {
-    static void ErrorCallback(int error, const char* description)
+static void ErrorCallback(int error, const char *description)
+{
+    fprintf(stderr, "Error: %s\n", description);
+}
+
+void KeyCallback(GLFWwindow *window, int key, int scanCode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-        fprintf(stderr, "Error: %s\n", description);
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+    CInput::Get()->SetKeyEvent(key, scanCode, action, mods);
+}
+
+void MouseCallback(GLFWwindow *window, int key, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
 
-    void KeyCallback(GLFWwindow* window, int key, int scanCode, int action, int mods)
-    {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
-        }
-        CInput::Get()->SetKeyEvent(key, scanCode, action, mods);
-    }
+    CInput::Get()->SetMouseEvent(key, action, mods);
+}
 
-    void MouseCallback(GLFWwindow* window, int key, int action, int mods)
-    {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
-        }
+void MouseMove(GLFWwindow *window, double mouseX, double mouseY)
+{
+}
 
-        CInput::Get()->SetMouseEvent(key, action, mods);
-    }
-
-    void MouseMove(GLFWwindow *window, double mouseX, double mouseY)
-    {
-        CInput::Get()->SetMousePosition(mouseX, mouseY);
-    }
-
-    void ResizeWindow(GLFWwindow *window, GLsizei width, GLsizei height)
-    {
-        CGraphics::GetContext()->SetFramebufferSize(width, height);
-    }
-};
+void ResizeWindow(GLFWwindow *window, GLsizei width, GLsizei height)
+{
+    CInput::Get()->SetScreenReferenceSize(width, height);
+    CGraphics::GetContext()->SetFramebufferSize(width, height);
+}
+}; // namespace COpenGLRenderStatics
 
 COpenGLRender::COpenGLRender()
 {
@@ -72,7 +72,7 @@ COpenGLRender::~COpenGLRender()
 {
     delete ShaderManager;
     delete MeshManager;
-    
+
     glfwDestroyWindow(Window);
     glfwTerminate();
     exit(EXIT_SUCCESS);
@@ -83,11 +83,11 @@ bool COpenGLRender::WindowShouldClose()
     return glfwWindowShouldClose(Window);
 }
 
-void COpenGLRender::Create(unsigned short width, unsigned short height, const CString& title)
+void COpenGLRender::Create(unsigned short width, unsigned short height, const CString &title)
 {
     glfwSetErrorCallback(COpenGLRenderStatics::ErrorCallback);
 
-    if (!glfwInit()) 
+    if (!glfwInit())
         exit(EXIT_FAILURE);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -104,17 +104,20 @@ void COpenGLRender::Create(unsigned short width, unsigned short height, const CS
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+
+    glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // set screen width explicitly
+    COpenGLRenderStatics::ResizeWindow(Window, FrameWidth, FrameHeight);
     // UI callbacks
     glfwSetWindowSizeCallback(Window, COpenGLRenderStatics::ResizeWindow);
     glfwSetKeyCallback(Window, COpenGLRenderStatics::KeyCallback);
-    glfwSetCursorPosCallback(Window, COpenGLRenderStatics::MouseMove); 
+    glfwSetCursorPosCallback(Window, COpenGLRenderStatics::MouseMove);
     glfwSetMouseButtonCallback(Window, COpenGLRenderStatics::MouseCallback);
 
     glfwMakeContextCurrent(Window);
-    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwSwapInterval(1);
-    
-    // glViewport(0, 0, width, height);
 }
 
 void COpenGLRender::GetWindowFramebufferSize(int &width, int &height)
@@ -133,27 +136,32 @@ void COpenGLRender::SetFramebufferSize(int &width, int &height)
 {
     FrameWidth = width;
     FrameHeight = height;
-    FrameAspectRatio = width / (float) height;
+    FrameAspectRatio = width / (float)height;
 }
 
-CVaoMeshManager* COpenGLRender::GetMeshManager()
+CVaoMeshManager *COpenGLRender::GetMeshManager()
 {
     return MeshManager;
 }
 
-COglShaderManager* COpenGLRender::GetShaderManager()
+COglShaderManager *COpenGLRender::GetShaderManager()
 {
     return ShaderManager;
 }
 
 bool COpenGLRender::IsWindowCreated()
 {
-    return Window != NULL;    
+    return Window != NULL;
 }
 
 void COpenGLRender::Update()
 {
+
     CInput::Get()->Update();
     glfwSwapBuffers(Window);
     glfwPollEvents();
+    
+    double x, y;
+    glfwGetCursorPos(Window, &x, &y);
+    CInput::Get()->SetMousePosition(x, y);
 }

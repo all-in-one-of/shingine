@@ -26,9 +26,9 @@
 #define WRITE_FOUR_BYTES(VAL, TYPE) \
     unsigned char b[sizeof(TYPE)]; \
     memcpy(b, &(VAL), sizeof(VAL)); \
-    Commands.push_back(b[0]); \ 
-    Commands.push_back(b[1]); \ 
-    Commands.push_back(b[2]); \ 
+    Commands.push_back(b[0]); \
+    Commands.push_back(b[1]); \
+    Commands.push_back(b[2]); \
     Commands.push_back(b[3]); 
 
 #define READ_FOUR_BYTES(VAL,TYPE) \

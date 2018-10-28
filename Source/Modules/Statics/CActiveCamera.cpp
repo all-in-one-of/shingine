@@ -1,5 +1,5 @@
-#include "Modules/Statics/CActiveCamera.h"
 #include "Engine/IComponent.h"
+#include "Modules/Statics/CActiveCamera.h"
 #include "Modules/Graphics/CGraphics.h"
 
 #include "Engine/Components/CCameraComponent.h"
@@ -9,6 +9,7 @@
 #include "Modules/Statics/CEntityManager.h"
 
 CActiveCamera* CActiveCamera::Instance = NULL;
+
 CCameraComponent* CActiveCamera::GetCameraComponent()
 {
     return CameraComponent;

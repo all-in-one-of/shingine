@@ -20,7 +20,7 @@ UniqueIdSetter::UniqueIdSetter(const std::vector<IDataNode*> &newNodes)
 
 void UniqueIdSetter::UpdateUid(IDataNode* node)
 {
-    unsigned int newId = Statics::Get()->GetUniqueId();
+    unsigned int newId = Statics::GetUniqueId();
     LocalToGlobalUid[node->GetUniqueID()] = newId;
     node->SetUniqueID(newId);
 

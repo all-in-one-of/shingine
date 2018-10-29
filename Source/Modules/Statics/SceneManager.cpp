@@ -1,6 +1,6 @@
 #include "Modules/Statics/SceneManager.h"
 
-SceneManager* SceneManager::Instance = NULL;
+REGISTER_SERIALIZED_NAME(SceneManager)
 
 void SceneManager::AddScene(const String &fileName, IScene* scene)
 {

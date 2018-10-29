@@ -2,7 +2,8 @@
 #include "Utility/Data/ISerialized.h"
 #include "Engine/IComponent.h"
 #include "Utility/Data/SerializedFactory.h"
-ComponentManager* ComponentManager::Instance = NULL;
+
+REGISTER_SERIALIZED_NAME(ComponentManager)
 
 ComponentManager::ComponentManager()
 {

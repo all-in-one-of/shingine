@@ -1,6 +1,6 @@
 #include "Modules/Graphics/OpenGL/VaoMeshManager.h"
 #include "Utility/Graphics.h"
-#include "Modules/Statics/AssetManager.h"
+#include "Modules/Statics/IAssetManager.h"
 #include "Engine/AssetTypes/Mesh.h"
 
 #include "Modules/Graphics/OpenGL/OpenGLRender.h"
@@ -23,7 +23,7 @@ void VaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId, un
     if (it == VaoMap[programId].end())
     {
         // get mesh
-        Mesh* mesh = AssetManager::Get()->GetAssetOfType<Mesh>(meshAssetId);
+        Mesh* mesh = Statics::Get<IAssetManager>()->GetAssetOfType<Mesh>(meshAssetId);
         if (!mesh) 
             throw 1;
 

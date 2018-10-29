@@ -23,7 +23,7 @@ ISerialized* SerializedFactory::CreateInstance(const std::string &s, bool setUid
     // set unique id
     if (setUid)
     {
-        unsigned int uniqueId = Statics::Get()->GetUniqueId();
+        unsigned int uniqueId = Statics::GetUniqueId();
         serializedClass->SetUniqueID(uniqueId);
 
         // initialize classes

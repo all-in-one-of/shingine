@@ -1,5 +1,5 @@
 #include "Modules/Graphics/Shader.h"
-#include "Modules/Statics/AssetManager.h"
+#include "Modules/Statics/IAssetManager.h"
 
 REGISTER_SERIALIZED_NAME(ShaderSource)
 REGISTER_SERIALIZED_NAME(Shader)
@@ -9,7 +9,7 @@ void Shader::AddSource(EShaderType type, const String &source)
     String garbage;
     if (GetSource(type, garbage)) return;
     ShaderSource* shaderSource = 
-        AssetManager::Get()->AddAssetOfType<ShaderSource>();
+        Statics::Get<IAssetManager>()->AddAssetOfType<ShaderSource>();
         
     shaderSource->Type = type;
     shaderSource->Source = source;

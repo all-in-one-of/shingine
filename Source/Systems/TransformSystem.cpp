@@ -1,5 +1,5 @@
 #include "Systems/TransformSystem.h"
-#include "Modules/Statics/ComponentManager.h"
+#include "Modules/Statics/IComponentManager.h"
 #include "Engine/Components/TransformComponent.h"
 
 #include <algorithm>
@@ -10,7 +10,7 @@ REGISTER_SERIALIZED_NAME(TransformSystem)
 bool TransformSystem::Initialize()
 {
     // get reference to the transform component collection
-    ComponentManager::Get()->GetComponentIteratorOfType("TransformComponent", TransformCollectionIterator);
+    Statics::Get<IComponentManager>()->GetComponentIteratorOfType("TransformComponent", TransformCollectionIterator);
     // calculate transform component for dynamic and static objects
     CalculateTransforms(false);
     Active = true;
@@ -27,8 +27,8 @@ void TransformSystem::CalculateTransforms(bool ignoreStatic)
 
 void TransformSystem::CalculateLocalTransforms(bool ignoreStatic)
 {
-    ComponentManager::IdMap &idMap = TransformCollectionIterator->second;
-    ComponentManager::IdMap::iterator transformIterator;
+    IComponentManager::IdMap &idMap = TransformCollectionIterator->second;
+    IComponentManager::IdMap::iterator transformIterator;
     for (transformIterator = idMap.begin(); transformIterator != idMap.end(); transformIterator++)
     {
         // iterate over transform components
@@ -56,8 +56,8 @@ void TransformSystem::CalculateLocalTransforms(bool ignoreStatic)
 
 void TransformSystem::CalculateWorldTransforms(bool ignoreStatic)
 {
-    ComponentManager::IdMap &idMap = TransformCollectionIterator->second;
-    ComponentManager::IdMap::iterator transformIterator;
+    IComponentManager::IdMap &idMap = TransformCollectionIterator->second;
+    IComponentManager::IdMap::iterator transformIterator;
     for (transformIterator = idMap.begin(); transformIterator != idMap.end(); transformIterator++)
     {
         // iterate over transform components
@@ -69,7 +69,7 @@ void TransformSystem::CalculateWorldTransforms(bool ignoreStatic)
         glm::mat4 parentTransform(1);
         glm::mat4 parentTransformUniformScale(1);
         TransformComponent* currentTransform = transform;
-        ComponentManager::IdMap::iterator parentIterator;
+        IComponentManager::IdMap::iterator parentIterator;
 
         unsigned int parentId = currentTransform->ParentID;
         unsigned char checkDepth = 255;

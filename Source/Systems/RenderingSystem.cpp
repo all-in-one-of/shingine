@@ -1,10 +1,10 @@
 #include "Systems/RenderingSystem.h"
 
-#include "Modules/Graphics/Graphics.h"
+#include "Modules/Statics/Graphics.h"
 
-#include "Modules/Statics/AssetManager.h"
-#include "Modules/Statics/ComponentManager.h"
-#include "Modules/Statics/EntityManager.h"
+#include "Modules/Statics/IAssetManager.h"
+#include "Modules/Statics/IComponentManager.h"
+#include "Modules/Statics/IEntityManager.h"
 
 #include "Engine/Components/TransformComponent.h"
 #include "Engine/Components/RendererComponent.h"
@@ -12,7 +12,7 @@
 
 #include "Engine/AssetTypes/Settings/RenderSettings.h"
 
-#include "Modules/Statics/ActiveCamera.h"
+#include "Modules/Statics/IActiveCamera.h"
 #include "Modules/Graphics/ICommandBuffer.h"
 
 #include "Utility/Typedefs.h"
@@ -26,21 +26,21 @@ bool RenderingSystem::Initialize()
 
 bool RenderingSystem::Update()
 {
-    ICommandBuffer* buf = Graphics::CommandBuffer();
+    ICommandBuffer* buf = Statics::Get<IGraphics>()->CommandBuffer();
 
     buf->EnableDepth();
     buf->EnableCullFace();
     buf->Clear();
 
     // Update projection matrix, then draw meshes
-    CameraComponent* camera = ActiveCamera::Get()->GetCameraComponent();
+    CameraComponent* camera = Statics::Get<IActiveCamera>()->GetCameraComponent();
     camera->ProjectionMatrix = glm::perspective(camera->FOV,
-        Graphics::GetContext()->GetFrameAspectRatio(), camera->NearPlane, camera->FarPlane);
+        Statics::Get<IGraphics>()->GetContext()->GetFrameAspectRatio(), camera->NearPlane, camera->FarPlane);
 
-    ComponentManager::StringMap::iterator rendererIterator;
-    ComponentManager::StringMap::iterator transformIterator;
+    IComponentManager::StringMap::iterator rendererIterator;
+    IComponentManager::StringMap::iterator transformIterator;
 
-    ComponentManager* componentManager = ComponentManager::Get();
+    IComponentManager* componentManager = Statics::Get<IComponentManager>();
     // iterate over renderer iterator
     bool drawMeshes = true;
     drawMeshes = drawMeshes && componentManager->GetComponentIteratorOfType("RendererComponent", rendererIterator);

@@ -1,50 +1,27 @@
 #pragma once
-#include <unordered_map>
+#include "IInput.h"
+#include "Utility/Data/Serialization.h"
 
-#define S_INPUT_ACTION_PRESSED 1
-#define S_INPUT_ACTION_REPEAT 2
-
-#define S_INPUT_KEY_A 65
-#define S_INPUT_KEY_D 68
-#define S_INPUT_KEY_E 69
-#define S_INPUT_KEY_Q 81
-#define S_INPUT_KEY_S 83
-#define S_INPUT_KEY_W 87
-
-#define S_INPUT_MOUSE_LEFT 0
-#define S_INPUT_MOUSE_RIGHT 1
-
-class Input
+class Input : public IInput, public ISerializedClass
 {
 public:
-    enum AxisType 
-    {
-        MouseX, MouseY
-    };
+    SERIALIZE_CLASS(Input)
+    Input();
+    virtual ~Input() {}
+    virtual void Update();
+    virtual void SetKeyEvent(int key, int scanCode, int action, int mods);
+    virtual void SetMousePosition(double x, double y);
+    virtual void SetMouseEvent(int key, int action, int mods);
 
-    static Input* Get() 
-    {
-        if (!Instance) 
-            Instance = new Input();
-        return Instance;
-    };
+    virtual float GetAxis(AxisType axis);
+
+    virtual bool GetKeyPressed(int keyCode);
+    virtual bool GetMousePressed(int keyCode);
     
-    void Update();
-    void SetKeyEvent(int key, int scanCode, int action, int mods);
-    void SetMousePosition(double x, double y);
-    void SetMouseEvent(int key, int action, int mods);
-
-    float GetAxis(AxisType axis);
-
-    bool GetKeyPressed(int keyCode);
-    bool GetMousePressed(int keyCode);
-    
-    void SetScreenReferenceSize(unsigned int width, unsigned int height);
+    virtual void SetScreenReferenceSize(unsigned int width, unsigned int height);
 
 
 private: 
-    Input();
-    static Input* Instance;
 
     typedef std::unordered_map<int, int> KeyMap;
 

@@ -1,11 +1,8 @@
 #include <iostream>
 #include "Core.h"
-#include "Modules/Statics/AssetManager.h"
-#include "Modules/Statics/ComponentManager.h"
-#include "Modules/Statics/EntityManager.h"
 
 #include "Modules/Graphics/IShader.h"
-#include "Modules/Graphics/Graphics.h"
+#include "Modules/Statics/Graphics.h"
 #include "Solver/Solver.h"
 
 #include "Modules/Statics/ActiveCamera.h"
@@ -14,32 +11,54 @@
 
 #include "Game/FirstPersonController/FirstPersonComponent.h"
 
+
+#include "Modules/Statics/Statics.h"
+#include "Modules/Statics/AssetManager.h"
+#include "Modules/Statics/ComponentManager.h"
+#include "Modules/Statics/EntityManager.h"
+#include "Modules/Statics/Input.h"
+#include "Modules/Statics/SceneManager.h"
+#include "Modules/Statics/ActiveCamera.h"
+#include "Modules/Statics/Graphics.h"
+
 void Initialize()
 {
-    AssetManager::Get()->AddAssetOfType("Material");
+    // Add global objects
+    Statics::AddStaticObject<IEntityManager, EntityManager>();
+    Statics::AddStaticObject<IAssetManager, AssetManager>();
+    Statics::AddStaticObject<IComponentManager, ComponentManager>();
+    Statics::AddStaticObject<IInput, Input>();
+    Statics::AddStaticObject<ISceneManager, SceneManager>();
+    Statics::AddStaticObject<IActiveCamera, ActiveCamera>();
+    Statics::AddStaticObject<IGraphics, Graphics>();
+    
+    Statics::Get<IAssetManager>()->AddAssetOfType("Material");
     // set default shader
     IShader* defaultShader = dynamic_cast<IShader*>(
-        AssetManager::Get()->AddAssetOfType("Shader"));
+        Statics::Get<IAssetManager>()->AddAssetOfType("Shader"));
+
     String vertSrc, fragSrc;
     ResourceLoader::LoadText("Assets/Shaders/default.vert", vertSrc);
     ResourceLoader::LoadText("Assets/Shaders/default.frag", fragSrc);
     defaultShader->AddSource(EShaderType::VERTEX, vertSrc);
     defaultShader->AddSource(EShaderType::FRAGMENT, fragSrc);
-    Graphics::SetDefaultShader(defaultShader);
+    Statics::Get<IGraphics>()->SetDefaultShader(defaultShader);
 
     // set camera
-    TransformComponent* transformComponent = ActiveCamera::Get()->GetTransformComponent();
+    TransformComponent* transformComponent = Statics::Get<IActiveCamera>()->GetTransformComponent();
     transformComponent->SetPosition(0, 1, -6.f);
     // add render settings
-    AssetManager::Get()->AddAssetOfType("RenderSettings");
+    Statics::Get<IAssetManager>()->AddAssetOfType("RenderSettings");
 
     // add first person component
-    IComponent *a = ComponentManager::Get()->AddComponent<FirstPersonController::FirstPersonComponent>(
+    IComponent *a = Statics::Get<IComponentManager>()->AddComponent<FirstPersonController::FirstPersonComponent>(
           transformComponent->EntityId());
     FirstPersonController::FirstPersonComponent *comp = dynamic_cast<FirstPersonController::FirstPersonComponent*>(a);
     comp->PlayerMovementSettings->RunMultiplier = 5.f;
     comp->PlayerMovementSettings->ForwardSpeed = 13.f;
     transformComponent->IsDynamic = 1;
+
+    Statics::Get<IGraphics>()->SetupWindow();
 }
 
 int main()
@@ -63,7 +82,7 @@ int main()
 
     while (solver->Simulate())
     {
-         if (!Graphics::Render())
+         if (!Statics::Get<IGraphics>()->Render())
              break;
     }
     return 0;

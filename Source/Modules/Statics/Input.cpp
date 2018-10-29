@@ -1,7 +1,8 @@
 #include "Modules/Statics/Input.h"
 #include <iostream>
 
-Input* Input::Instance = NULL;
+REGISTER_SERIALIZED_NAME(Input)
+
 Input::Input()
 {
     for (int x = 0; x < 255; x++)

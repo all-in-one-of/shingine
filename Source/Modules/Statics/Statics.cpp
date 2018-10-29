@@ -2,49 +2,40 @@
 #include "Utility/Data/ISerialized.h"
 
 #include "Engine/IComponent.h"
-#include "Modules/Statics/AssetManager.h"
-#include "Modules/Statics/ComponentManager.h"
+#include "Modules/Statics/IAssetManager.h"
+#include "Modules/Statics/IComponentManager.h"
 
-Statics* Statics::Instance = NULL;
+Statics* Statics::Instance = nullptr;
 
 Statics::Statics()
 {
-    // unsigned int maxItems = 10000000;
-    // unsigned int startId = 1000;
-    // IdPool = std::vector<unsigned int>(maxItems - 1000);
-
-    // for (unsigned int x = 0; x < IdPool.size(); x++)
-    //     IdPool[x] = x + startId;
 }
 
 unsigned int Statics::GetUniqueId()
 {
-    if (IdPool.size() == 0)
+    Statics* instance = GetInstance();
+    if ((instance->IdPool).size() == 0)
     {
-        return NextId++;
+        return instance->NextId++;
     }
-    unsigned int id = IdPool[IdPool.size() - 1];
-    IdPool.pop_back();
+    unsigned int id = instance->IdPool[instance->IdPool.size() - 1];
+    (instance->IdPool).pop_back();
     return id;
 }
 
 void Statics::Destroy(ISerializedClass *object)
 {
-    
-    // TODO
-    // if component delete from map by name + entity id
-    // if asset delete by unique id
-
-    IdPool.push_back(object->UniqueID());
+    Statics* instance = GetInstance();
+    (instance->IdPool).push_back(object->UniqueID());
     delete object;
 }
 
-
 void Statics::AddSerializedObject(ISerializedClass* object)
 {
+    Statics* instance = GetInstance();
     IComponent* component = dynamic_cast<IComponent*>(object);
     if (component)
-        ComponentManager::Get()->AddComponent(component);
+        instance->Get<IComponentManager>()->AddComponent(component);
     else
-        AssetManager::Get()->AddInstance(object);
+        instance->Get<IAssetManager>()->AddInstance(object);
 }

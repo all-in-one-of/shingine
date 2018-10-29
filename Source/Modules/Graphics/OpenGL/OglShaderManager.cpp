@@ -1,7 +1,7 @@
 #include "Modules/Graphics/OpenGL/OglShaderManager.h"
 #include "Utility/Graphics.h"
 
-#include "Modules/Graphics/Graphics.h"
+#include "Modules/Statics/IGraphics.h"
 
 #include "Modules/Statics/AssetManager.h"
 #include "Modules/Graphics/IShader.h"
@@ -51,7 +51,7 @@ int OglShaderManager::GetShaderProgramId(unsigned int shaderId)
 {
     // if the asset id is 0 then assign the default shader id
     if (shaderId == 0)
-        shaderId = Graphics::DefaultShader()->AssetId();
+        shaderId = Statics::Get<IGraphics>()->DefaultShader()->AssetId();
 
     std::unordered_map<unsigned int, int>::iterator it = AssetIdToShaderProgramId.find(shaderId);
     if (it != AssetIdToShaderProgramId.end())
@@ -59,7 +59,7 @@ int OglShaderManager::GetShaderProgramId(unsigned int shaderId)
 
     // compile shader source or raise the error
     IShader* shader = dynamic_cast<IShader*>(
-        AssetManager::Get()->GetAssetOfType("Shader", shaderId));
+        Statics::Get<IAssetManager>()->GetAssetOfType("Shader", shaderId));
     
     if (shader == NULL)
         throw 1;

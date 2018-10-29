@@ -1,8 +1,7 @@
 #include "Modules/Statics/EntityManager.h"
-#include "Modules/Statics/Statics.h"
-#include "Modules/Statics/ComponentManager.h"
+#include "Modules/Statics/IComponentManager.h"
 
-EntityManager* EntityManager::Instance = NULL;
+REGISTER_SERIALIZED_NAME(EntityManager)
 
 EntityManager::EntityManager()
 {
@@ -10,7 +9,7 @@ EntityManager::EntityManager()
 
 unsigned int EntityManager::CreateEntity()
 {
-    return CreateEntity(Statics::Get()->GetUniqueId());
+    return CreateEntity(Statics::GetUniqueId());
 }
 
 unsigned int EntityManager::CreateEntity(unsigned int id)
@@ -24,7 +23,7 @@ unsigned int EntityManager::CreateEntity(std::vector<String> componentsToAttach)
     unsigned int id = CreateEntity();
     for (size_t x = 0; x < componentsToAttach.size(); x++)
     {
-        ComponentManager::Get()->AddComponent(componentsToAttach[x], id);
+        Statics::Get<IComponentManager>()->AddComponent(componentsToAttach[x], id);
     }
     return id;
 }

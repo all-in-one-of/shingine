@@ -6,10 +6,10 @@
 
 #include "Modules/Statics/AssetManager.h"
 #include "Engine/AssetTypes/Material.h"
-#include "Modules/Statics/ActiveCamera.h"
-#include "Modules/Graphics/Graphics.h"
+#include "Modules/Statics/IActiveCamera.h"
+#include "Modules/Statics/IGraphics.h"
 
-#include "Modules/Statics/Input.h"
+#include "Modules/Statics/IInput.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,7 +38,8 @@ void KeyCallback(GLFWwindow *window, int key, int scanCode, int action, int mods
     {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-    Input::Get()->SetKeyEvent(key, scanCode, action, mods);
+    
+    Statics::Get<IInput>()->SetKeyEvent(key, scanCode, action, mods);
 }
 
 void MouseCallback(GLFWwindow *window, int key, int action, int mods)
@@ -48,7 +49,7 @@ void MouseCallback(GLFWwindow *window, int key, int action, int mods)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
 
-    Input::Get()->SetMouseEvent(key, action, mods);
+    Statics::Get<IInput>()->SetMouseEvent(key, action, mods);
 }
 
 void MouseMove(GLFWwindow *window, double mouseX, double mouseY)
@@ -57,8 +58,8 @@ void MouseMove(GLFWwindow *window, double mouseX, double mouseY)
 
 void ResizeWindow(GLFWwindow *window, GLsizei width, GLsizei height)
 {
-    Input::Get()->SetScreenReferenceSize(width, height);
-    Graphics::GetContext()->SetFramebufferSize(width, height);
+    Statics::Get<IInput>()->SetScreenReferenceSize(width, height);
+    Statics::Get<IGraphics>()->GetContext()->SetFramebufferSize(width, height);
 }
 }; // namespace OpenGLRenderStatics
 
@@ -157,11 +158,11 @@ bool OpenGLRender::IsWindowCreated()
 void OpenGLRender::Update()
 {
 
-    Input::Get()->Update();
+    Statics::Get<IInput>()->Update();
     glfwSwapBuffers(Window);
     glfwPollEvents();
     
     double x, y;
     glfwGetCursorPos(Window, &x, &y);
-    Input::Get()->SetMousePosition(x, y);
+    Statics::Get<IInput>()->SetMousePosition(x, y);
 }

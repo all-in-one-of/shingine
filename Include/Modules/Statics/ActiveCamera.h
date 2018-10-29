@@ -1,25 +1,21 @@
 #pragma once
-#include <glm/glm.hpp>
+#include "IActiveCamera.h"
+#include "Utility/Data/Serialization.h"
 
-class CameraComponent;
-class TransformComponent;
-
-class ActiveCamera
+class ActiveCamera : public IActiveCamera, public ISerializedClass
 {
 public:
-    static ActiveCamera* Get() 
-    {
-        if (!Instance) Instance = new ActiveCamera();
-        return Instance;
-    }
-
-    CameraComponent* GetCameraComponent();
-    TransformComponent* GetTransformComponent();
-    static glm::mat4 ProjectionMatrix();
-    static glm::mat4 ViewMatrix();
-private: 
+    SERIALIZE_CLASS(ActiveCamera)
     ActiveCamera();
-    static ActiveCamera* Instance;
+    virtual ~ActiveCamera() {};
+    virtual CameraComponent* GetCameraComponent();
+    virtual TransformComponent* GetTransformComponent();
+    virtual glm::mat4 ProjectionMatrix();
+    virtual glm::mat4 ViewMatrix();
+
+    void SetComponents();
+private: 
     TransformComponent* Transform = NULL;
     CameraComponent* Camera = NULL;
+    bool AreComponentsSet = false;
 };

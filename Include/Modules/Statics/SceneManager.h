@@ -1,21 +1,17 @@
 #pragma once
 #include <map>
-#include "../Scene/IScene.h"
+#include "ISceneManager.h"
+#include "Utility/Data/Serialization.h"
 
-class SceneManager
+class SceneManager : public ISceneManager, public ISerializedClass
 {
 public:
-    static SceneManager* Get()
-    {
-        if (!SceneManager::Instance)
-            SceneManager::Instance = new SceneManager();
-        return SceneManager::Instance;
-    }
-    void AddScene(const String &fileName, IScene* scene);
-    IScene* CurrentScene();
-private:
+    SERIALIZE_CLASS(SceneManager)
     SceneManager();
-    static SceneManager* Instance;
+    virtual ~SceneManager() {}
+    virtual void AddScene(const String &fileName, IScene* scene);
+    virtual IScene* CurrentScene();
+private:
     std::map<String, IScene*> Scenes;
     IScene* CurrentSceneInstance = NULL;
 };

@@ -11,9 +11,8 @@
 #include "Utility/Data/EntityComponentIdSetter.h"
 #include "Modules/Scene/SceneMaker.h"
 
-#include "Modules/Statics/Statics.h"
-#include "Modules/Statics/SceneManager.h"
-#include "Modules/Statics/AssetManager.h"
+#include "Modules/Statics/ISceneManager.h"
+#include "Modules/Statics/IAssetManager.h"
 
 String ResourceLoader::LastError = "";
 String ResourceLoader::GetLastError() { return LastError; }
@@ -92,7 +91,7 @@ bool ResourceLoader::Load(const String &fileName)
 
         // add instance
         ISerializedClass* serializedObject = dynamic_cast<ISerializedClass*>(deserializedDataNode);
-        Statics::Get()->AddSerializedObject(serializedObject);
+        Statics::AddSerializedObject(serializedObject);
     }
 
     reader->Close();
@@ -113,16 +112,16 @@ bool ResourceLoader::Load(const String &fileName)
         {
             EntityComponentIdSetter::UpdateIds(deserializedNodes[x]);
             // will return the unique id
-            Statics::Get()->Destroy(dynamic_cast<ISerializedClass*>(deserializedNodes[x]));
+            Statics::Destroy(dynamic_cast<ISerializedClass*>(deserializedNodes[x]));
         }
     }
-
-    AssetManager::Get()->RemoveAssetType("Entity");
-    AssetManager::Get()->RemoveAssetType("EntityIdCollection");
+    
+    Statics::Get<IAssetManager>()->RemoveAssetType("Entity");
+    Statics::Get<IAssetManager>()->RemoveAssetType("EntityIdCollection");
     
     // check if the ssd file contains entities
     if (entities.size() > 0)
-        SceneManager::Get()->AddScene(fileName, SceneMaker::Create(nodes));
+        Statics::Get<ISceneManager>()->AddScene(fileName, SceneMaker::Create(nodes));
     else
         for (size_t x = 0; x < nodes.size(); x++)
             delete nodes[x];

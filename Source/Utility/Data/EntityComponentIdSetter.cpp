@@ -4,8 +4,8 @@
 #include "Engine/Entity.h"
 #include "Engine/IComponent.h"
 
-#include "Modules/Statics/EntityManager.h"
-#include "Modules/Statics/ComponentManager.h"
+#include "Modules/Statics/IEntityManager.h"
+#include "Modules/Statics/IComponentManager.h"
 
 void EntityComponentIdSetter::UpdateIds(ISerialized* idCollections)
 {
@@ -21,13 +21,13 @@ EntityComponentIdSetter::EntityComponentIdSetter(EntityIdCollection* collection)
     for (size_t x = 0; x < collection->Ids.size(); x++)
     {
         unsigned int entityId = collection->Ids[x];
-        EntityManager::Get()->CreateEntity(entityId);
+        Statics::Get<IEntityManager>()->CreateEntity(entityId);
         for (size_t y = 0; y < collection->Components[x]->Ids.size(); y++)
             componentIdToEntityId[collection->Components[x]->Ids[y]] = entityId;
     }
     
     std::vector<IComponent*> components;
-    ComponentManager::Get()->GetAllComponents(components);
+    Statics::Get<IComponentManager>()->GetAllComponents(components);
     for (size_t x = 0; x < components.size(); x++)
     {
         unsigned int componentId = components[x]->Id();
@@ -36,6 +36,6 @@ EntityComponentIdSetter::EntityComponentIdSetter(EntityIdCollection* collection)
         if (it == componentIdToEntityId.end())
             continue;
         components[x]->SetEntityId(it->second);
-        ComponentManager::Get()->UpdateComponentEntityId(components[x]);
+        Statics::Get<IComponentManager>()->UpdateComponentEntityId(components[x]);
     }
 }

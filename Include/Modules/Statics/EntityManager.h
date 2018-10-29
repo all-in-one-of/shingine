@@ -1,21 +1,19 @@
 #pragma once
 #include <vector>
 #include "Core.h"
+#include "IEntityManager.h"
+#include "Utility/Data/Serialization.h"
 
-class EntityManager
+class EntityManager : public IEntityManager, public ISerializedClass
 {
 public:
-    static EntityManager* Get() 
-    {
-        if (!Instance) Instance = new EntityManager();
-        return Instance;
-    }
+    SERIALIZE_CLASS(EntityManager)
+    EntityManager();
     unsigned int CreateEntity();
     unsigned int CreateEntity(unsigned int id);
     unsigned int CreateEntity(std::vector<String> componentsToAttach);
     void Destroy(unsigned int id);
 private:
-    EntityManager();
     static EntityManager* Instance;
     std::vector<unsigned int> Ids;
 };

@@ -1,10 +1,10 @@
 #include "Game/FirstPersonController/FirstPersonSystem.h"
-#include "Modules/Statics/ComponentManager.h"
+#include "Modules/Statics/IComponentManager.h"
 #include "Game/FirstPersonController/FirstPersonComponent.h"
 #include "Engine/Components/TransformComponent.h"
 #include "Engine/Components/CameraComponent.h"
 
-#include "Modules/Statics/Input.h"
+#include "Modules/Statics/IInput.h"
 
 #include "Utility/Typedefs.h"
 
@@ -20,7 +20,7 @@ namespace FirstPersonController
 
     bool FirstPersonSystem::Initialize()
     {
-        ComponentManager* componentManager = ComponentManager::Get();
+        IComponentManager* componentManager = Statics::Get<IComponentManager>();
         // find first person component
         FirstPersonComponent =
             componentManager->GetComponentOfType<FirstPersonController::FirstPersonComponent>();
@@ -45,8 +45,8 @@ namespace FirstPersonController
 
     void FirstPersonSystem::UpdateRotation(glm::vec3 &Front, glm::vec3 &Horizontal, glm::vec3 &cameraFront, glm::vec3 &cameraUp)
     {
-        float offsetX = Input::Get()->GetAxis(Input::AxisType::MouseX);
-        float offsetY = -Input::Get()->GetAxis(Input::AxisType::MouseY);
+        float offsetX = Statics::Get<IInput>()->GetAxis(IInput::AxisType::MouseX);
+        float offsetY = -Statics::Get<IInput>()->GetAxis(IInput::AxisType::MouseY);
         bool isMouseMoving = abs(offsetX) > .0001f || abs(offsetY) > .0001f;
         if (!isMouseMoving) return;
 
@@ -77,9 +77,10 @@ namespace FirstPersonController
     void FirstPersonSystem::UpdateMovement(glm::vec3 &position, glm::vec3 &Front, glm::vec3 &Horizontal)
     {
         float deltaTime = 1 / 60.f;
+        IInput* input = Statics::Get<IInput>();
         
         float factor = deltaTime * 
-            (Input::Get()->GetMousePressed(S_INPUT_MOUSE_LEFT) 
+            (input->GetMousePressed(S_INPUT_MOUSE_LEFT)
             ? FirstPersonComponent->PlayerMovementSettings->RunMultiplier
             : 1.f);
         
@@ -87,28 +88,28 @@ namespace FirstPersonController
         position = PlayerTransform->GetPosition();
         glm::vec3 translation(0);
 
-        if (Input::Get()->GetKeyPressed(S_INPUT_KEY_W))
+        if (input->GetKeyPressed(S_INPUT_KEY_W))
         {
             translation.x += factor * Front.x;
             translation.z += factor * Front.z;
         }
         
-        if (Input::Get()->GetKeyPressed(S_INPUT_KEY_S))
+        if (input->GetKeyPressed(S_INPUT_KEY_S))
         {
             translation.x -= factor * Front.x;
             translation.z -= factor * Front.z;
         }
 
-        if (Input::Get()->GetKeyPressed(S_INPUT_KEY_A))
+        if (input->GetKeyPressed(S_INPUT_KEY_A))
             translation -= Horizontal * factor;
 
-        if (Input::Get()->GetKeyPressed(S_INPUT_KEY_D))
+        if (input->GetKeyPressed(S_INPUT_KEY_D))
             translation += Horizontal * factor;
 
-        if (Input::Get()->GetKeyPressed(S_INPUT_KEY_Q))
+        if (input->GetKeyPressed(S_INPUT_KEY_Q))
             translation.y += factor * 1.f;
 
-        if (Input::Get()->GetKeyPressed(S_INPUT_KEY_E))
+        if (input->GetKeyPressed(S_INPUT_KEY_E))
             translation.y += factor * -1.f;
 
         position += translation;

@@ -2,7 +2,7 @@
 #include "Utility/Data/ISerialized.h"
 #include "Utility/Data/SerializedFactory.h"
 
-AssetManager* AssetManager::Instance = NULL;
+REGISTER_SERIALIZED_NAME(AssetManager)
 ISerializedClass* AssetManager::GetAssetOfType(const String &typeName, unsigned int assetId)
 {
     StringMap::iterator it;

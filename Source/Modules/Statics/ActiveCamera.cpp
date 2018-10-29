@@ -1,16 +1,14 @@
 #include "Engine/IComponent.h"
-#include "Modules/Graphics/Graphics.h"
+#include "Modules/Statics/IGraphics.h"
 
-#include "Modules/Statics/ComponentManager.h"
-#include "Modules/Statics/EntityManager.h"
+#include "Modules/Statics/IComponentManager.h"
+#include "Modules/Statics/IEntityManager.h"
 
 #include "Engine/Components/CameraComponent.h"
 #include "Engine/Components/TransformComponent.h"
 #include "Modules/Statics/ActiveCamera.h"
 
-
-ActiveCamera* ActiveCamera::Instance = NULL;
-
+REGISTER_SERIALIZED_NAME(ActiveCamera)
 CameraComponent* ActiveCamera::GetCameraComponent()
 {
     return Camera;
@@ -23,23 +21,23 @@ TransformComponent* ActiveCamera::GetTransformComponent()
 
 glm::mat4 ActiveCamera::ProjectionMatrix()
 {
-    return Instance->Camera->ProjectionMatrix;
+    return Camera->ProjectionMatrix;
 }
 
 glm::mat4 ActiveCamera::ViewMatrix()
 {
-    return Instance->Camera->ViewMatrix;
+    return Camera->ViewMatrix;
 }
 
 ActiveCamera::ActiveCamera()
 {
     // find camera component or make a new entity
-    ComponentManager* componentManager = ComponentManager::Get();
+    IComponentManager* componentManager = Statics::Get<IComponentManager>();
     Camera = componentManager->GetComponentOfType<CameraComponent>();
     if (!Camera)
     {
         unsigned int newId = 
-            EntityManager::Get()->CreateEntity(
+            Statics::Get<IEntityManager>()->CreateEntity(
                 {"TransformComponent", "CameraComponent", "ObjectMetadataComponent"});
         
         Camera = componentManager->GetComponentOfType<CameraComponent>(newId);

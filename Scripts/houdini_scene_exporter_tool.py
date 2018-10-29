@@ -170,7 +170,7 @@ for node in obj_nodes:
 
 for uid, hom_node in uid_to_hom_node.items():
     # add object metadata component
-    current_node = Node("ObjectMetadata")
+    current_node = Node("ObjectMetadataComponent")
     current_node.attributes.append(Attribute("Name", DataType_CHAR, hom_node.name(), True))
     current_node.attributes.append(Attribute("Tag", DataType_CHAR, "default", True))
     current_node.attributes.append(Attribute("Layer", DataType_CHAR, "default", True))
@@ -183,7 +183,7 @@ for uid, hom_node in uid_to_hom_node.items():
     quat = hou.Quaternion(local_transform.extractRotationMatrix3())
     scale = local_transform.extractScales()
     # transform node
-    current_node = Node("Transform")
+    current_node = Node("TransformComponent")
     current_node.attributes.append(Attribute("ParentID", DataType_UID, parent_node_uid(hom_node), True))
     current_node.attributes.append(Attribute("IsDynamic", DataType_BYTE, 0, True))
     current_node.attributes.append(Attribute("LocalPosition", DataType_FLOAT, position))
@@ -193,7 +193,7 @@ for uid, hom_node in uid_to_hom_node.items():
     uid_to_components[uid].append(current_node.unique_id)
     # handle light component
     if hom_node.type().name() == light_type_name:
-        current_node = Node("Light")
+        current_node = Node("LightComponent")
         current_node.attributes.append(Attribute("Color", DataType_FLOAT, hom_node.parmTuple("light_color").eval()))
         current_node.attributes.append(Attribute("Exposure", DataType_FLOAT, hom_node.parm("light_exposure").eval(), True))
         current_node.attributes.append(Attribute("Intensity", DataType_FLOAT, hom_node.parm("light_intensity").eval(), True))
@@ -211,7 +211,7 @@ for uid, hom_node in uid_to_hom_node.items():
         geometry_node.attributes.append(Attribute("TexCoord", DataType_FLOAT, geometry_data.texcoord))
         meshes[hom_node.name()] = geometry_node
         # add renderer component
-        renderer_node = Node("Renderer")
+        renderer_node = Node("RendererComponent")
         renderer_node.attributes.append(Attribute("DrawType", DataType_BYTE, DrawType_FILL, True))
         renderer_node.attributes.append(Attribute("Enabled", DataType_BYTE, 1, True))
         renderer_node.attributes.append(Attribute("MeshReference", DataType_UID, geometry_node.unique_id, True))

@@ -6,5 +6,5 @@
 class CResourceReaderFactory
 {
 public:
-    IResourceReader* CreateReader(const CString &fileName);
+    IResourceReader* CreateReader(const String &fileName);
 };

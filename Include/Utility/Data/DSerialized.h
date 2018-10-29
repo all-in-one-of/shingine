@@ -1,13 +1,13 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <typeinfo>
 
 class ISerialized;
 
 #define ____REGISTER_SERIALIZED_TYPE(TYPENAME) \
-    virtual CString SerializedName(); \
-    static const CString SerializedNameVar; \
-    static CSerializedRegistry<TYPENAME> reg; \
+    virtual String SerializedName(); \
+    static SerializedRegistry<TYPENAME> reg; \
     \
     unsigned int SerializedUniqueID; \
     bool SerializedIDSet = false; \
@@ -23,10 +23,9 @@ class ISerialized;
             throw 1; \
     }
     
-#define REGISTER_SERIALIZED_NAME(TYPENAME,NAME) \
-    const CString TYPENAME::SerializedNameVar = #NAME; \
-    CString TYPENAME::SerializedName() { return TYPENAME::SerializedNameVar; } \
-    CSerializedRegistry<TYPENAME> TYPENAME::reg(TYPENAME::SerializedNameVar, #TYPENAME); \
+#define REGISTER_SERIALIZED_NAME(TYPENAME) \
+    String TYPENAME::SerializedName() { return #TYPENAME; } \
+    SerializedRegistry<TYPENAME> TYPENAME::reg(#TYPENAME, typeid(TYPENAME).name()); \
 
 #define SERIALIZE_CLASS(CLASSNAME) \
     typedef void (CLASSNAME::*MFP)(ISerialized* &attr); \
@@ -36,7 +35,7 @@ class ISerialized;
     { \
         SetAttribute(attr->SerializedName(), attr); \
     }; \
-    virtual void SetAttribute(const CString& serializedName, ISerialized* &attr) \
+    virtual void SetAttribute(const String& serializedName, ISerialized* &attr) \
     { \
         std::string mapName = std::string("Set_") + serializedName.GetStdString(); \
         if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end()) \
@@ -67,46 +66,46 @@ class ISerialized;
     unsigned int NAME = 0; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
-        NAME = ((CTypedAttributeValue<unsigned int> *)attr)->Get(); \
+        NAME = ((TypedAttributeValue<unsigned int> *)attr)->Get(); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
-        attr = new CTypedAttributeValue<unsigned int>(#NAME, "uid", NAME); \
+        attr = new TypedAttributeValue<unsigned int>(#NAME, "uid", NAME); \
     }
 
 #define ATTRIBUTE_ID_VECTOR(NAME) \
     std::vector<unsigned int> NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
-        NAME = ((CTypedAttribute<unsigned int> *)attr)->Get(); \
+        NAME = ((TypedAttribute<unsigned int> *)attr)->Get(); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
-        attr = new CTypedAttribute<unsigned int>(#NAME, "uid", NAME); \
+        attr = new TypedAttribute<unsigned int>(#NAME, "uid", NAME); \
     }
 
 #define ATTRIBUTE_VALUE(TYPE_NAME,NAME) \
     TYPE_NAME NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
-        NAME = ((CTypedAttributeValue<TYPE_NAME> *)attr)->Get(); \
+        NAME = ((TypedAttributeValue<TYPE_NAME> *)attr)->Get(); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
-        attr = new CTypedAttributeValue<TYPE_NAME>(#NAME, #TYPE_NAME, NAME); \
+        attr = new TypedAttributeValue<TYPE_NAME>(#NAME, #TYPE_NAME, NAME); \
     }
 
 #define ATTRIBUTE_VECTOR(TYPE_NAME,NAME) \
     std::vector<TYPE_NAME> NAME; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
-        CTypedAttribute<TYPE_NAME> * typedAttr = (CTypedAttribute<TYPE_NAME> *)attr; \
+        TypedAttribute<TYPE_NAME> * typedAttr = (TypedAttribute<TYPE_NAME> *)attr; \
         if (typedAttr == NULL) return; \
         NAME = typedAttr->Get(); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
-        attr = new CTypedAttribute<TYPE_NAME>(#NAME, #TYPE_NAME, NAME); \
+        attr = new TypedAttribute<TYPE_NAME>(#NAME, #TYPE_NAME, NAME); \
     } 
 
 #define ATTRIBUTE_CLASS(CLASSNAME,NAME) \
@@ -119,7 +118,7 @@ class ISerialized;
     { \
         if (NAME == NULL) \
         { \
-            attr = CSerializedFactory::CreateInstance(std::string("Class:") + #CLASSNAME); \
+            attr = SerializedFactory::CreateInstance(#CLASSNAME); \
             NAME = dynamic_cast<CLASSNAME*>(attr); \
             return; \
         } \

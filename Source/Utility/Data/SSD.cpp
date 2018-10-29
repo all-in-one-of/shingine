@@ -3,7 +3,7 @@
 
 namespace SSD
 {
-    SNode::~SNode()
+    Node::~Node()
     {
         delete[] Name;
         for (unsigned char x = 0; x < AttributeCount; x++)
@@ -15,7 +15,7 @@ namespace SSD
         delete[] Nodes;
     }
 
-    SAttribute::~SAttribute()
+    Attribute::~Attribute()
     {
         delete[] Name;
         delete[] DataType;

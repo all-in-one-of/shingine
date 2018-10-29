@@ -10,7 +10,7 @@ class IResourceReader
 public:
     virtual ~IResourceReader() {};
 
-    virtual CString GetLastError() = 0;
+    virtual String GetLastError() = 0;
     virtual bool Open() = 0;
     virtual void ReadNodes(std::vector<IDataNode*> &nodes) = 0;
     virtual void Close() = 0;

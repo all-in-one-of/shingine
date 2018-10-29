@@ -1,5 +1,5 @@
 #pragma once
-#include "CComponent.h"
-#include "Utility/Data/CSerializedFactory.h"
-#include "Utility/Data/CTypedAttribute.h"
+#include "Component.h"
+#include "Utility/Data/SerializedFactory.h"
+#include "Utility/Data/TypedAttribute.h"
 #include "Utility/Data/DSerialized.h"

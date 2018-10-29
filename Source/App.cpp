@@ -45,7 +45,10 @@ void Initialize()
 int main()
 {
     Initialize();
-    bool didLoad = CResourceLoader::Load("Assets/Scenes/Test.ssd");
+
+    bool didLoad = CResourceLoader::Load("Assets/Scenes/building.ssd");
+
+    IGraphics* graphics = CStatics::StaticObjectBuilder->Get<IGraphics>("IGraphics");
 
     if (!didLoad)
     {

@@ -21,7 +21,7 @@ CString CResourceLoader::GetLastError() { return LastError; }
 
 void CResourceLoader::SetupPath(const CString &localPath, CString& outPath)
 {
-    const CString basePath = "";
+    const CString basePath = "/Users/snowbear/Documents/GIT/shingine/";
     outPath = basePath + localPath;
 }
 

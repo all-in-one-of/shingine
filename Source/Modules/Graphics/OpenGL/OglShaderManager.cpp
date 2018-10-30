@@ -61,7 +61,7 @@ int OglShaderManager::GetShaderProgramId(unsigned int shaderId)
     IShader* shader = dynamic_cast<IShader*>(
         Statics::Get<IAssetManager>()->GetAssetOfType("Shader", shaderId));
     
-    if (shader == NULL)
+    if (shader == nullptr)
         throw 1;
 
     int shaderProgramId = CreateVertexFragmentShaderProgram(shader);
@@ -135,7 +135,7 @@ int OglShaderManager::CompileShaderSource(int shaderType, const String& shaderSo
         arraySource[x][charCount + 1] = '\0';
     }
     
-    glShaderSource(shaderId, lineCount, arraySource, NULL);
+    glShaderSource(shaderId, lineCount, arraySource, nullptr);
     glCompileShader(shaderId);
 
     for (size_t x = 0; x < lineCount; x++)

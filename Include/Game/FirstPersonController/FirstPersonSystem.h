@@ -18,9 +18,9 @@ namespace FirstPersonController
         void UpdateRotation(glm::vec3 &Front, glm::vec3 &Horizontal, glm::vec3 &cameraFront, 
             glm::vec3 &cameraUp);
         void UpdateMovement(glm::vec3 &position, glm::vec3 &Front, glm::vec3 &Horizontal);
-        class FirstPersonComponent* FirstPersonComponent = NULL;
+        class FirstPersonComponent* FirstPersonComponent = nullptr;
 
-        TransformComponent* PlayerTransform = NULL;
-        CameraComponent* Camera = NULL;
+        TransformComponent* PlayerTransform = nullptr;
+        CameraComponent* Camera = nullptr;
     };
 };

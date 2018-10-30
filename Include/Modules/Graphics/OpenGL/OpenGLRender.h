@@ -40,8 +40,8 @@ private:
     int FrameHeight = -1;
     float FrameAspectRatio = 1.f;
 
-    VaoMeshManager* MeshManager = NULL;
-    OglShaderManager* ShaderManager = NULL;
+    VaoMeshManager* MeshManager = nullptr;
+    OglShaderManager* ShaderManager = nullptr;
 
 
         

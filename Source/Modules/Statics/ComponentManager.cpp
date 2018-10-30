@@ -23,7 +23,7 @@ IComponent* ComponentManager::AddComponent(String type, unsigned int entityId)
 {
     ISerialized* serializedObject = SerializedFactory::CreateInstance(type.GetStdString());
     if (!serializedObject) 
-        return NULL;
+        return nullptr;
     IComponent* component = dynamic_cast<IComponent*>(serializedObject);
 
     if (entityId != 0) 
@@ -45,18 +45,18 @@ IComponent* ComponentManager::GetComponentOfType(String typeName, unsigned int c
 {
     StringMap::iterator it = Components.find(typeName.GetStdString());
     if (it == Components.end())
-        return NULL;
+        return nullptr;
 
     IdMap &idMap = it->second;
 
     if (idMap.begin() == idMap.end())
-        return NULL;
+        return nullptr;
     if (componentId == 0)
         return idMap.begin()->second;
 
     IdMap::iterator idMapIterator = idMap.find(componentId);
     if (idMapIterator == idMap.end()) 
-        return NULL;
+        return nullptr;
 
     return idMapIterator->second;
 }

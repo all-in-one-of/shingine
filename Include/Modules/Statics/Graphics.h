@@ -21,6 +21,6 @@ public:
     virtual void SetupWindow();
 private:
     IShader* defaultShader;
-    IRenderContext* RenderContext = NULL;
-    ICommandBuffer* DefaultCommandBuffer = NULL;
+    IRenderContext* RenderContext = nullptr;
+    ICommandBuffer* DefaultCommandBuffer = nullptr;
 };

@@ -13,5 +13,5 @@ public:
     virtual IScene* CurrentScene();
 private:
     std::map<String, IScene*> Scenes;
-    IScene* CurrentSceneInstance = NULL;
+    IScene* CurrentSceneInstance = nullptr;
 };

@@ -152,7 +152,7 @@ OglShaderManager *OpenGLRender::GetShaderManager()
 
 bool OpenGLRender::IsWindowCreated()
 {
-    return Window != NULL;
+    return Window != nullptr;
 }
 
 void OpenGLRender::Update()

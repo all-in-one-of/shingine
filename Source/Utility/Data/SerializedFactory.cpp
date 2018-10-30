@@ -1,8 +1,8 @@
 #include "Utility/Data/SerializedFactory.h"
 #include "Modules/Statics/Statics.h"
 
-SerializedFactory::TSerializedTypeMap* SerializedFactory::Map = NULL;
-SerializedFactory::TypeNameMap* SerializedFactory::TypeNames = NULL;
+SerializedFactory::TSerializedTypeMap* SerializedFactory::Map = nullptr;
+SerializedFactory::TypeNameMap* SerializedFactory::TypeNames = nullptr;
 
 void SerializedFactory::GetDemangledName(String &name)
 {
@@ -16,7 +16,7 @@ ISerialized* SerializedFactory::CreateInstance(const std::string &s, bool setUid
 {
     TSerializedTypeMap::iterator it = GetMap()->find(s);
     if (it == GetMap()->end()) 
-        return NULL;
+        return nullptr;
 
     ISerialized* createdInstance = it->second();
     ISerializedClass* serializedClass = dynamic_cast<ISerializedClass*>(createdInstance);

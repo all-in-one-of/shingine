@@ -45,7 +45,7 @@ ISerialized* DataNode::Deserialize()
 
     serializedClass->SetUniqueID(UniqueID);
 
-    if (serializedClass == NULL) 
+    if (serializedClass == nullptr) 
         return serializedClass;
 
     for (size_t x = 0; x < Attributes.size(); x++)
@@ -226,7 +226,7 @@ ISerialized* DataNode::MakeTypedAttribute(SSD::Attribute* attribute)
         return new TypedAttribute<float>(name, typeName, data_float);
     if (typeName == "unsigned char") 
         return new TypedAttribute<unsigned char>(name, typeName, data_uchar);
-    return NULL;
+    return nullptr;
 }
 
 String DataNode::Name() { return NodeName; }

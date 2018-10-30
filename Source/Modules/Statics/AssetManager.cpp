@@ -7,18 +7,18 @@ ISerializedClass* AssetManager::GetAssetOfType(const String &typeName, unsigned 
 {
     StringMap::iterator it;
     if (!GetAssetIteratorOfType(typeName, it))
-        return NULL;
+        return nullptr;
 
     IdMap &idMap = it->second;
     if (idMap.size() == 0)
-        return NULL;
+        return nullptr;
 
     IdMap::iterator idIterator = idMap.begin();
     if (assetId == 0) return idIterator->second;
 
     idIterator = idMap.find(assetId);
     if (idIterator == idMap.end()) 
-        return NULL;
+        return nullptr;
     
     return idIterator->second;
 }

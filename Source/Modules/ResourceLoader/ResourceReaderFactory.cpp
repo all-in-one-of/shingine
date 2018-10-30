@@ -8,7 +8,7 @@ IResourceReader* CResourceReaderFactory::CreateReader(const String &fileName)
 
     // TODO add ascii and json formats
     if (fileExtensionName == "ssd") return new ResourceReaderBinary(fileName);
-    else if (fileExtensionName == "ssda") return NULL;
-    else if (fileExtensionName == "ssd_json") return NULL;
-    return NULL;
+    else if (fileExtensionName == "ssda") return nullptr;
+    else if (fileExtensionName == "ssd_json") return nullptr;
+    return nullptr;
 }

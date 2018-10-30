@@ -35,7 +35,7 @@ namespace FirstPersonController
         Camera = 
             componentManager->GetComponentOfType<CameraComponent>(FirstPersonComponent->EntityId());
                 
-        Active = PlayerTransform != NULL && Camera != NULL;
+        Active = PlayerTransform != nullptr && Camera != nullptr;
 
         FirstPersonComponent->Yaw = 90.f;
 

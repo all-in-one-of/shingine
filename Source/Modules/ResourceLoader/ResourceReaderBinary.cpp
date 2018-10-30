@@ -52,7 +52,7 @@ SSD::Node* ResourceReaderBinary::ReadNode()
     if (garbage != SSD::NodeBegin)
     {
         LastError = "Error reading node identifier";
-        return NULL;
+        return nullptr;
     }
     SSD::Node* node = new SSD::Node();
     ReadUInt32(node->UniqueID);
@@ -77,7 +77,7 @@ SSD::Node* ResourceReaderBinary::ReadNode()
 
     LastError = "Couldn't find node end byte";
     delete node;
-    return NULL;
+    return nullptr;
 }
 
 SSD::Attribute* ResourceReaderBinary::ReadAttribute()
@@ -87,7 +87,7 @@ SSD::Attribute* ResourceReaderBinary::ReadAttribute()
     if (garbage != SSD::AttributeBegin)
     {
         LastError = "Error reading attr identifier";
-        return NULL;
+        return nullptr;
     }
     
     SSD::Attribute* attr = new SSD::Attribute();
@@ -142,7 +142,7 @@ SSD::Attribute* ResourceReaderBinary::ReadAttribute()
         return attr;
 
     delete attr;
-    return NULL;
+    return nullptr;
 }
 
 void ResourceReaderBinary::ReadHeader(SSD::Header &header)

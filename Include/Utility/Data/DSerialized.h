@@ -100,7 +100,7 @@ class ISerialized;
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
         TypedAttribute<TYPE_NAME> * typedAttr = (TypedAttribute<TYPE_NAME> *)attr; \
-        if (typedAttr == NULL) return; \
+        if (!typedAttr) return; \
         NAME = typedAttr->Get(); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
@@ -109,14 +109,14 @@ class ISerialized;
     } 
 
 #define ATTRIBUTE_CLASS(CLASSNAME,NAME) \
-    CLASSNAME* NAME = NULL; \
+    CLASSNAME* NAME = nullptr; \
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
         NAME = dynamic_cast<CLASSNAME*>(attr); \
     } \
     void Attrib_Get_##NAME(ISerialized* &attr) \
     { \
-        if (NAME == NULL) \
+        if (NAME == nullptr) \
         { \
             attr = SerializedFactory::CreateInstance(#CLASSNAME); \
             NAME = dynamic_cast<CLASSNAME*>(attr); \
@@ -131,7 +131,7 @@ class ISerialized;
     void Attrib_Set_##NAME(ISerialized* &attr) \
     { \
         CAttributeClassVector* typedAttr = dynamic_cast<CAttributeClassVector*>(attr); \
-        if (typedAttr == NULL) \
+        if (!typedAttr ) \
             return; \
         std::vector<ISerialized*> data = typedAttr->Get(); \
         NAME.clear(); \

@@ -15,7 +15,7 @@ public:
 
     void SetComponents();
 private: 
-    TransformComponent* Transform = NULL;
-    CameraComponent* Camera = NULL;
+    TransformComponent* Transform = nullptr;
+    CameraComponent* Camera = nullptr;
     bool AreComponentsSet = false;
 };

@@ -41,15 +41,17 @@ namespace BitmapReader
         fclose(file);
 
         pixels = new Pixel32[width * height]; 
-        for (unsigned int x = 0; x < size; x+=3)
+        unsigned int pixelCount = width * height;
+        for (unsigned int x = 0; x < pixelCount; x++)
         {
+
             Pixel32 pixel;
-            pixel.r = pixelsRaw[x + 2] / 255.f;
-            pixel.g = pixelsRaw[x + 1] / 255.f;
-            pixel.b = pixelsRaw[x] / 255.f;
+            pixel.r = pixelsRaw[x * 3 + 2] / 255.f;
+            pixel.g = pixelsRaw[x * 3 + 1] / 255.f;
+            pixel.b = pixelsRaw[x * 3 + 0] / 255.f;
             pixel.a = 1.f;
 
-            pixels[x / 3] = pixel; 
+            pixels[x] = pixel; 
         }
 
         tex->Name = fileName;

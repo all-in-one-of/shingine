@@ -18,8 +18,17 @@ public:
     ATTRIBUTE_VECTOR(String, VectorUniformNames)
     ATTRIBUTE_VECTOR(float, VectorUniformValues)
 
+    ATTRIBUTE_VECTOR(String, TextureUniformNames)
+    ATTRIBUTE_VECTOR(unsigned int, TextureUniformValues)
+
     virtual void GetFloatUniforms(std::vector<std::string> &names, std::vector<float> &values);
     virtual void GetVectorUniforms(std::vector<std::string> &names, std::vector<glm::vec4> &values);
+    virtual void GetTextureUniforms(std::vector<std::string> &names, std::vector<unsigned int> &values);
+
+
+    virtual void SetFloat(const String &name, float value);
+    virtual void SetVector(const String &name, const glm::vec4 &value);
+    virtual void SetTexture(const String &name, unsigned int textureId);
 
 };
 

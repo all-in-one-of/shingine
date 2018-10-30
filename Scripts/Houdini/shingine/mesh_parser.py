@@ -4,7 +4,9 @@ from . import core
 
 class GeometryData:
     def __init__(self, node):
+        self.nodes_to_destroy = []
         display = node.displayNode()
+        display = self.find_texture_coordinates(display)
         divide = node.createNode("divide")
         normal = node.createNode("normal")
         normal.parm("type").set(0)
@@ -29,21 +31,44 @@ class GeometryData:
             normals.append(normal_value[1])
             normals.append(normal_value[2])
             # deal with uvs later
-            texcoord.append(0.0)
-            texcoord.append(0.0)
-            texcoord.append(0.0)
+            texture_coordinate_value = point.attribValue("uv")
+            texcoord.append(texture_coordinate_value[0])
+            texcoord.append(texture_coordinate_value[1])
+            texcoord.append(texture_coordinate_value[2])
         for face in geometry.prims():
             vertices = reversed(face.vertices())
             for vert in vertices:
                 indices.append(vert.point().number())
         # delete temp houdini nodes
-        normal.destroy()
-        divide.destroy()
-
+        self.nodes_to_destroy.extend([normal, divide])
+        for node in self.nodes_to_destroy:
+            node.destroy()
+            
         self.positions = positions
         self.normals = normals
         self.indices = indices
         self.texcoord = texcoord
+
+    def find_texture_coordinates(self, sop_node):
+        # check if has uvs
+        node = sop_node.parent()
+        new_node = sop_node
+        if sop_node.geometry().findPointAttrib("uv"):
+            return sop_node
+        # add uv unwrap
+        if not sop_node.geometry().findVertexAttrib("uv"):
+            uvunwrap = node.createNode("uvunwrap")
+            self.nodes_to_destroy.append(uvunwrap)
+            uvunwrap.setParms({"uvattrib" : "uv"})
+            uvunwrap.setInput(0, new_node)
+            new_node = uvunwrap
+        # promote vertex uv attribute to the point one
+        attribpromote = node.createNode("attribpromote")
+        self.nodes_to_destroy.append(attribpromote)
+        attribpromote.setParms({"inname" : "uv", "inclass" : 3, "outclass" : 2})
+        attribpromote.setInput(0, new_node)
+        new_node = attribpromote
+        return new_node
 
     def get_parsed_mesh_node(self, name="GenericMeshNode"):
         geometry_node = core.Node("Mesh")

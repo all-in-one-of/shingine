@@ -21,7 +21,10 @@ public:
         StaticObjectMap::iterator it = instance->StaticObjects.find(typeName.GetStdString());
 
         if (it == instance->StaticObjects.end())
+        {
+            printf("Couldn't find static object of type : %s", typeName.GetCharArray());
             return nullptr;
+        }
         return dynamic_cast<InterfaceTypeName*>(it->second);
     }
 

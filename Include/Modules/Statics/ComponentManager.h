@@ -9,9 +9,6 @@ class IComponent;
 class ComponentManager : public IComponentManager, public ISerializedClass
 {
 public:
-    typedef std::unordered_map<unsigned int, IComponent*> IdMap;
-    typedef std::unordered_map<std::string, IdMap> StringMap;
-
     SERIALIZE_CLASS(ComponentManager)
     ComponentManager();
     virtual ~ComponentManager() {}

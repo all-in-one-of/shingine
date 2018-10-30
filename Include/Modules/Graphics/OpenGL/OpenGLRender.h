@@ -5,6 +5,7 @@
 
 class VaoMeshManager;
 class OglShaderManager;
+class OglTextureManager;
 class ISerializedClass;
 
 class OpenGLRender : public IRenderContext
@@ -33,6 +34,7 @@ public:
 
     VaoMeshManager* GetMeshManager();
     OglShaderManager* GetShaderManager();
+    OglTextureManager* GetTextureManager();
 private:
     struct GLFWwindow* Window;
 
@@ -42,7 +44,5 @@ private:
 
     VaoMeshManager* MeshManager = nullptr;
     OglShaderManager* ShaderManager = nullptr;
-
-
-        
+    OglTextureManager* TextureManager = nullptr;
 };

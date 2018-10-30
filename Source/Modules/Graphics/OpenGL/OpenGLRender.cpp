@@ -1,5 +1,6 @@
 #include "Modules/Graphics/OpenGL/OpenGLRender.h"
 #include "Modules/Graphics/OpenGL/OglShaderManager.h"
+#include "Modules/Graphics/OpenGL/OglTextureManager.h"
 #include "Modules/Graphics/OpenGL/VaoMeshManager.h"
 #include "Core.h"
 #include "Utility/Graphics.h"
@@ -61,18 +62,20 @@ void ResizeWindow(GLFWwindow *window, GLsizei width, GLsizei height)
     Statics::Get<IInput>()->SetScreenReferenceSize(width, height);
     Statics::Get<IGraphics>()->GetContext()->SetFramebufferSize(width, height);
 }
-}; // namespace OpenGLRenderStatics
+}; 
 
 OpenGLRender::OpenGLRender()
 {
     ShaderManager = new OglShaderManager();
     MeshManager = new VaoMeshManager();
+    TextureManager = new OglTextureManager();
 }
 
 OpenGLRender::~OpenGLRender()
 {
     delete ShaderManager;
     delete MeshManager;
+    delete TextureManager;
 
     glfwDestroyWindow(Window);
     glfwTerminate();
@@ -140,14 +143,19 @@ void OpenGLRender::SetFramebufferSize(int &width, int &height)
     FrameAspectRatio = width / (float)height;
 }
 
-VaoMeshManager *OpenGLRender::GetMeshManager()
+VaoMeshManager* OpenGLRender::GetMeshManager()
 {
     return MeshManager;
 }
 
-OglShaderManager *OpenGLRender::GetShaderManager()
+OglShaderManager* OpenGLRender::GetShaderManager()
 {
     return ShaderManager;
+}
+
+OglTextureManager* OpenGLRender::GetTextureManager()
+{
+    return TextureManager;
 }
 
 bool OpenGLRender::IsWindowCreated()

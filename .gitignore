@@ -1,4 +1,4 @@
-.vscode/*
+*.vscode*
 .vs/*
 Debug/*
 x64/Debug/*
@@ -6,6 +6,8 @@ x64/Debug/*
 cmake-build-debug/*
 build/*
 .DS_Store
+
+*.pyc
 
 # Prerequisites
 *.d

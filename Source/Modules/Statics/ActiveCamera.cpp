@@ -44,5 +44,4 @@ ActiveCamera::ActiveCamera()
     }
     Transform =
         componentManager->GetComponentOfType<TransformComponent>(Camera->EntityId());
-
 }

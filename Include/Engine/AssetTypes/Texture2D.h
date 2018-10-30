@@ -25,7 +25,7 @@ public:
 
     Pixel32* GetPixels();
     void SetPixels(unsigned int width, unsigned int height, Pixel32 *newData);
-
+    void GetResolution(int &width, int& height);
 
 private:
     ATTRIBUTE_VALUE(unsigned int, Width)

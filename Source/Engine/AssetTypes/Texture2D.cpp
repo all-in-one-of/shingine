@@ -25,6 +25,11 @@ Pixel32* Texture2D::GetPixels()
     return Data;
 }
 
+void Texture2D::GetResolution(int &width, int& height)
+{
+    width = Width;
+    height = Height;
+}
 
 void Texture2D::SetPixels(unsigned int width, unsigned int height, Pixel32 *newData)
 {

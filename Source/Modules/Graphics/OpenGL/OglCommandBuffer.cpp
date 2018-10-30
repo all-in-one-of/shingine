@@ -1,18 +1,16 @@
-#include "Modules/Statics/IGraphics.h"
-#include "Utility/Graphics.h"
-
 #include "Modules/Graphics/OpenGL/DOglCommandBuffer.h"
 #include "Modules/Graphics/OpenGL/OglCommandBuffer.h"
 #include "Modules/Graphics/OpenGL/OglShaderManager.h"
+#include "Modules/Graphics/OpenGL/OglTextureManager.h"
 #include "Modules/Graphics/OpenGL/VaoMeshManager.h"
 #include "Modules/Graphics/OpenGL/OpenGLRender.h"
 
-#include <glm/gtc/type_ptr.hpp>
-#include "Modules/Statics/IAssetManager.h"
-#include "Engine/AssetTypes/Material.h"
+#include "Modules/Statics/IGraphics.h"
 #include "Modules/Statics/IActiveCamera.h"
 
+#include "Utility/Graphics.h"
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 OglCommandBuffer::OglCommandBuffer()
 {
@@ -73,10 +71,10 @@ void OglCommandBuffer::SetPolygonMode(ICommandBuffer::EDrawPolygonMode mode)
     }
 }
 
-void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, unsigned int &meshAssetId, unsigned int &materialId)
+void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, unsigned int &meshAssetId, unsigned int &shaderId)
 {
     glm::mat4 matrixInv = glm::inverse(glm::transpose(matrix));
-    DrawMesh(matrix, matrixInv, meshAssetId, materialId);
+    DrawMesh(matrix, matrixInv, meshAssetId, shaderId);
 }
 
 #define PositionAttributeName "_PositionAttribute"
@@ -88,44 +86,20 @@ void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, unsigned int &meshAssetId, un
 #define ViewMatrixName "_ViewMatrix"
 #define ProjectionMatrixName "_ProjectionMatrix"
 
-void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv, unsigned int &meshAssetId, unsigned int &materialId)
+void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv, unsigned int &meshAssetId, unsigned int &shaderId)
 {
-    OpenGLRender* oglRender = dynamic_cast<OpenGLRender*>(Statics::Get<IGraphics>()->GetContext());
+    OpenGLRender* oglRender = GetContext();
 
-    std::unordered_map<std::string, 
-        std::unordered_map<unsigned int, ISerializedClass*>>::iterator MaterialIterator;
-
-    Statics::Get<IAssetManager>()->GetAssetIteratorOfType("Material", MaterialIterator);
-    Material* material;
-    if (materialId == 0)
-        materialId = MaterialIterator->second.begin()->first;
-
-    material = dynamic_cast<Material*>(MaterialIterator->second.at(materialId));
     // set material uniforms
-    int programId = oglRender->GetShaderManager()->GetShaderProgramId(material->ShaderId);
+    int programId = oglRender->GetShaderManager()->GetShaderProgramId(shaderId);
 
-    SetMatrix(ModelMatrixName, programId, matrix);
-    SetMatrix(ModelMatrixInverseName, programId, matrixInv);
+    SetMatrixOgl(ModelMatrixName, programId, matrix);
+    SetMatrixOgl(ModelMatrixInverseName, programId, matrixInv);
    
-    SetMatrix(ProjectionMatrixName, programId, Statics::Get<IActiveCamera>()->ProjectionMatrix());
-    SetMatrix(ViewMatrixName, programId, Statics::Get<IActiveCamera>()->ViewMatrix());
-
-    // set material uniforms
-    {
-        // float uniforms
-        std::vector<std::string> names;
-        std::vector<float> floatValues;
-        material->GetFloatUniforms(names, floatValues);
-        for (size_t x = 0; x < names.size(); x++)
-            SetFloat(names[x], programId, floatValues[x]);
-        // vector uniforms
-        std::vector<glm::vec4> vectorValues;
-        material->GetVectorUniforms(names, vectorValues);
-        for (size_t x = 0; x < names.size(); x++)
-            SetVector(names[x], programId, vectorValues[x]);
-        // TODO add matrices
-    }
-
+    SetMatrixOgl(ProjectionMatrixName, programId, Statics::Get<IActiveCamera>()->ProjectionMatrix());
+    SetMatrixOgl(ViewMatrixName, programId, Statics::Get<IActiveCamera>()->ViewMatrix());
+    
+    
     unsigned int vaoId, indexCount;
     oglRender->GetMeshManager()->GetVAOForMeshId(programId, meshAssetId, vaoId, indexCount);
     
@@ -135,7 +109,6 @@ void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv, unsigne
     { WRITE_INT(programId) }
     { WRITE_UINT(vaoId) }
     { WRITE_UINT(indexCount) }
-    
 }
 
 void OglCommandBuffer::ReadValue(unsigned char &cmd)
@@ -143,31 +116,79 @@ void OglCommandBuffer::ReadValue(unsigned char &cmd)
     cmd = Commands[CurrentByte++];
 }
 
-void OglCommandBuffer::SetMatrix(const std::string &name, int programId, glm::mat4 matrix)
+OpenGLRender* OglCommandBuffer::GetContext()
 {
-    int uniformLoc;
-    OpenGLRender* oglRender = dynamic_cast<OpenGLRender*>(Statics::Get<IGraphics>()->GetContext());
-    oglRender->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
-    SetMatrix(uniformLoc, matrix);
+    if (!CachedRenderContext) 
+        CachedRenderContext = dynamic_cast<OpenGLRender*>(Statics::Get<IGraphics>()->GetContext());
+    return CachedRenderContext;
 }
 
-void OglCommandBuffer::SetFloat(const std::string &name, int programId, float value)
+void OglCommandBuffer::SetTexture(const std::string &name, unsigned int shaderId, unsigned int textureId)
 {
-    int uniformLoc;
-    OpenGLRender* oglRender = dynamic_cast<OpenGLRender*>(Statics::Get<IGraphics>()->GetContext());
-    oglRender->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
-    SetFloat(uniformLoc, value);
+    OpenGLRender* context = GetContext();
+    OglTextureManager* textureManager = context->GetTextureManager();
+    OglShaderManager* shaderManager = context->GetShaderManager();
+    unsigned int textureOglId = textureManager->GetTextureIdByAssetId(textureId);
+    int programId = shaderManager->GetShaderProgramId(shaderId);
+    int textureSlot = 0;
+    bool isNew = false;
+    textureManager->GetTextureSlotForShaderProgramByName(name, programId, textureSlot, isNew);
+    if (isNew)
+    {
+        // need to set texture slot first
+        UseProgram(programId);
+        int uniformLoc;
+        shaderManager->GetUniformId(name, programId, uniformLoc);
+
+        AddCommand(CB_SET_INTEGER_UNIFORM);
+        WRITE_INT(uniformLoc)
+        { WRITE_INT(textureSlot) }
+    }
+    AddCommand(CB_BIND_TEXTURE);
+    { WRITE_INT(textureSlot) }
+    { WRITE_INT(textureOglId) }
 }
 
-void OglCommandBuffer::SetVector(const std::string &name, int programId, glm::vec4 &vector)
+void OglCommandBuffer::SetMatrix(const std::string &name, unsigned int shaderId, glm::mat4 matrix)
 {
-    int uniformLoc;
-    OpenGLRender* oglRender = dynamic_cast<OpenGLRender*>(Statics::Get<IGraphics>()->GetContext());
-    oglRender->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
-    SetVector(uniformLoc, vector);
+    int programId = GetContext()->GetShaderManager()->GetShaderProgramId(shaderId);
+    SetMatrixOgl(name, programId, matrix);
 }
 
-void OglCommandBuffer::SetMatrix(int uniformLocation, glm::mat4 &matrix)
+void OglCommandBuffer::SetFloat(const std::string &name, unsigned int shaderId, float value)
+{
+    int programId = GetContext()->GetShaderManager()->GetShaderProgramId(shaderId);
+    SetFloatOgl(name, programId, value);
+}
+
+void OglCommandBuffer::SetVector(const std::string &name, unsigned int shaderId, glm::vec4 &vector)
+{
+    int programId = GetContext()->GetShaderManager()->GetShaderProgramId(shaderId);
+    SetVectorOgl(name, programId, vector);
+}
+
+void OglCommandBuffer::SetMatrixOgl(const std::string &name, int programId, glm::mat4 matrix)
+{
+    int uniformLoc;
+    GetContext()->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
+    SetMatrixOgl(uniformLoc, matrix);
+}
+
+void OglCommandBuffer::SetFloatOgl(const std::string &name, int programId, float value)
+{
+    int uniformLoc;
+    GetContext()->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
+    SetFloatOgl(uniformLoc, value);
+}
+
+void OglCommandBuffer::SetVectorOgl(const std::string &name, int programId, glm::vec4 &vector)
+{
+    int uniformLoc;
+    GetContext()->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
+    SetVectorOgl(uniformLoc, vector);
+}
+
+void OglCommandBuffer::SetMatrixOgl(int uniformLocation, glm::mat4 &matrix)
 {
     AddCommand(CB_SET_MATRIX_UNIFORM);
     WRITE_INT(uniformLocation)
@@ -177,14 +198,14 @@ void OglCommandBuffer::SetMatrix(int uniformLocation, glm::mat4 &matrix)
     WM(3,0) WM(3,1) WM(3,2) WM(3,3) 
 }
 
-void OglCommandBuffer::SetFloat(int uniformLocation, float value)
+void OglCommandBuffer::SetFloatOgl(int uniformLocation, float value)
 {
     AddCommand(CB_SET_FLOAT_UNIFORM);
     WRITE_INT(uniformLocation)
     { WRITE_FLOAT(value) }
 }
 
-void OglCommandBuffer::SetVector(int uniformLocation, glm::vec4 &vector)
+void OglCommandBuffer::SetVectorOgl(int uniformLocation, glm::vec4 &vector)
 {
     AddCommand(CB_SET_VECTOR_UNIFORM);
     WRITE_INT(uniformLocation)
@@ -245,6 +266,15 @@ void OglCommandBuffer::Execute()
                 glUseProgram(programId);
             }
             break;
+            case CB_SET_INTEGER_UNIFORM:
+            {
+                int uniformLoc;
+                int intValue;
+                { READ_INT(uniformLoc) }
+                { READ_INT(intValue) }
+                glUniform1i(uniformLoc, intValue);
+            }
+            break;
             case CB_SET_FLOAT_UNIFORM:
             {
                 int uniformLocFloat;
@@ -278,6 +308,15 @@ void OglCommandBuffer::Execute()
                 RM(3,0) RM(3,1) RM(3,2) RM(3,3)            
                 glUniformMatrix4fv(uniformLocMat,
                    1, GL_FALSE, glm::value_ptr(matrix));
+            }
+            break;
+            case CB_BIND_TEXTURE:
+            {
+                int textureSlot, textureId;
+                { READ_INT(textureSlot) }
+                { READ_INT(textureId) }
+                glActiveTexture(GL_TEXTURE0 + textureSlot);
+                glBindTexture(GL_TEXTURE_2D, textureId);
             }
             break;
             case CB_DRAW_MESH:

@@ -14,6 +14,7 @@
 
 #include "Modules/Statics/IActiveCamera.h"
 #include "Modules/Graphics/ICommandBuffer.h"
+#include "Modules/Graphics/GraphicsUtils.h"
 
 #include "Utility/Typedefs.h"
 
@@ -62,7 +63,11 @@ bool RenderingSystem::Update()
             if (!transform || !renderer)
                 continue;
             
-            buf->DrawMesh(transform->WorldTransform, transform->WorldTransformInv, renderer->MeshReference, renderer->MaterialReference);
+            // TODO cache material if it repeats
+            
+            unsigned int shaderId;
+            GraphicsUtils::SetUniformsFromMaterial(buf, renderer->MaterialReference, shaderId);
+            buf->DrawMesh(transform->WorldTransform, transform->WorldTransformInv, renderer->MeshReference, shaderId);
         }
     }
     return true;

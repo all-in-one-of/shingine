@@ -14,6 +14,8 @@
 #include "Modules/Statics/ISceneManager.h"
 #include "Modules/Statics/IAssetManager.h"
 
+#include "Modules/ResourceLoader/BitmapReader/BitmapReader.h"
+
 String ResourceLoader::LastError = "";
 String ResourceLoader::GetLastError() { return LastError; }
 
@@ -21,6 +23,15 @@ void ResourceLoader::SetupPath(const String &localPath, String& outPath)
 {
     const String basePath = "/Users/snowbear/Documents/GIT/shingine/";
     outPath = basePath + localPath;
+}
+
+bool ResourceLoader::LoadBitmap(const String &fileName, ISerializedClass* &textureAsset)
+{
+    String updatedFileName;
+    SetupPath(fileName, updatedFileName);
+    textureAsset = Statics::Get<IAssetManager>()->AddAssetOfType("Texture2D");
+    return BitmapReader::ReadBitmapToTexture(updatedFileName.GetCharArray(), textureAsset);
+
 }
 
 bool ResourceLoader::LoadText(const String &fileName, String &data)

@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Core.h"
+#include "Application/Setup.h"
 
 #include "Modules/Graphics/IShader.h"
-#include "Modules/Statics/Graphics.h"
 #include "Solver/Solver.h"
 
 #include "Modules/Statics/ActiveCamera.h"
@@ -11,30 +11,18 @@
 
 #include "Game/FirstPersonController/FirstPersonComponent.h"
 
+#include "Modules/Statics/IGraphics.h"
+#include "Modules/Statics/IAssetManager.h"
+#include "Modules/Statics/IComponentManager.h"
 
-#include "Modules/Statics/Statics.h"
-#include "Modules/Statics/AssetManager.h"
-#include "Modules/Statics/ComponentManager.h"
-#include "Modules/Statics/EntityManager.h"
-#include "Modules/Statics/Input.h"
-#include "Modules/Statics/SceneManager.h"
-#include "Modules/Statics/ActiveCamera.h"
-#include "Modules/Statics/Graphics.h"
 
 void Initialize()
 {
-    // Add global objects
-    Statics::AddStaticObject<IEntityManager, EntityManager>();
-    Statics::AddStaticObject<IAssetManager, AssetManager>();
-    Statics::AddStaticObject<IComponentManager, ComponentManager>();
-    Statics::AddStaticObject<IInput, Input>();
-    Statics::AddStaticObject<ISceneManager, SceneManager>();
-    Statics::AddStaticObject<IActiveCamera, ActiveCamera>();
-    Statics::AddStaticObject<IGraphics, Graphics>();
-    
+    SetStaticObjects();
+
     Statics::Get<IAssetManager>()->AddAssetOfType("Material");
     // set default shader
-    IShader* defaultShader = dynamic_cast<IShader*>(
+    IShader *defaultShader = dynamic_cast<IShader *>(
         Statics::Get<IAssetManager>()->AddAssetOfType("Shader"));
 
     String vertSrc, fragSrc;
@@ -45,18 +33,22 @@ void Initialize()
     Statics::Get<IGraphics>()->SetDefaultShader(defaultShader);
 
     // set camera
-    TransformComponent* transformComponent = Statics::Get<IActiveCamera>()->GetTransformComponent();
+    TransformComponent *transformComponent = Statics::Get<IActiveCamera>()->GetTransformComponent();
     transformComponent->SetPosition(0, 1, -6.f);
     // add render settings
     Statics::Get<IAssetManager>()->AddAssetOfType("RenderSettings");
 
     // add first person component
     IComponent *a = Statics::Get<IComponentManager>()->AddComponent<FirstPersonController::FirstPersonComponent>(
-          transformComponent->EntityId());
-    FirstPersonController::FirstPersonComponent *comp = dynamic_cast<FirstPersonController::FirstPersonComponent*>(a);
+        transformComponent->EntityId());
+    FirstPersonController::FirstPersonComponent *comp = dynamic_cast<FirstPersonController::FirstPersonComponent *>(a);
     comp->PlayerMovementSettings->RunMultiplier = 5.f;
     comp->PlayerMovementSettings->ForwardSpeed = 13.f;
     transformComponent->IsDynamic = 1;
+
+
+    ISerializedClass *obj;
+    ResourceLoader::LoadBitmap("Assets/Textures/uv_checker.bmp", obj);
 
     Statics::Get<IGraphics>()->SetupWindow();
 }
@@ -67,14 +59,13 @@ int main()
 
     bool didLoad = ResourceLoader::Load("Assets/Scenes/Test.ssd");
 
-
     if (!didLoad)
     {
         std::cout << "Couldn't load the scene" << std::endl;
         return 1;
     }
 
-    Solver* solver = new Solver();
+    Solver *solver = new Solver();
     solver->AddSystem("TransformSystem");
     solver->AddSystem("RenderingSystem");
     solver->AddSystem("FirstPersonSystem");
@@ -82,8 +73,8 @@ int main()
 
     while (solver->Simulate())
     {
-         if (!Statics::Get<IGraphics>()->Render())
-             break;
+        if (!Statics::Get<IGraphics>()->Render())
+            break;
     }
     return 0;
 }

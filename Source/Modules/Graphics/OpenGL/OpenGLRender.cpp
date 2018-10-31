@@ -17,14 +17,14 @@
 
 #include <iostream>
 
-std::string OpenGLRender::PositionAttributeName = "_PositionAttribute";
-std::string OpenGLRender::NormalAttributeName = "_NormalAttribute";
-std::string OpenGLRender::TexCoordAttributeName = "_TexCoordAttribute";
+// std::string OpenGLRender::PositionAttributeName = "_PositionAttribute";
+// std::string OpenGLRender::NormalAttributeName = "_NormalAttribute";
+// std::string OpenGLRender::TexCoordAttributeName = "_TexCoordAttribute";
 
-std::string OpenGLRender::ModelMatrixName = "_ModelMatrix";
-std::string OpenGLRender::ModelMatrixInverseName = "_ModelMatrixInverseTransposed";
-std::string OpenGLRender::ViewMatrixName = "_ViewMatrix";
-std::string OpenGLRender::ProjectionMatrixName = "_ProjectionMatrix";
+// std::string OpenGLRender::ModelMatrixName = "_ModelMatrix";
+// std::string OpenGLRender::ModelMatrixInverseName = "_ModelMatrixInverseTransposed";
+// std::string OpenGLRender::ViewMatrixName = "_ViewMatrix";
+// std::string OpenGLRender::ProjectionMatrixName = "_ProjectionMatrix";
 
 namespace OpenGLRenderStatics
 {

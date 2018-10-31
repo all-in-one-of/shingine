@@ -4,9 +4,12 @@
 #include "Modules/Graphics/OpenGL/OglTextureManager.h"
 #include "Modules/Graphics/OpenGL/VaoMeshManager.h"
 #include "Modules/Graphics/OpenGL/OpenGLRender.h"
+#include "Modules/Graphics/OpenGL/BuiltInUniformNames.h"
 
 #include "Modules/Statics/IGraphics.h"
 #include "Modules/Statics/IActiveCamera.h"
+
+#include "Engine/Components/TransformComponent.h"
 
 #include "Utility/Graphics.h"
 #include <iostream>
@@ -77,15 +80,6 @@ void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, unsigned int &meshAssetId, un
     DrawMesh(matrix, matrixInv, meshAssetId, shaderId);
 }
 
-#define PositionAttributeName "_PositionAttribute"
-#define NormalAttributeName "_NormalAttribute"
-#define TexCoordAttributeName "_TexCoordAttribute"
-
-#define ModelMatrixName "_ModelMatrix"
-#define ModelMatrixInverseName "_ModelMatrixInverseTransposed"
-#define ViewMatrixName "_ViewMatrix"
-#define ProjectionMatrixName "_ProjectionMatrix"
-
 void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv, unsigned int &meshAssetId, unsigned int &shaderId)
 {
     OpenGLRender* oglRender = GetContext();
@@ -95,10 +89,12 @@ void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv, unsigne
 
     SetMatrixOgl(ModelMatrixName, programId, matrix);
     SetMatrixOgl(ModelMatrixInverseName, programId, matrixInv);
-   
     SetMatrixOgl(ProjectionMatrixName, programId, Statics::Get<IActiveCamera>()->ProjectionMatrix());
     SetMatrixOgl(ViewMatrixName, programId, Statics::Get<IActiveCamera>()->ViewMatrix());
     
+    glm::vec4 pos;
+    Statics::Get<IActiveCamera>()->GetTransformComponent()->GetPosition(pos);
+    SetVectorOgl(CameraWorldPositionName, programId, pos);
     
     unsigned int vaoId, indexCount;
     oglRender->GetMeshManager()->GetVAOForMeshId(programId, meshAssetId, vaoId, indexCount);

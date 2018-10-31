@@ -22,16 +22,6 @@ public:
     virtual bool IsWindowCreated();
     virtual void Update();
 
-    // // pre-defined uniform names 
-    static std::string ModelMatrixName;
-    static std::string ModelMatrixInverseName;
-    static std::string ViewMatrixName; 
-    static std::string ProjectionMatrixName; 
-
-    static std::string PositionAttributeName; 
-    static std::string NormalAttributeName; 
-    static std::string TexCoordAttributeName;
-
     VaoMeshManager* GetMeshManager();
     OglShaderManager* GetShaderManager();
     OglTextureManager* GetTextureManager();

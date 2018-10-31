@@ -1,4 +1,5 @@
 #include "Modules/Graphics/OpenGL/VaoMeshManager.h"
+#include "Modules/Graphics/OpenGL/BuiltInUniformNames.h"
 #include "Utility/Graphics.h"
 #include "Modules/Statics/IAssetManager.h"
 #include "Engine/AssetTypes/Mesh.h"
@@ -73,9 +74,9 @@ void VaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId, un
 
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexCount, indicesPointer, GL_STATIC_DRAW);
 
-        GLint posLocation = glGetAttribLocation(programId, OpenGLRender::PositionAttributeName.c_str());
-        GLint normalLocation = glGetAttribLocation(programId, OpenGLRender::NormalAttributeName.c_str());
-        GLint texcoordLocation = glGetAttribLocation(programId, OpenGLRender::TexCoordAttributeName.c_str());
+        GLint posLocation = glGetAttribLocation(programId, PositionAttributeName);
+        GLint normalLocation = glGetAttribLocation(programId, NormalAttributeName);
+        GLint texcoordLocation = glGetAttribLocation(programId, TexCoordAttributeName);
 
         glEnableVertexAttribArray(posLocation);
         glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_xyz_nxnynz_txtytz), (void*)offsetof(Vertex_xyz_nxnynz_txtytz, x));

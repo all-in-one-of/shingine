@@ -41,7 +41,7 @@ void ComponentManager::UpdateComponentEntityId(IComponent* component)
     Components[serializedComponent->SerializedName().GetStdString()][component->EntityId()] = component;
 }
 
-IComponent* ComponentManager::GetComponentOfType(String typeName, unsigned int componentId)
+IComponent* ComponentManager::GetComponentOfType(String typeName, unsigned int entityId)
 {
     StringMap::iterator it = Components.find(typeName.GetStdString());
     if (it == Components.end())
@@ -51,10 +51,10 @@ IComponent* ComponentManager::GetComponentOfType(String typeName, unsigned int c
 
     if (idMap.begin() == idMap.end())
         return nullptr;
-    if (componentId == 0)
+    if (entityId == 0)
         return idMap.begin()->second;
 
-    IdMap::iterator idMapIterator = idMap.find(componentId);
+    IdMap::iterator idMapIterator = idMap.find(entityId);
     if (idMapIterator == idMap.end()) 
         return nullptr;
 

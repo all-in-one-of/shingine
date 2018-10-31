@@ -16,7 +16,7 @@ public:
     virtual void AddComponent(IComponent* component);
     virtual IComponent* AddComponent(String type, unsigned int entityId = 0);
     virtual void UpdateComponentEntityId(IComponent* component);
-    virtual IComponent* GetComponentOfType(String typeName, unsigned int componentId = 0);
+    virtual IComponent* GetComponentOfType(String typeName, unsigned int entityId = 0);
     
     virtual void GetAllComponents(std::vector<IComponent*> &components);
     virtual bool GetComponentIteratorOfType(String typeName, StringMap::iterator &iterator);

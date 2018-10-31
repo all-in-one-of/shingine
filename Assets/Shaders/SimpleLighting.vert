@@ -1,5 +1,6 @@
 #version 410 
 
+// hard coded uniforms
 uniform mat4 _ModelMatrix;
 uniform mat4 _ModelMatrixInverseTransposed;
 uniform mat4 _ViewMatrix;
@@ -8,11 +9,13 @@ uniform mat4 _ProjectionMatrix;
 in vec3 _PositionAttribute;
 in vec3 _NormalAttribute;
 in vec3 _TexCoordAttribute;
+// ...
 
-out vec3 _Color;
+//
 out vec4 _WorldPosition;
 out vec3 _Normal;
-out vec2 _UV;
+out vec2 _TexCoord;
+//
 
 void main()
 {
@@ -22,6 +25,5 @@ void main()
 
 	_WorldPosition = _ModelMatrix * vec4(position, 1.0);
 	_Normal = vec3(_ModelMatrixInverseTransposed * vec4(normalize(_NormalAttribute), 1.0f));
-    _Color = abs(_Normal);
-    _UV = _TexCoordAttribute.xy;
+    _TexCoord = _TexCoordAttribute.xy;
 }

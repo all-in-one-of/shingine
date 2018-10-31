@@ -12,6 +12,8 @@ public:
     ATTRIBUTE_ID(ParentID)
     ATTRIBUTE_VALUE(unsigned char, IsDynamic)
 
+    void GetPosition(glm::vec3 &position);
+    void GetPosition(glm::vec4 &position);
     glm::vec3 GetPosition();
     glm::quat GetRotation();
     glm::vec3 GetScale();

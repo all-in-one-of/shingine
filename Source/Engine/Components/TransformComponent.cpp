@@ -17,6 +17,17 @@ glm::vec3 TransformComponent::GetPosition()
 {
     return glm::vec3(LocalPosition[0], LocalPosition[1], LocalPosition[2]);
 }
+
+void TransformComponent::GetPosition(glm::vec3 &position)
+{
+    position = glm::vec3(LocalPosition[0], LocalPosition[1], LocalPosition[2]);
+}
+
+void TransformComponent::GetPosition(glm::vec4 &position)
+{
+    position = glm::vec4(LocalPosition[0], LocalPosition[1], LocalPosition[2], 1);
+}
+
 glm::quat TransformComponent::GetRotation()
 {
     glm::quat q;

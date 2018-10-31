@@ -6,9 +6,6 @@
 #include "Modules/Statics/IComponentManager.h"
 #include "Modules/Statics/IEntityManager.h"
 
-#include "Engine/Components/TransformComponent.h"
-#include "Engine/Components/RendererComponent.h"
-#include "Engine/Components/CameraComponent.h"
 
 #include "Engine/AssetTypes/Settings/RenderSettings.h"
 
@@ -17,8 +14,16 @@
 #include "Modules/Graphics/GraphicsUtils.h"
 
 #include "Utility/Typedefs.h"
+#include "Engine/Components/TransformComponent.h"
+#include "Engine/Components/LightComponent.h"
+#include "Engine/Components/SkyLightComponent.h"
+#include "Engine/Components/RendererComponent.h"
+#include "Engine/Components/CameraComponent.h"
 
 REGISTER_SERIALIZED_NAME(RenderingSystem)
+
+typedef std::unordered_map<unsigned int, IComponent*> IComponentMap;
+
 bool RenderingSystem::Initialize()
 {
     Active = true;
@@ -27,17 +32,62 @@ bool RenderingSystem::Initialize()
 
 bool RenderingSystem::Update()
 {
-    ICommandBuffer* buf = Statics::Get<IGraphics>()->CommandBuffer();
+    ActiveCommandBuffer = Statics::Get<IGraphics>()->CommandBuffer();
 
-    buf->EnableDepth();
-    buf->EnableCullFace();
-    buf->Clear();
+    ActiveCommandBuffer->EnableDepth();
+    ActiveCommandBuffer->EnableCullFace();
+    ActiveCommandBuffer->Clear();
 
     // Update projection matrix, then draw meshes
     CameraComponent* camera = Statics::Get<IActiveCamera>()->GetCameraComponent();
     camera->ProjectionMatrix = glm::perspective(camera->FOV,
         Statics::Get<IGraphics>()->GetContext()->GetFrameAspectRatio(), camera->NearPlane, camera->FarPlane);
 
+    // Draw Skybox
+    // find lights
+
+    DrawSkyBox();
+    DrawOpaqueMeshes();
+    
+    return true;
+}
+
+void RenderingSystem::DrawSkyBox()
+{
+    IComponentManager* componentManager = Statics::Get<IComponentManager>();
+    SkyLightComponent* skyLight = componentManager->GetComponentOfType<SkyLightComponent>();
+
+    // draw sky light here
+
+}
+
+void RenderingSystem::FindLights()
+{
+    for (unsigned char x = 0; x < MAX_LIGHTS; x++)
+        LightComponents[x] = nullptr;
+    
+    LightsFound = 0;
+    CachedDirectionalLight = nullptr;
+
+    IComponentManager* componentManager = Statics::Get<IComponentManager>();
+    IComponentManager::StringMap::iterator lightsIterator;
+    componentManager->GetComponentIteratorOfType("LightComponent", lightsIterator);
+    IComponentMap &lightsComponentMap = lightsIterator->second;
+    IComponentMap::iterator entityIterator;
+
+    for (entityIterator = lightsComponentMap.begin(); entityIterator != lightsComponentMap.end(); entityIterator++)
+    {
+        LightComponent* light = dynamic_cast<LightComponent*>(lightsComponentMap.at(entityIterator->first));
+        
+        if (light->LightType != DIRECTIONAL_LIGHT_TYPE && LightsFound != MAX_LIGHTS)
+            LightComponents[LightsFound] = light;
+        else if (light->LightType == DIRECTIONAL_LIGHT_TYPE && !CachedDirectionalLight)
+            CachedDirectionalLight = light;
+    }
+}
+
+void RenderingSystem::DrawOpaqueMeshes()
+{
     IComponentManager::StringMap::iterator rendererIterator;
     IComponentManager::StringMap::iterator transformIterator;
 
@@ -47,30 +97,31 @@ bool RenderingSystem::Update()
     drawMeshes = drawMeshes && componentManager->GetComponentIteratorOfType("RendererComponent", rendererIterator);
     drawMeshes = drawMeshes && componentManager->GetComponentIteratorOfType("TransformComponent", transformIterator);
 
-    if (drawMeshes)
-    {
-        typedef std::unordered_map<unsigned int, IComponent*> IComponentMap;
+    if (!drawMeshes) 
+        return;
 
-        IComponentMap &rendererComponentMap = rendererIterator->second;
-        IComponentMap::iterator entityIterator;
+
+    IComponentMap &rendererComponentMap = rendererIterator->second;
+    IComponentMap::iterator entityIterator;
+    
+    for (entityIterator = rendererComponentMap.begin(); entityIterator != rendererComponentMap.end(); entityIterator++)
+    {
+        unsigned int entityId = entityIterator->first;
+        IComponentMap &transformComponentMap = transformIterator->second;
+        TransformComponent* transform = dynamic_cast<TransformComponent*>(transformComponentMap.at(entityId));
+        RendererComponent* renderer = dynamic_cast<RendererComponent*>(entityIterator->second);
+
+        if (!transform || !renderer)
+            continue;
         
-        for (entityIterator = rendererComponentMap.begin(); entityIterator != rendererComponentMap.end(); entityIterator++)
-        {
-            unsigned int entityId = entityIterator->first;
-            IComponentMap &transformComponentMap = transformIterator->second;
-            TransformComponent* transform = dynamic_cast<TransformComponent*>(transformComponentMap.at(entityId));
-            RendererComponent* renderer = dynamic_cast<RendererComponent*>(entityIterator->second);
-            if (!transform || !renderer)
-                continue;
-            
-            // TODO cache material if it repeats
-            
-            unsigned int shaderId;
-            GraphicsUtils::SetUniformsFromMaterial(buf, renderer->MaterialReference, shaderId);
-            buf->DrawMesh(transform->WorldTransform, transform->WorldTransformInv, renderer->MeshReference, shaderId);
-        }
+        // TODO cache material if it repeats
+        // discard object if it's not in the view frustrum
+
+        
+        unsigned int shaderId;
+        GraphicsUtils::SetUniformsFromMaterial(ActiveCommandBuffer, renderer->MaterialReference, shaderId);
+        ActiveCommandBuffer->DrawMesh(transform->WorldTransform, transform->WorldTransformInv, renderer->MeshReference, shaderId);
     }
-    return true;
 }
 
 RenderingSystem::~RenderingSystem()

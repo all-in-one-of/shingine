@@ -1,20 +1,30 @@
 #pragma once
 #include "ComponentSetup.h"
 
+#define POINT_LIGHT_TYPE 0
+#define SPOT_LIGHT_TYPE 1
+#define DIRECTIONAL_LIGHT_TYPE 2
+
 class LightComponent : public Component
 {
 public:
     SERIALIZE_CLASS(LightComponent)
     
-    LightComponent()
-    {
-        ATTRIBUTE_REGISTER(LightComponent, Color)
-        ATTRIBUTE_REGISTER(LightComponent, Exposure)
-        ATTRIBUTE_REGISTER(LightComponent, Intensity)
-    };
+    LightComponent();
     virtual ~LightComponent();
-private:
+
     ATTRIBUTE_VECTOR(float, Color)
     ATTRIBUTE_VALUE(float, Exposure)
     ATTRIBUTE_VALUE(float, Intensity)
+
+    // 0 point 1 spot 2 directional
+    ATTRIBUTE_VALUE(unsigned char, LightType)
+    // attenuation
+    ATTRIBUTE_VALUE(float, Constant)
+    ATTRIBUTE_VALUE(float, Linear)
+    ATTRIBUTE_VALUE(float, Quadratic)
+
+    ATTRIBUTE_VALUE(float, CutOff)
+
+    ATTRIBUTE_VALUE(unsigned char, ShadowEnabled)
 };

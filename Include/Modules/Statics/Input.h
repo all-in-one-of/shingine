@@ -27,10 +27,7 @@ private:
 
     KeyMap Keys;
     KeyMap MouseKeys;
-
-    int KeyScanCode = -1;
-    int KeyMods = -1;
-
+    
     double MousePositionX = .0;
     double MousePositionY = .0;
 
@@ -41,6 +38,4 @@ private:
     unsigned int ScreenHeight = 240;
     
     bool FirstMousePositionRecorded = false;
-
-    int MouseMods = -1;
 };

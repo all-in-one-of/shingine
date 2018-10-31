@@ -19,7 +19,7 @@ namespace BitmapReader
 
         Texture2D* tex = dynamic_cast<Texture2D*>(texture);
         if(!tex) 
-            return;
+            return false;
 
         FILE *file = fopen(fileName, "rb");
         if (!file)

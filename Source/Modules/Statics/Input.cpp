@@ -51,8 +51,6 @@ bool Input::GetKeyPressed(int keyCode)
 
 void Input::Update()
 {
-    // MousePositionX = MousePrevX;
-    // MousePositionY = MousePrevY;
 }
 
 void Input::SetKeyEvent(int key, int scanCode, int action, int mods)

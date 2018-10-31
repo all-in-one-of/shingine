@@ -24,6 +24,9 @@ public:
     ATTRIBUTE_VALUE(float, Linear)
     ATTRIBUTE_VALUE(float, Quadratic)
 
+    ATTRIBUTE_VALUE(float, InnerAngle)
+    ATTRIBUTE_VALUE(float, OuterAngle)
+
     ATTRIBUTE_VALUE(float, CutOff)
 
     ATTRIBUTE_VALUE(unsigned char, ShadowEnabled)

@@ -43,7 +43,7 @@ void TestStuff()
     Material *mat = Statics::Get<IAssetManager>()->AddAssetOfType<Material>();
     mat->Name = "TexturePreviewMaterial";
     mat->ShaderId = shader->AssetId();
-    mat->SetTexture("MainTex", tex->UniqueID());
+    mat->SetTexture("_MainTex", tex->UniqueID());
 
     // set the same lighting material to the each object on the scene
     {

@@ -20,6 +20,9 @@ LightComponent::LightComponent()
     
     CutOff = 0.9762959977f;
     ShadowEnabled = 0;
+    
+    InnerAngle = 15.f;
+    OuterAngle = 45.f;
 };
 
 LightComponent::~LightComponent()

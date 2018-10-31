@@ -21,6 +21,7 @@ void main()
 {
     vec3 position = _PositionAttribute;
 	mat4 MVP = _ProjectionMatrix * _ViewMatrix * _ModelMatrix;
+    
     gl_Position = MVP * vec4(position, 1.0);
 
 	_WorldPosition = _ModelMatrix * vec4(position, 1.0);

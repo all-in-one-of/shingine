@@ -16,6 +16,8 @@ private:
     void FindLights();
     void DrawSkyBox();
     void DrawOpaqueMeshes();
+
+    void SetLightParameters(unsigned int shaderId);
     // private helper methods
     ICommandBuffer* ActiveCommandBuffer = nullptr;
     //

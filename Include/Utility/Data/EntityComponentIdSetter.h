@@ -2,11 +2,11 @@
 #include <map>
 class ISerialized;
 class EntityIdCollection;
-class EntityComponentIdSetter
-{
+class EntityComponentIdSetter {
 public:
-    static void UpdateIds(ISerialized* idCollections);
+  static void UpdateIds(ISerialized *idCollections);
+
 private:
-    EntityComponentIdSetter() {};
-    EntityComponentIdSetter(EntityIdCollection* collection);
+  EntityComponentIdSetter(){};
+  EntityComponentIdSetter(EntityIdCollection *collection);
 };

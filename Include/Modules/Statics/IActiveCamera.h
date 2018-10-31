@@ -4,12 +4,11 @@
 
 class CameraComponent;
 class TransformComponent;
-class IActiveCamera
-{
+class IActiveCamera {
 public:
-    virtual ~IActiveCamera() {};
-    virtual CameraComponent* GetCameraComponent() = 0;
-    virtual TransformComponent* GetTransformComponent() = 0;
-    virtual glm::mat4 ProjectionMatrix() = 0;
-    virtual glm::mat4 ViewMatrix() = 0;
+  virtual ~IActiveCamera(){};
+  virtual CameraComponent *GetCameraComponent() = 0;
+  virtual TransformComponent *GetTransformComponent() = 0;
+  virtual glm::mat4 ProjectionMatrix() = 0;
+  virtual glm::mat4 ViewMatrix() = 0;
 };

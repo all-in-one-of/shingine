@@ -72,11 +72,16 @@ class GeometryData:
 
     def get_parsed_mesh_node(self, name="GenericMeshNode"):
         geometry_node = core.Node("Mesh")
-        geometry_node.attributes.append(core.Attribute("Name", core.DataType_CHAR, name, True))
-        geometry_node.attributes.append(core.Attribute("Indices", core.DataType_UINT, self.indices))
-        geometry_node.attributes.append(core.Attribute("Normals", core.DataType_FLOAT, self.normals))
-        geometry_node.attributes.append(core.Attribute("Positions", core.DataType_FLOAT, self.positions))
-        geometry_node.attributes.append(core.Attribute("TexCoord", core.DataType_FLOAT, self.texcoord))
+        geometry_node.attributes.append(
+            core.Attribute("Name", core.DataType_CHAR, name, True))
+        geometry_node.attributes.append(
+            core.Attribute("Indices", core.DataType_UINT, self.indices))
+        geometry_node.attributes.append(
+            core.Attribute("Normals", core.DataType_FLOAT, self.normals))
+        geometry_node.attributes.append(
+            core.Attribute("Positions", core.DataType_FLOAT, self.positions))
+        geometry_node.attributes.append(
+            core.Attribute("TexCoord", core.DataType_FLOAT, self.texcoord))
         return geometry_node
         
 def mesh_nodes_from_hom_nodes(hom_nodes):

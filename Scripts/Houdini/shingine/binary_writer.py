@@ -89,11 +89,13 @@ def attribute_to_bytes(attr):
             if (attr.data_type == core.DataType_FLOAT):
                 byte_count = element_count * 4
                 unpacked_values.extend(bytearray(struct.pack("f", values[x])))
-            if (attr.data_type == core.DataType_UINT or attr.data_type == core.DataType_UID \
+            if (attr.data_type == core.DataType_UINT 
+                or attr.data_type == core.DataType_UID \
                 or attr.data_type == core.DataType_INT):
                 byte_count = element_count * 4
                 unpacked_values.extend(get_uint32_to_bytes(values[x]))
-            if (attr.data_type == core.DataType_UINT16 or attr.data_type == core.DataType_INT16):
+            if (attr.data_type == core.DataType_UINT16 
+                or attr.data_type == core.DataType_INT16):
                 byte_count = element_count * 2
                 unpacked_values.extend(get_uint16_to_bytes(values[x]))
             if (attr.data_type == core.DataType_BYTE):

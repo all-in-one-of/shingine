@@ -8,31 +8,32 @@ class OglShaderManager;
 class OglTextureManager;
 class ISerializedClass;
 
-class OpenGLRender : public IRenderContext
-{
+class OpenGLRender : public IRenderContext {
 public:
-    OpenGLRender();
-    virtual ~OpenGLRender();
-    virtual void Create(unsigned short width, unsigned short height, const String& title);
+  OpenGLRender();
+  virtual ~OpenGLRender();
+  virtual void Create(unsigned short width, unsigned short height,
+                      const String &title);
 
-    virtual bool WindowShouldClose();
-    virtual void GetWindowFramebufferSize(int &width, int &height);
-    virtual float GetFrameAspectRatio();
-    virtual void SetFramebufferSize(int &width, int &height);
-    virtual bool IsWindowCreated();
-    virtual void Update();
+  virtual bool WindowShouldClose();
+  virtual void GetWindowFramebufferSize(int &width, int &height);
+  virtual float GetFrameAspectRatio();
+  virtual void SetFramebufferSize(int &width, int &height);
+  virtual bool IsWindowCreated();
+  virtual void Update();
 
-    VaoMeshManager* GetMeshManager();
-    OglShaderManager* GetShaderManager();
-    OglTextureManager* GetTextureManager();
+  VaoMeshManager *GetMeshManager();
+  OglShaderManager *GetShaderManager();
+  OglTextureManager *GetTextureManager();
+
 private:
-    struct GLFWwindow* Window;
+  struct GLFWwindow *Window;
 
-    int FrameWidth = -1;
-    int FrameHeight = -1;
-    float FrameAspectRatio = 1.f;
+  int FrameWidth = -1;
+  int FrameHeight = -1;
+  float FrameAspectRatio = 1.f;
 
-    VaoMeshManager* MeshManager = nullptr;
-    OglShaderManager* ShaderManager = nullptr;
-    OglTextureManager* TextureManager = nullptr;
+  VaoMeshManager *MeshManager = nullptr;
+  OglShaderManager *ShaderManager = nullptr;
+  OglTextureManager *TextureManager = nullptr;
 };

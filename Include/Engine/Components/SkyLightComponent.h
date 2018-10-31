@@ -1,17 +1,16 @@
 #pragma once
 #include "ComponentSetup.h"
 
-class SkyLightComponent : public Component
-{
+class SkyLightComponent : public Component {
 public:
-    SERIALIZE_CLASS(SkyLightComponent)
-    
-    SkyLightComponent();
-    virtual ~SkyLightComponent();
+  COMPONENT_CLASS(SkyLightComponent);
 
-    ATTRIBUTE_VECTOR(float, Color)
-    ATTRIBUTE_VALUE(float, Intensity)
+  SkyLightComponent();
+  virtual ~SkyLightComponent();
 
-    ATTRIBUTE_VALUE(unsigned char, CubemapEnabled)
-    ATTRIBUTE_ID(CubemapId)
+  ATTRIBUTE_VECTOR(float, Color);
+  ATTRIBUTE_VALUE(float, Intensity);
+
+  ATTRIBUTE_VALUE(unsigned char, CubemapEnabled);
+  ATTRIBUTE_ID(CubemapId);
 };

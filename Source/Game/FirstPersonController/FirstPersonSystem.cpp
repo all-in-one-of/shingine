@@ -1,8 +1,8 @@
 #include "Game/FirstPersonController/FirstPersonSystem.h"
-#include "Modules/Statics/IComponentManager.h"
-#include "Game/FirstPersonController/FirstPersonComponent.h"
-#include "Engine/Components/TransformComponent.h"
 #include "Engine/Components/CameraComponent.h"
+#include "Engine/Components/TransformComponent.h"
+#include "Game/FirstPersonController/FirstPersonComponent.h"
+#include "Modules/Statics/IComponentManager.h"
 
 #include "Modules/Statics/IInput.h"
 
@@ -14,125 +14,122 @@
 #define RAD2DEG 57.29577950560105f
 
 // TODO optimize
-namespace FirstPersonController
-{
-    REGISTER_SERIALIZED_NAME(FirstPersonSystem)
+namespace FirstPersonController {
+REGISTER_SERIALIZED_CLASS(FirstPersonSystem)
 
-    bool FirstPersonSystem::Initialize()
-    {
-        IComponentManager* componentManager = Statics::Get<IComponentManager>();
-        // find first person component
-        FirstPersonComponent =
-            componentManager->GetComponentOfType<FirstPersonController::FirstPersonComponent>();
-        
-        if (!FirstPersonComponent)
-        {
-            Active = false;
-            return true;
-        }
-        PlayerTransform = 
-            componentManager->GetComponentOfType<TransformComponent>(FirstPersonComponent->EntityId());
-        Camera = 
-            componentManager->GetComponentOfType<CameraComponent>(FirstPersonComponent->EntityId());
-                
-        Active = PlayerTransform != nullptr && Camera != nullptr;
+bool FirstPersonSystem::Initialize() {
+  IComponentManager *componentManager = Statics::Get<IComponentManager>();
+  // find first person component
+  FirstPersonComponent =
+      componentManager
+          ->GetComponentOfType<FirstPersonController::FirstPersonComponent>();
 
-        FirstPersonComponent->Yaw = 90.f;
+  if (!FirstPersonComponent) {
+    Active = false;
+    return true;
+  }
+  PlayerTransform = componentManager->GetComponentOfType<TransformComponent>(
+      FirstPersonComponent->EntityId());
+  Camera = componentManager->GetComponentOfType<CameraComponent>(
+      FirstPersonComponent->EntityId());
 
-       
-        return true;
-    }
+  Active = PlayerTransform != nullptr && Camera != nullptr;
 
-    void FirstPersonSystem::UpdateRotation(glm::vec3 &Front, glm::vec3 &Horizontal, glm::vec3 &cameraFront, glm::vec3 &cameraUp)
-    {
-        float offsetX = Statics::Get<IInput>()->GetAxis(IInput::AxisType::MouseX);
-        float offsetY = -Statics::Get<IInput>()->GetAxis(IInput::AxisType::MouseY);
-        bool isMouseMoving = abs(offsetX) > .0001f || abs(offsetY) > .0001f;
-        if (!isMouseMoving) return;
+  FirstPersonComponent->Yaw = 90.f;
 
-        float &xoffset = offsetX;
-        float &yoffset = offsetY;
-        float &yaw = FirstPersonComponent->Yaw;
-        float &pitch = FirstPersonComponent->Pitch;
+  return true;
+}
 
-        float sensitivity = 0.05;
-        xoffset *= sensitivity;
-        yoffset *= sensitivity;
+void FirstPersonSystem::UpdateRotation(glm::vec3 &Front, glm::vec3 &Horizontal,
+                                       glm::vec3 &cameraFront,
+                                       glm::vec3 &cameraUp) {
+  float offsetX = Statics::Get<IInput>()->GetAxis(IInput::AxisType::MouseX);
+  float offsetY = -Statics::Get<IInput>()->GetAxis(IInput::AxisType::MouseY);
+  bool isMouseMoving = abs(offsetX) > .0001f || abs(offsetY) > .0001f;
+  if (!isMouseMoving)
+    return;
 
-        yaw += xoffset;
-        pitch += yoffset;
+  float &xoffset = offsetX;
+  float &yoffset = offsetY;
+  float &yaw = FirstPersonComponent->Yaw;
+  float &pitch = FirstPersonComponent->Pitch;
 
-        if (pitch > 89.0f)
-            pitch = 89.0f;
-        if (pitch < -89.0f)
-            pitch = -89.0f;
+  float sensitivity = 0.05;
+  xoffset *= sensitivity;
+  yoffset *= sensitivity;
 
-        Front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        Front.y = sin(glm::radians(pitch));
-        Front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        cameraFront = glm::normalize(Front);
-        Horizontal = glm::normalize(glm::cross(Front, cameraUp));
-    }
+  yaw += xoffset;
+  pitch += yoffset;
 
-    void FirstPersonSystem::UpdateMovement(glm::vec3 &position, glm::vec3 &Front, glm::vec3 &Horizontal)
-    {
-        float deltaTime = 1 / 60.f;
-        IInput* input = Statics::Get<IInput>();
-        
-        float factor = deltaTime * 
-            (input->GetMousePressed(S_INPUT_MOUSE_LEFT)
-            ? FirstPersonComponent->PlayerMovementSettings->RunMultiplier
-            : 1.f);
-        
-        factor *= FirstPersonComponent->PlayerMovementSettings->ForwardSpeed;
-        position = PlayerTransform->GetPosition();
-        glm::vec3 translation(0);
+  if (pitch > 89.0f)
+    pitch = 89.0f;
+  if (pitch < -89.0f)
+    pitch = -89.0f;
 
-        if (input->GetKeyPressed(S_INPUT_KEY_W))
-        {
-            translation.x += factor * Front.x;
-            translation.z += factor * Front.z;
-        }
-        
-        if (input->GetKeyPressed(S_INPUT_KEY_S))
-        {
-            translation.x -= factor * Front.x;
-            translation.z -= factor * Front.z;
-        }
+  Front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+  Front.y = sin(glm::radians(pitch));
+  Front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+  cameraFront = glm::normalize(Front);
+  Horizontal = glm::normalize(glm::cross(Front, cameraUp));
+}
 
-        if (input->GetKeyPressed(S_INPUT_KEY_A))
-            translation -= Horizontal * factor;
+void FirstPersonSystem::UpdateMovement(glm::vec3 &position, glm::vec3 &Front,
+                                       glm::vec3 &Horizontal) {
+  float deltaTime = 1 / 60.f;
+  IInput *input = Statics::Get<IInput>();
 
-        if (input->GetKeyPressed(S_INPUT_KEY_D))
-            translation += Horizontal * factor;
+  float factor =
+      deltaTime *
+      (input->GetMousePressed(S_INPUT_MOUSE_LEFT)
+           ? FirstPersonComponent->PlayerMovementSettings->RunMultiplier
+           : 1.f);
 
-        if (input->GetKeyPressed(S_INPUT_KEY_Q))
-            translation.y += factor * 1.f;
+  factor *= FirstPersonComponent->PlayerMovementSettings->ForwardSpeed;
+  position = PlayerTransform->GetPosition();
+  glm::vec3 translation(0);
 
-        if (input->GetKeyPressed(S_INPUT_KEY_E))
-            translation.y += factor * -1.f;
+  if (input->GetKeyPressed(S_INPUT_KEY_W)) {
+    translation.x += factor * Front.x;
+    translation.z += factor * Front.z;
+  }
 
-        position += translation;
-    }
+  if (input->GetKeyPressed(S_INPUT_KEY_S)) {
+    translation.x -= factor * Front.x;
+    translation.z -= factor * Front.z;
+  }
 
-    bool FirstPersonSystem::Update()
-    {
-        if (!Active)
-            return true;
+  if (input->GetKeyPressed(S_INPUT_KEY_A))
+    translation -= Horizontal * factor;
 
-        glm::vec3 &Front = FirstPersonComponent->Front;
-        glm::vec3 &Horizontal = FirstPersonComponent->Horizontal;
-        glm::vec3 &cameraFront = FirstPersonComponent->CameraFront;
-        glm::vec3 &cameraUp = FirstPersonComponent->CameraUp;
+  if (input->GetKeyPressed(S_INPUT_KEY_D))
+    translation += Horizontal * factor;
 
-        glm::vec3 position = PlayerTransform->GetPosition();
-        UpdateRotation(Front, Horizontal, cameraFront, cameraUp);
-        UpdateMovement(position, Front, Horizontal);
+  if (input->GetKeyPressed(S_INPUT_KEY_Q))
+    translation.y += factor * 1.f;
 
-        Camera->ViewMatrix = glm::lookAt(position, position + cameraFront, cameraUp);
+  if (input->GetKeyPressed(S_INPUT_KEY_E))
+    translation.y += factor * -1.f;
 
-        PlayerTransform->SetPosition(position);
-        
-        return true;
-    }
-};
+  position += translation;
+}
+
+bool FirstPersonSystem::Update() {
+  if (!Active)
+    return true;
+
+  glm::vec3 &Front = FirstPersonComponent->Front;
+  glm::vec3 &Horizontal = FirstPersonComponent->Horizontal;
+  glm::vec3 &cameraFront = FirstPersonComponent->CameraFront;
+  glm::vec3 &cameraUp = FirstPersonComponent->CameraUp;
+
+  glm::vec3 position = PlayerTransform->GetPosition();
+  UpdateRotation(Front, Horizontal, cameraFront, cameraUp);
+  UpdateMovement(position, Front, Horizontal);
+
+  Camera->ViewMatrix = glm::lookAt(position, position + cameraFront, cameraUp);
+
+  PlayerTransform->SetPosition(position);
+
+  return true;
+}
+}; // namespace FirstPersonController

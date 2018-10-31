@@ -3,7 +3,6 @@
 #include <iostream>
 
 class ISerializedClass;
-namespace BitmapReader
-{
-    bool ReadBitmapToTexture(const char* fileName, ISerializedClass* texture);
+namespace BitmapReader {
+bool ReadBitmapToTexture(const char *fileName, ISerializedClass *texture);
 };

@@ -3,8 +3,7 @@
 #include "Common.h"
 #include "IResourceReader.h"
 
-class CResourceReaderFactory
-{
+class CResourceReaderFactory {
 public:
-    IResourceReader* CreateReader(const String &fileName);
+  IResourceReader *CreateReader(const String &fileName);
 };

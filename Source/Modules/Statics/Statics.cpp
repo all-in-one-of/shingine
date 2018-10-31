@@ -5,37 +5,31 @@
 #include "Modules/Statics/IAssetManager.h"
 #include "Modules/Statics/IComponentManager.h"
 
-Statics* Statics::Instance = nullptr;
+Statics *Statics::Instance = nullptr;
 
-Statics::Statics()
-{
+Statics::Statics() {}
+
+unsigned int Statics::GetUniqueId() {
+  Statics *instance = GetInstance();
+  if ((instance->IdPool).size() == 0) {
+    return instance->NextId++;
+  }
+  unsigned int id = instance->IdPool[instance->IdPool.size() - 1];
+  (instance->IdPool).pop_back();
+  return id;
 }
 
-unsigned int Statics::GetUniqueId()
-{
-    Statics* instance = GetInstance();
-    if ((instance->IdPool).size() == 0)
-    {
-        return instance->NextId++;
-    }
-    unsigned int id = instance->IdPool[instance->IdPool.size() - 1];
-    (instance->IdPool).pop_back();
-    return id;
+void Statics::Destroy(ISerializedClass *object) {
+  Statics *instance = GetInstance();
+  (instance->IdPool).push_back(object->UniqueID());
+  delete object;
 }
 
-void Statics::Destroy(ISerializedClass *object)
-{
-    Statics* instance = GetInstance();
-    (instance->IdPool).push_back(object->UniqueID());
-    delete object;
-}
-
-void Statics::AddSerializedObject(ISerializedClass* object)
-{
-    Statics* instance = GetInstance();
-    IComponent* component = dynamic_cast<IComponent*>(object);
-    if (component)
-        instance->Get<IComponentManager>()->AddComponent(component);
-    else
-        instance->Get<IAssetManager>()->AddInstance(object);
+void Statics::AddSerializedObject(ISerializedClass *object) {
+  Statics *instance = GetInstance();
+  IComponent *component = dynamic_cast<IComponent *>(object);
+  if (component)
+    instance->Get<IComponentManager>()->AddComponent(component);
+  else
+    instance->Get<IAssetManager>()->AddInstance(object);
 }

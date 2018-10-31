@@ -1,10 +1,7 @@
 #include "Engine/Components/Component.h"
 
-Component::~Component()
-{
-}
+Component::~Component() {}
 
-void Component::SetEntityId(unsigned int entityId)
-{ 
-    ComponentEntityId = entityId; 
+void Component::SetEntityId(unsigned int entityId) {
+  ComponentEntityId = entityId;
 }

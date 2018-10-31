@@ -14,23 +14,20 @@
 #define S_INPUT_MOUSE_LEFT 0
 #define S_INPUT_MOUSE_RIGHT 1
 
-class IInput
-{
+class IInput {
 public:
-    enum AxisType 
-    {
-        MouseX, MouseY
-    };
-    virtual ~IInput() {}
-    virtual void Update() = 0;
-    virtual void SetKeyEvent(int key, int scanCode, int action, int mods) = 0;
-    virtual void SetMousePosition(double x, double y) = 0;
-    virtual void SetMouseEvent(int key, int action, int mods) = 0;
+  enum AxisType { MouseX, MouseY };
+  virtual ~IInput() {}
+  virtual void Update() = 0;
+  virtual void SetKeyEvent(int key, int scanCode, int action, int mods) = 0;
+  virtual void SetMousePosition(double x, double y) = 0;
+  virtual void SetMouseEvent(int key, int action, int mods) = 0;
 
-    virtual float GetAxis(AxisType axis) = 0;
+  virtual float GetAxis(AxisType axis) = 0;
 
-    virtual bool GetKeyPressed(int keyCode) = 0;
-    virtual bool GetMousePressed(int keyCode) = 0;
-    
-    virtual void SetScreenReferenceSize(unsigned int width, unsigned int height) = 0;
+  virtual bool GetKeyPressed(int keyCode) = 0;
+  virtual bool GetMousePressed(int keyCode) = 0;
+
+  virtual void SetScreenReferenceSize(unsigned int width,
+                                      unsigned int height) = 0;
 };

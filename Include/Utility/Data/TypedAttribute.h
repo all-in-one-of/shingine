@@ -1,76 +1,68 @@
 #pragma once
-#include <vector>
 #include "../Common.h"
 #include "ISerialized.h"
+#include <vector>
 
 // for ATTRIBUTE_VECTOR
-template <class T>
-class TypedAttribute : public ISerialized
-{
+template <class T> class TypedAttribute : public ISerialized {
 public:
-    TypedAttribute(String name, String type, std::vector<T> &data)
-    {
-        AttributeName = name; 
-        AttributeType = type;
-        Data = data;
-    };
+  TypedAttribute(String name, String type, std::vector<T> &data) {
+    AttributeName = name;
+    AttributeType = type;
+    Data = data;
+  };
 
-    virtual ~TypedAttribute() {};
-    virtual String SerializedName() { return AttributeName; }; 
-    virtual String TypeName() { return AttributeType; }; 
+  virtual ~TypedAttribute(){};
+  virtual String SerializedName() { return AttributeName; };
+  virtual String TypeName() { return AttributeType; };
 
-    std::vector<T> Get() { return Data; }
-    void Set(std::vector<T> &data) { Data = data; }
+  std::vector<T> Get() { return Data; }
+  void Set(std::vector<T> &data) { Data = data; }
 
 private:
-    std::vector<T> Data;
-    String AttributeName;
-    String AttributeType;
+  std::vector<T> Data;
+  String AttributeName;
+  String AttributeType;
 };
 
 // for ATTRIBUTE_VALUE
-template <class T>
-class TypedAttributeValue : public ISerialized
-{
+template <class T> class TypedAttributeValue : public ISerialized {
 public:
-    TypedAttributeValue(String name, String type, T data)
-    {
-        AttributeName = name; 
-        AttributeType = type;
-        Data = data;
-    };
+  TypedAttributeValue(String name, String type, T data) {
+    AttributeName = name;
+    AttributeType = type;
+    Data = data;
+  };
 
-    virtual ~TypedAttributeValue() {};
-    virtual String SerializedName() { return AttributeName; }; 
-    virtual String TypeName() { return AttributeType; }; 
+  virtual ~TypedAttributeValue(){};
+  virtual String SerializedName() { return AttributeName; };
+  virtual String TypeName() { return AttributeType; };
 
-    T Get() { return Data; }
-    void Set(T &data) { Data = data; }
+  T Get() { return Data; }
+  void Set(T &data) { Data = data; }
 
 private:
-    T Data;
-    String AttributeName;
-    String AttributeType;
+  T Data;
+  String AttributeName;
+  String AttributeType;
 };
 
 // for ATTRIBUTE_CLASS_VECTOR
-class CAttributeClassVector : public ISerialized
-{
+class CAttributeClassVector : public ISerialized {
 public:
-    CAttributeClassVector(String name, std::vector<ISerialized*> &data)
-    {
-        AttributeName = name; 
-        Data = data;
-    };
+  CAttributeClassVector(String name, std::vector<ISerialized *> &data) {
+    AttributeName = name;
+    Data = data;
+  };
 
-    virtual ~CAttributeClassVector() {};
-    virtual String SerializedName() { return AttributeName; }; 
-    virtual String TypeName() { return "SerializedClass"; }; 
+  virtual ~CAttributeClassVector(){};
+  virtual String SerializedName() { return AttributeName; };
+  virtual String TypeName() { return "SerializedClass"; };
 
-    std::vector<ISerialized*> Get() { return Data; }
-    void Set(std::vector<ISerialized*> &data) { Data = data; }
+  std::vector<ISerialized *> Get() { return Data; }
+  void Set(std::vector<ISerialized *> &data) { Data = data; }
 
 private:
-    std::vector<ISerialized*> Data;
-    String AttributeName;
+  std::vector<ISerialized *> Data;
+  String AttributeName;
 };

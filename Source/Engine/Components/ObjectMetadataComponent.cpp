@@ -1,2 +1,2 @@
 #include "Engine/Components/ObjectMetadataComponent.h"
-REGISTER_SERIALIZED_NAME(ObjectMetadataComponent)
+REGISTER_COMPONENT(ObjectMetadataComponent);

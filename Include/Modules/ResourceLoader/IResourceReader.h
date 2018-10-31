@@ -1,17 +1,16 @@
 #pragma once
+#include "Common.h"
 #include <fstream>
 #include <vector>
-#include "Common.h"
 
 class IDataNode;
 
-class IResourceReader
-{
+class IResourceReader {
 public:
-    virtual ~IResourceReader() {};
+  virtual ~IResourceReader(){};
 
-    virtual String GetLastError() = 0;
-    virtual bool Open() = 0;
-    virtual void ReadNodes(std::vector<IDataNode*> &nodes) = 0;
-    virtual void Close() = 0;
+  virtual String GetLastError() = 0;
+  virtual bool Open() = 0;
+  virtual void ReadNodes(std::vector<IDataNode *> &nodes) = 0;
+  virtual void Close() = 0;
 };

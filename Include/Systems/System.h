@@ -1,12 +1,12 @@
 #pragma once
 #include "ISystem.h"
 
-class System : public ISystem
-{
+class System : public ISystem {
 public:
-    virtual ~System(){};
-    virtual void SetActive(bool active);
-    virtual bool IsActive();
+  virtual ~System(){};
+  virtual void SetActive(bool active);
+  virtual bool IsActive();
+
 protected:
-    bool Active = false;
+  bool Active = false;
 };

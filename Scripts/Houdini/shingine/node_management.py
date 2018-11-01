@@ -11,7 +11,7 @@ shingine_material_node_type = "Material"
 shingine_shade_node_type = "Shader"
 shingine_shade_source_node_type = "ShaderSource"
 
-shingine_external_node_type = "External"
+shingine_external_node_type = "ExternalAsset"
 
 
 def add_external_export_flag():
@@ -30,8 +30,8 @@ def get_mesh_node():
     node = core.Node(shingine_mesh_node_type)
     return node
 
-def get_external_node(node_name, filename):
-    node = core.Node(shingine_external_node_type)
+def get_external_node(uid, node_name, filename):
+    node = core.Node(shingine_external_node_type, uid)
     node.attributes.append(core.Attribute(
         "Name", core.DataType_CHAR, node_name, True))
     node.attributes.append(core.Attribute(

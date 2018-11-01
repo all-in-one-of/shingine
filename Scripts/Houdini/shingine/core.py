@@ -87,9 +87,11 @@ def get_attribute(node, attribute_name):
     return next(attr for attr in node.attributes if attr.name == attribute_name)
 
 class Node:
-    def __init__(self, name="Node"):
+    def __init__(self, name="Node", uid = -1):
         self.name = name
-        self.unique_id = GetUid()
+        self.unique_id = uid
+        if uid == -1:
+            self.unique_id = GetUid()
         self.attributes = []
         self.nodes = []
 

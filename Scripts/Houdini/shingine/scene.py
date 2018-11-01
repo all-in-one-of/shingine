@@ -162,7 +162,7 @@ class Exporter:
         # if it's not external, return the regular node
         if not self.external_assets_flag:
             return node
-        
+
         external_node = None
         # generate the asset name or use from the attribute
         asset_name = node.name + "_" + str(node.unique_id)
@@ -185,9 +185,10 @@ class Exporter:
 
         # info file name is necessary to include the asset type to the file name
         asset_filename = asset_name + core.file_name_extension
-        info_asset_filename = os.path.join(asset_dir,asset_filename)
+        info_asset_filename = os.path.join(
+            self.asset_dir, asset_dir, asset_filename)
         # this external node will be saved to the scene file
-        external_node = node_management.get_external_node(node.name,
+        external_node = node_management.get_external_node(node.unique_id, node.name,
                                                           info_asset_filename)
 
         # write the original node in the external file

@@ -10,7 +10,7 @@ int main() {
   InitializeEngine();
   AddFirstPersonController();
 
-  if (!ResourceLoader::Load("Assets/Scenes/Test.ssd")) {
+  if (!ResourceLoader::Load("Assets/Scenes/test_external.ssd")) {
     std::cout << "Couldn't load the scene" << std::endl;
     return 1;
   }

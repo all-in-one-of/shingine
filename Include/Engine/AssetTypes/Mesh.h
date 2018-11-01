@@ -1,7 +1,8 @@
 #pragma once
+#include "Asset.h"
 #include "Utility/Data/Serialization.h"
 
-class Mesh : public ISerializedClass {
+class Mesh : public Asset, public ISerializedClass {
 public:
   SERIALIZE_CLASS(Mesh);
   Mesh() {

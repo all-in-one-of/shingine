@@ -13,11 +13,8 @@ class ISerialized;
   bool SerializedIDSet = false;                                                \
   virtual unsigned int UniqueID() { return SerializedUniqueID; }               \
   virtual void SetUniqueID(unsigned int newId) {                               \
-    if (!SerializedIDSet) {                                                    \
-      SerializedUniqueID = newId;                                              \
-      SerializedIDSet = true;                                                  \
-    } else                                                                     \
-      throw 1;                                                                 \
+    SerializedUniqueID = newId;                                                \
+    SerializedIDSet = true;                                                    \
   }
 
 #define REGISTER_SERIALIZED_CLASS(TYPENAME)                                    \

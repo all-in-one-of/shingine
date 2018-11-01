@@ -14,6 +14,8 @@
 #include "Modules/Statics/IAssetManager.h"
 #include "Modules/Statics/ISceneManager.h"
 
+#include "Engine/AssetTypes/Asset.h"
+#include "Engine/AssetTypes/ExternalAsset.h"
 #include "Modules/ResourceLoader/BitmapReader/BitmapReader.h"
 
 String ResourceLoader::LastError = "";
@@ -65,7 +67,44 @@ bool ResourceLoader::LoadText(const String &fileName, String &data) {
   return true;
 }
 
-bool ResourceLoader::Load(const String &fileName) {
+void ResourceLoader::LoadExternalAsset(ISerialized *obj,
+                                       const String &sceneFileName) {
+  ExternalAsset *externalAsset = dynamic_cast<ExternalAsset *>(obj);
+  std::vector<IDataNode *> nodes;
+
+  String sceneRootDir;
+  // Get directory of the scene file
+  std::vector<String> fileSegments = sceneFileName.Split('/');
+  for (unsigned int x = 0; x < fileSegments.size() - 1; x++)
+    sceneRootDir += fileSegments[x] + "/";
+
+  const String fileName = externalAsset->FileName;
+  const String fileNameFull = sceneRootDir + fileName;
+  std::cout << fileNameFull.GetStdString() << std::endl;
+
+  bool ssdLoaded = LoadSsd(fileNameFull, nodes);
+
+  assert(ssdLoaded);
+  assert(nodes.size() == 1); // the node count should be one
+
+  unsigned int uniqueId = externalAsset->UniqueID();
+  delete externalAsset;
+
+  ISerialized *deserializedObj = nodes[0]->Deserialize();
+  ISerializedClass *serializedClass =
+      dynamic_cast<ISerializedClass *>(deserializedObj);
+  serializedClass->SetUniqueID(uniqueId);
+
+  Statics::AddSerializedObject(serializedClass);
+  Asset *asset = dynamic_cast<Asset *>(serializedClass);
+  assert(asset != NULL);
+  // set run time parameters
+  asset->SetOrigin(Asset::OriginType::External);
+  asset->SetFileName(fileName);
+}
+
+bool ResourceLoader::LoadSsd(const String &fileName,
+                             std::vector<IDataNode *> &nodes) {
   // 3 file types are supported
   // *.ssd - binary version
   // *.ssda - ascii version
@@ -83,13 +122,22 @@ bool ResourceLoader::Load(const String &fileName) {
     return false;
   }
 
-  std::vector<ISerialized *> deserializedNodes;
-  std::vector<IDataNode *> nodes;
   reader->ReadNodes(nodes);
+  reader->Close();
 
+  delete reader;
+  return true;
+}
+
+bool ResourceLoader::Load(const String &fileName) {
+
+  std::vector<IDataNode *> nodes;
+  if (!LoadSsd(fileName, nodes))
+    return false;
   // traverse through each node, create unique ids
   UniqueIdSetter::SetIds(nodes);
 
+  std::vector<ISerialized *> deserializedNodes;
   for (size_t x = 0; x < nodes.size(); x++) {
     ISerialized *deserializedDataNode = nodes[x]->Deserialize();
     if (deserializedDataNode)
@@ -98,15 +146,19 @@ bool ResourceLoader::Load(const String &fileName) {
     // add instance
     ISerializedClass *serializedObject =
         dynamic_cast<ISerializedClass *>(deserializedDataNode);
+
     Statics::AddSerializedObject(serializedObject);
   }
-
-  reader->Close();
-  delete reader;
 
   std::vector<ISerialized *> entities;
 
   for (unsigned int x = 0; x < deserializedNodes.size(); x++) {
+    Asset *asset = dynamic_cast<Asset *>(deserializedNodes[x]);
+    if (asset) {
+      asset->SetOrigin(Asset::OriginType::Scene);
+      asset->SetFileName(fileName);
+    }
+
     if (deserializedNodes[x]->SerializedName() == "Entity") {
       entities.push_back(deserializedNodes[x]);
       // won't return the unique id
@@ -118,10 +170,18 @@ bool ResourceLoader::Load(const String &fileName) {
       // will return the unique id
       Statics::Destroy(dynamic_cast<ISerializedClass *>(deserializedNodes[x]));
     }
-  }
 
-  Statics::Get<IAssetManager>()->RemoveAssetType("Entity");
-  Statics::Get<IAssetManager>()->RemoveAssetType("EntityIdCollection");
+    // handle external node
+    else if (deserializedNodes[x]->SerializedName() == "ExternalAsset") {
+      LoadExternalAsset(deserializedNodes[x], fileName);
+    }
+  }
+  
+  IAssetManager *assetManager = Statics::Get<IAssetManager>();
+  // helper types which are supposed to be deleted once the scene is loaded
+  assetManager->RemoveAssetType("Entity");
+  assetManager->RemoveAssetType("EntityIdCollection");
+  assetManager->RemoveAssetType("ExternalAsset");
 
   // check if the ssd file contains entities
   if (entities.size() > 0)

@@ -14,6 +14,9 @@ public:
 
 private:
   ResourceLoader(){};
+  static bool LoadSsd(const String &fileName,
+                      std::vector<class IDataNode *> &nodes);
+  static void LoadExternalAsset(ISerialized *obj, const String &sceneFileName);
   static void SetupPath(const String &localPath, String &outPath);
   static String LastError;
 };

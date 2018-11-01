@@ -18,8 +18,10 @@ public:
 
   virtual void GetAllComponents(std::vector<IComponent *> &components);
   virtual IComponentMap *GetComponentMap(const String &typeName);
+  
 
 private:
+  IComponentMap *AddComponentMap(const std::string &typeName);
   typedef std::unordered_map<std::string, IComponentMap *> StringCompMap;
   StringCompMap Components;
 };

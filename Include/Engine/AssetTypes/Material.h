@@ -1,8 +1,9 @@
 #pragma once
 #include "IMaterial.h"
 #include "Utility/Data/Serialization.h"
+#include "Asset.h"
 
-class Material : public IMaterial, public ISerializedClass {
+class Material : public Asset, public IMaterial, public ISerializedClass {
 public:
   SERIALIZE_CLASS(Material)
   Material();

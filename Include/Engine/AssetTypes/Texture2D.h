@@ -1,11 +1,12 @@
 #pragma once
 #include "Utility/Data/Serialization.h"
+#include "Asset.h"
 
 struct Pixel32 {
   float r, g, b, a;
 };
 
-class Texture2D : public ISerializedClass {
+class Texture2D : public Asset, public ISerializedClass {
 public:
   SERIALIZE_CLASS(Texture2D);
   Texture2D() {

@@ -67,10 +67,41 @@ bool ResourceLoader::LoadText(const String &fileName, String &data) {
   return true;
 }
 
-void ResourceLoader::LoadExternalAsset(ISerialized *obj,
-                                       const String &sceneFileName) {
-  ExternalAsset *externalAsset = dynamic_cast<ExternalAsset *>(obj);
+bool ResourceLoader::LoadAsset(const String &fileName, Asset *&loadedAsset,
+                               unsigned int uniqueId) {
   std::vector<IDataNode *> nodes;
+  if (!LoadSsd(fileName, nodes))
+    return false;
+  assert(nodes.size() == 1); // loading a single asset file
+
+  if (uniqueId == 0)
+    UniqueIdSetter::SetIds(nodes);
+
+  ISerialized *deserializedObj = nodes[0]->Deserialize();
+  ISerializedClass *serializedClass =
+      dynamic_cast<ISerializedClass *>(deserializedObj);
+  // TODO fix
+  // if it's a complex asset which contains serialized objects inside,
+  // those won't get a global unique id.
+  if (uniqueId != 0)
+    serializedClass->SetUniqueID(uniqueId);
+
+  Statics::AddSerializedObject(serializedClass);
+  loadedAsset = dynamic_cast<Asset *>(serializedClass);
+  assert(loadedAsset != NULL);
+  // set run time parameters
+  loadedAsset->SetOrigin(Asset::OriginType::External);
+  loadedAsset->SetFileName(fileName);
+  Statics::Get<IAssetManager>()->SaveExternalAssetPath(fileName.GetStdString(),
+                                                       uniqueId);
+  // clean up
+  delete nodes[0];
+  return true;
+}
+
+void ResourceLoader::LoadExternalAssetFromScene(ISerialized *obj,
+                                                const String &sceneFileName) {
+  ExternalAsset *externalAsset = dynamic_cast<ExternalAsset *>(obj);
 
   String sceneRootDir;
   // Get directory of the scene file
@@ -78,31 +109,13 @@ void ResourceLoader::LoadExternalAsset(ISerialized *obj,
   for (unsigned int x = 0; x < fileSegments.size() - 1; x++)
     sceneRootDir += fileSegments[x] + "/";
 
-  const String fileName = externalAsset->FileName;
-  const String fileNameFull = sceneRootDir + fileName;
-  std::cout << fileNameFull.GetStdString() << std::endl;
-
-  bool ssdLoaded = LoadSsd(fileNameFull, nodes);
-
-  assert(ssdLoaded);
-  assert(nodes.size() == 1); // the node count should be one
+  const String fileNameRel = externalAsset->FileName;
+  const String fileName = sceneRootDir + fileNameRel;
 
   unsigned int uniqueId = externalAsset->UniqueID();
   delete externalAsset;
-
-  ISerialized *deserializedObj = nodes[0]->Deserialize();
-  ISerializedClass *serializedClass =
-      dynamic_cast<ISerializedClass *>(deserializedObj);
-  serializedClass->SetUniqueID(uniqueId);
-
-  Statics::AddSerializedObject(serializedClass);
-  Asset *asset = dynamic_cast<Asset *>(serializedClass);
-  assert(asset != NULL);
-  // set run time parameters
-  asset->SetOrigin(Asset::OriginType::External);
-  asset->SetFileName(fileName);
-  Statics::Get<IAssetManager>()->SaveExternalAssetPath(fileName.GetStdString(),
-                                                       uniqueId);
+  Asset *loadedAsset;
+  assert(LoadAsset(fileName, loadedAsset, uniqueId));
 }
 
 bool ResourceLoader::LoadSsd(const String &fileName,
@@ -174,7 +187,7 @@ bool ResourceLoader::LoadScene(const String &fileName) {
 
     // handle external node
     else if (deserializedNodes[x]->SerializedName() == "ExternalAsset") {
-      LoadExternalAsset(deserializedNodes[x], fileName);
+      LoadExternalAssetFromScene(deserializedNodes[x], fileName);
     }
   }
 

@@ -9,8 +9,8 @@ REGISTER_SERIALIZED_CLASS(TransformSystem)
 
 bool TransformSystem::Initialize() {
   // get reference to the transform component collection
-  Statics::Get<IComponentManager>()->GetComponentIteratorOfType(
-      "TransformComponent", TransformCollectionIterator);
+  TransformComponentMap =
+      Statics::Get<IComponentManager>()->GetComponentMap<TransformComponent>();
   // calculate transform component for dynamic and static objects
   CalculateTransforms(false);
   Active = true;
@@ -25,13 +25,8 @@ void TransformSystem::CalculateTransforms(bool ignoreStatic) {
 }
 
 void TransformSystem::CalculateLocalTransforms(bool ignoreStatic) {
-  IComponentManager::IdMap &idMap = TransformCollectionIterator->second;
-  IComponentManager::IdMap::iterator transformIterator;
-  for (transformIterator = idMap.begin(); transformIterator != idMap.end();
-       transformIterator++) {
-    // iterate over transform components
-    TransformComponent *transform =
-        dynamic_cast<TransformComponent *>(transformIterator->second);
+  for (unsigned int x = 0; x < TransformComponentMap->Count(); x++) {
+    TransformComponent *transform = TransformComponentMap->AtIndex(x);
 
     if (ignoreStatic && !transform->IsDynamic)
       continue;
@@ -55,13 +50,8 @@ void TransformSystem::CalculateLocalTransforms(bool ignoreStatic) {
 }
 
 void TransformSystem::CalculateWorldTransforms(bool ignoreStatic) {
-  IComponentManager::IdMap &idMap = TransformCollectionIterator->second;
-  IComponentManager::IdMap::iterator transformIterator;
-  for (transformIterator = idMap.begin(); transformIterator != idMap.end();
-       transformIterator++) {
-    // iterate over transform components
-    TransformComponent *transform =
-        dynamic_cast<TransformComponent *>(transformIterator->second);
+  for (unsigned int x = 0; x < TransformComponentMap->Count(); x++) {
+    TransformComponent *transform = TransformComponentMap->AtIndex(x);
 
     if (ignoreStatic && !transform->IsDynamic)
       continue;
@@ -69,7 +59,6 @@ void TransformSystem::CalculateWorldTransforms(bool ignoreStatic) {
     glm::mat4 parentTransform(1);
     glm::mat4 parentTransformUniformScale(1);
     TransformComponent *currentTransform = transform;
-    IComponentManager::IdMap::iterator parentIterator;
 
     unsigned int parentId = currentTransform->ParentID;
     unsigned char checkDepth = 255;
@@ -77,12 +66,7 @@ void TransformSystem::CalculateWorldTransforms(bool ignoreStatic) {
     for (unsigned char x = 0; x < checkDepth; x++) {
       if (parentId == 0)
         break;
-
-      parentIterator = idMap.find(parentId);
-      if (parentIterator == idMap.end())
-        break;
-      currentTransform =
-          dynamic_cast<TransformComponent *>(parentIterator->second);
+      currentTransform = TransformComponentMap->At(parentId);
       // if static then use world matrix and break
       parentTransform = currentTransform->LocalTransform * parentTransform;
       parentTransformUniformScale =
@@ -113,14 +97,4 @@ void TransformSystem::CalculateWorldTransforms(bool ignoreStatic) {
 bool TransformSystem::Update() {
   CalculateTransforms();
   return true;
-}
-
-glm::mat4 TransformSystem::GetRotationMatrix(glm::quat q) {
-  float s = glm::dot(q, q);
-  return glm::mat4(
-      1 - 2 * s * (q.y * q.y + q.z * q.z), 2 * s * (q.x * q.y - q.z * q.w),
-      2 * s * (q.x * q.z + q.y * q.w), 0, 2 * s * (q.x * q.y + q.z * q.w),
-      1 - 2 * s * (q.x * q.x + q.z * q.z), 2 * s * (q.y * q.z - q.x * q.w), 0,
-      2 * s * (q.x * q.z - q.y * q.w), 2 * s * (q.y * q.z + q.x * q.w),
-      1 - 2 * s * (q.x * q.x + q.y * q.y), 0, 0, 0, 0, 1);
 }

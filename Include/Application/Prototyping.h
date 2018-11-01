@@ -46,13 +46,11 @@ void TestStuff() {
 
   // set the same lighting material to the each object on the scene
   {
-    IComponentManager::StringMap::iterator iterator;
-    componentManager->GetComponentIteratorOfType("RendererComponent", iterator);
-    IComponentManager::IdMap &map = iterator->second;
-    IComponentManager::IdMap::iterator it = map.begin();
+    ComponentMap<RendererComponent> *renderers =
+        componentManager->GetComponentMap<RendererComponent>();
 
-    for (it = map.begin(); it != map.end(); it++) {
-      RendererComponent *r = dynamic_cast<RendererComponent *>(it->second);
+    for (unsigned int x = 0; x < renderers->Count(); x++) {
+      RendererComponent *r = renderers->AtIndex(x);
       r->MaterialReference = mat->UniqueID();
     }
   }
@@ -64,20 +62,19 @@ void TestStuff() {
     Statics::Get<IEntityManager>()->CreateEntity(
         {"TransformComponent", "SkyLightComponent", "ObjectMetadataComponent"});
 
-  // Add a directional light if there isn't
   {
-    IComponentManager::StringMap::iterator iterator;
-    componentManager->GetComponentIteratorOfType("LightComponent", iterator);
-    IComponentManager::IdMap &map = iterator->second;
-    IComponentManager::IdMap::iterator it = map.begin();
+    ComponentMap<LightComponent> *lightMap =
+        componentManager->GetComponentMap<LightComponent>();
+  
     bool directionalLight = false;
 
-    for (it = map.begin(); it != map.end(); it++) {
-      LightComponent *r = dynamic_cast<LightComponent *>(it->second);
-      directionalLight = r->LightType == 2;
+    for (unsigned int x = 0; x < lightMap->Count(); x++) {
+      LightComponent *light = lightMap->AtIndex(x);
+      directionalLight = light->LightType == 2;
       if (directionalLight)
         break;
     }
+
     if (!directionalLight) {
       unsigned int newEntity = Statics::Get<IEntityManager>()->CreateEntity(
           {"TransformComponent", "LightComponent", "ObjectMetadataComponent"});

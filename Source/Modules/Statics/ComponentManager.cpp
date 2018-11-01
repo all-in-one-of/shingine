@@ -3,22 +3,37 @@
 #include "Utility/Data/ISerialized.h"
 #include "Utility/Data/SerializedFactory.h"
 
+#include "Utility/Data/IComponentMap.h"
+
 REGISTER_SERIALIZED_CLASS(ComponentManager)
 
 ComponentManager::ComponentManager() {}
 
-void ComponentManager::AddComponent(IComponent *component) {
+void ComponentManager::AddGenericComponent(IComponent *component) {
   unsigned int entityId = component->EntityId();
   if (entityId == 0)
     entityId = component->Id();
 
-  //
-  Components[dynamic_cast<ISerializedClass *>(component)
-                 ->SerializedName()
-                 .GetStdString()][entityId] = component;
+  std::string typeName = dynamic_cast<ISerializedClass *>(component)
+                             ->SerializedName()
+                             .GetStdString();
+  StringCompMap::iterator stringMapIterator = Components.find(typeName);
+  IComponentMap *componentMap = nullptr;
+  // first find out if there is  a map for this type
+  if (stringMapIterator == Components.end()) {
+    ISerialized *newMap = SerializedFactory::CreateInstance(
+        std::string("ComponentMap<") + typeName + ">");
+    componentMap = dynamic_cast<IComponentMap *>(newMap);
+    Components[typeName] = componentMap;
+  } else
+    componentMap = stringMapIterator->second;
+  // replace the old component map with the new one
+  componentMap->Set(entityId, component);
+  // Components[typeName][entityId] = component;
 }
 
-IComponent *ComponentManager::AddComponent(String type, unsigned int entityId) {
+IComponent *ComponentManager::AddComponent(String type,
+                                                  unsigned int entityId) {
   ISerialized *serializedObject =
       SerializedFactory::CreateInstance(type.GetStdString());
   if (!serializedObject)
@@ -27,8 +42,16 @@ IComponent *ComponentManager::AddComponent(String type, unsigned int entityId) {
 
   if (entityId != 0)
     component->SetEntityId(entityId);
-  AddComponent(component);
+  AddGenericComponent(component);
   return component;
+}
+
+IComponentMap *ComponentManager::GetComponentMap(const String &typeName) {
+  StringCompMap::iterator stringMapIterator =
+      Components.find(typeName.GetStdString());
+  if (stringMapIterator == Components.end())
+    return nullptr;
+  return stringMapIterator->second;
 }
 
 void ComponentManager::UpdateComponentEntityId(IComponent *component) {
@@ -36,46 +59,19 @@ void ComponentManager::UpdateComponentEntityId(IComponent *component) {
   ISerializedClass *serializedComponent =
       dynamic_cast<ISerializedClass *>(component);
   unsigned int uniqueId = serializedComponent->UniqueID();
-  Components[serializedComponent->SerializedName().GetStdString()].erase(
-      uniqueId);
-  Components[serializedComponent->SerializedName().GetStdString()]
-            [component->EntityId()] = component;
-}
 
-IComponent *ComponentManager::GetComponentOfType(String typeName,
-                                                 unsigned int entityId) {
-  StringMap::iterator it = Components.find(typeName.GetStdString());
-  if (it == Components.end())
-    return nullptr;
+  std::string serializedName =
+      serializedComponent->SerializedName().GetStdString();
 
-  IdMap &idMap = it->second;
-
-  if (idMap.begin() == idMap.end())
-    return nullptr;
-  if (entityId == 0)
-    return idMap.begin()->second;
-
-  IdMap::iterator idMapIterator = idMap.find(entityId);
-  if (idMapIterator == idMap.end())
-    return nullptr;
-
-  return idMapIterator->second;
+  IComponentMap *componentMap = Components[serializedName];
+  componentMap->Erase(uniqueId);
+  componentMap->Set(component->EntityId(), component);
 }
 
 void ComponentManager::GetAllComponents(std::vector<IComponent *> &components) {
-  for (StringMap::iterator it = Components.begin(); it != Components.end();
+  for (StringCompMap::iterator it = Components.begin(); it != Components.end();
        it++) {
-    IdMap &idMap = it->second;
-    for (IdMap::iterator idMapIt = idMap.begin(); idMapIt != idMap.end();
-         idMapIt++)
-      components.push_back(idMapIt->second);
+    IComponentMap *componentMap = it->second;
+    componentMap->GetAllComponents(components);
   }
-}
-bool ComponentManager::GetComponentIteratorOfType(
-    String typeName, StringMap::iterator &iterator) {
-  StringMap::iterator it = Components.find(typeName.GetStdString());
-  if (it == Components.end())
-    return false;
-  iterator = it;
-  return true;
 }

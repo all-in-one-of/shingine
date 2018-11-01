@@ -6,6 +6,8 @@
 #include <unordered_map>
 
 class IComponent;
+class TransformComponent;
+template <class T> class ComponentMap;
 class TransformSystem : public System, public ISerializedClass {
 public:
   SERIALIZE_CLASS(TransformSystem);
@@ -17,10 +19,9 @@ public:
 private:
   void CalculateLocalTransforms(bool ignoreStatic = true);
   void CalculateTransforms(bool ignoreStatic = true);
-  glm::mat4 GetRotationMatrix(glm::quat q);
   typedef std::unordered_map<std::string,
                              std::unordered_map<unsigned int, IComponent *>>
       StringMap;
   void CalculateWorldTransforms(bool ignoreStatic);
-  StringMap::iterator TransformCollectionIterator;
+  ComponentMap<TransformComponent> *TransformComponentMap;
 };

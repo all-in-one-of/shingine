@@ -3,7 +3,7 @@
 #include "Utility/Data/Serialization.h"
 #include <typeinfo>
 #include <unordered_map>
-
+class IComponentMap;
 class IComponent;
 
 class ComponentManager : public IComponentManager, public ISerializedClass {
@@ -12,16 +12,14 @@ public:
   ComponentManager();
   virtual ~ComponentManager() {}
 
-  virtual void AddComponent(IComponent *component);
+  virtual void AddGenericComponent(IComponent *component);
   virtual IComponent *AddComponent(String type, unsigned int entityId = 0);
   virtual void UpdateComponentEntityId(IComponent *component);
-  virtual IComponent *GetComponentOfType(String typeName,
-                                         unsigned int entityId = 0);
 
   virtual void GetAllComponents(std::vector<IComponent *> &components);
-  virtual bool GetComponentIteratorOfType(String typeName,
-                                          StringMap::iterator &iterator);
+  virtual IComponentMap *GetComponentMap(const String &typeName);
 
 private:
-  StringMap Components;
+  typedef std::unordered_map<std::string, IComponentMap *> StringCompMap;
+  StringCompMap Components;
 };

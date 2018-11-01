@@ -67,17 +67,12 @@ void RenderingSystem::FindLights() {
   CachedDirectionalLight = nullptr;
 
   IComponentManager *componentManager = Statics::Get<IComponentManager>();
-  IComponentManager::StringMap::iterator lightsIterator;
-  componentManager->GetComponentIteratorOfType("LightComponent",
-                                               lightsIterator);
-  IComponentMapType &lightsComponentMap = lightsIterator->second;
-  IComponentMapType::iterator entityIterator;
 
-  for (entityIterator = lightsComponentMap.begin();
-       entityIterator != lightsComponentMap.end(); entityIterator++) {
-    LightComponent *light = dynamic_cast<LightComponent *>(
-        lightsComponentMap.at(entityIterator->first));
+  ComponentMap<LightComponent> *lightComponentMap =
+      componentManager->GetComponentMap<LightComponent>();
 
+  for (unsigned int x = 0; x < lightComponentMap->Count(); x++) {
+    LightComponent *light = lightComponentMap->AtIndex(x);
     if (light->LightType != DIRECTIONAL_LIGHT_TYPE && LightsFound != MAX_LIGHTS)
       LightComponents[LightsFound++] = light;
     else if (light->LightType == DIRECTIONAL_LIGHT_TYPE &&
@@ -162,33 +157,25 @@ void RenderingSystem::SetLightParameters(unsigned int shaderId) {
 }
 
 void RenderingSystem::DrawOpaqueMeshes() {
-  IComponentManager::StringMap::iterator rendererIterator;
-  IComponentManager::StringMap::iterator transformIterator;
-
   IComponentManager *componentManager = Statics::Get<IComponentManager>();
   // iterate over renderer iterator
+
+  ComponentMap<TransformComponent> *transformComponents =
+      componentManager->GetComponentMap<TransformComponent>();
+  ComponentMap<RendererComponent> *rendererComponents =
+      componentManager->GetComponentMap<RendererComponent>();
+
   bool drawMeshes = true;
-  drawMeshes = drawMeshes && componentManager->GetComponentIteratorOfType(
-                                 "RendererComponent", rendererIterator);
-  drawMeshes = drawMeshes && componentManager->GetComponentIteratorOfType(
-                                 "TransformComponent", transformIterator);
+  drawMeshes = drawMeshes && transformComponents;
+  drawMeshes = drawMeshes && rendererComponents;
 
   if (!drawMeshes)
     return;
 
-  // std::cout<<"Hey: "<< LightsFound<<std::endl;
-
-  IComponentMapType &rendererComponentMap = rendererIterator->second;
-  IComponentMapType::iterator entityIterator;
-
-  for (entityIterator = rendererComponentMap.begin();
-       entityIterator != rendererComponentMap.end(); entityIterator++) {
-    unsigned int entityId = entityIterator->first;
-    IComponentMapType &transformComponentMap = transformIterator->second;
-    TransformComponent *transform =
-        dynamic_cast<TransformComponent *>(transformComponentMap.at(entityId));
-    RendererComponent *renderer =
-        dynamic_cast<RendererComponent *>(entityIterator->second);
+  for (unsigned int x = 0; x < rendererComponents->Count(); x++) {
+    RendererComponent *renderer = rendererComponents->AtIndex(x);
+    unsigned int entityId = renderer->EntityId();
+    TransformComponent *transform = transformComponents->At(entityId);
 
     if (!transform || !renderer)
       continue;

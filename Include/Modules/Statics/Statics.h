@@ -4,6 +4,7 @@
 
 class ISerializedClass;
 class String;
+
 class Statics {
 public:
   static void AddStaticObject(const String &interfaceName,

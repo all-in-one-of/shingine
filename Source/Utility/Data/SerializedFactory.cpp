@@ -20,6 +20,8 @@ ISerialized *SerializedFactory::CreateInstance(const std::string &s,
   ISerialized *createdInstance = it->second();
   ISerializedClass *serializedClass =
       dynamic_cast<ISerializedClass *>(createdInstance);
+  if (!serializedClass)
+    return createdInstance;
   // set unique id
   if (setUid) {
     unsigned int uniqueId = Statics::GetUniqueId();

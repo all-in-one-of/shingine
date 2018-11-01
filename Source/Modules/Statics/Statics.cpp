@@ -29,7 +29,7 @@ void Statics::AddSerializedObject(ISerializedClass *object) {
   Statics *instance = GetInstance();
   IComponent *component = dynamic_cast<IComponent *>(object);
   if (component)
-    instance->Get<IComponentManager>()->AddComponent(component);
+    instance->Get<IComponentManager>()->AddGenericComponent(component);
   else
     instance->Get<IAssetManager>()->AddInstance(object);
 }

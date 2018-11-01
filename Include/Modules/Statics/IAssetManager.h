@@ -10,6 +10,7 @@ public:
 
   virtual ~IAssetManager() {}
   virtual void RemoveAssetType(String assetType) = 0;
+  virtual ISerializedClass *GetAssetByFileName(const String &fileName) = 0;
   virtual ISerializedClass *GetAssetOfType(const String &typeName,
                                            unsigned int assetId = 0) = 0;
   virtual ISerializedClass *AddAssetOfType(const String &typeName) = 0;

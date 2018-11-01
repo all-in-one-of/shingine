@@ -172,7 +172,6 @@ void RenderingSystem::DrawOpaqueMeshes() {
   bool drawMeshes = true;
   drawMeshes = drawMeshes && transformComponents;
   drawMeshes = drawMeshes && rendererComponents;
-
   if (!drawMeshes)
     return;
 

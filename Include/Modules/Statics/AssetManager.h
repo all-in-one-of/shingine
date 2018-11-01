@@ -11,6 +11,7 @@ public:
 
   virtual ~AssetManager() {}
   virtual void RemoveAssetType(String assetType);
+  virtual ISerializedClass *GetAssetByFileName(const String &fileName);
   virtual ISerializedClass *GetAssetOfType(const String &typeName,
                                            unsigned int assetId = 0);
   virtual ISerializedClass *AddAssetOfType(const String &typeName);
@@ -19,7 +20,9 @@ public:
   virtual void AddInstance(ISerializedClass *newAsset);
   virtual void SaveExternalAssetPath(const std::string &path,
                                      unsigned int assetId);
+
 private:
   StringMap Assets;
-  std::unordered_map<std::string, unsigned int> ExternalPathToAssetId;
+  typedef std::unordered_map<std::string, unsigned int> ExternalPathMap;
+  ExternalPathMap ExternalPathToAssetId;
 };

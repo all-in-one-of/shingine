@@ -1,6 +1,7 @@
 #include "Modules/Statics/AssetManager.h"
 #include "Utility/Data/ISerialized.h"
 #include "Utility/Data/SerializedFactory.h"
+#include "Engine/AssetTypes/Asset.h"
 
 REGISTER_SERIALIZED_CLASS(AssetManager)
 ISerializedClass *AssetManager::GetAssetOfType(const String &typeName,
@@ -22,6 +23,19 @@ ISerializedClass *AssetManager::GetAssetOfType(const String &typeName,
     return nullptr;
 
   return idIterator->second;
+}
+
+ISerializedClass *AssetManager::GetAssetByFileName(const String &fileName) {
+  ExternalPathMap::iterator it =
+      ExternalPathToAssetId.find(fileName.GetStdString());
+  if (it == ExternalPathToAssetId.end()) {
+    // attempt to load it from file
+    Asset *newAsset = nullptr;
+    ResourceLoader::LoadAsset(fileName, newAsset);
+    return dynamic_cast<ISerializedClass *>(newAsset);
+  }
+  unsigned int uniqueId = it->second;
+  return Statics::FindSerializedObject(uniqueId);
 }
 
 ISerializedClass *AssetManager::AddAssetOfType(const String &typeName) {

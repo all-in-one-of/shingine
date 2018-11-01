@@ -14,7 +14,7 @@ public:
   virtual ~Graphics() {}
   virtual bool Render();
   virtual IRenderContext *GetContext();
-  virtual ICommandBuffer *CommandBuffer();
+  virtual ICommandBuffer *GetCommandBuffer(CommandBufferType type);
   virtual void SetDefaultShader(IShader *shader);
   virtual IShader *DefaultShader();
   virtual void SetupWindow();
@@ -22,5 +22,5 @@ public:
 private:
   IShader *defaultShader;
   IRenderContext *RenderContext = nullptr;
-  ICommandBuffer *DefaultCommandBuffer = nullptr;
+  ICommandBuffer *CommandBuffers[CommandBufferType::COUNT];
 };

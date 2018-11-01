@@ -29,11 +29,15 @@ bool RenderingSystem::Initialize() {
 }
 
 bool RenderingSystem::Update() {
-  ActiveCommandBuffer = Statics::Get<IGraphics>()->CommandBuffer();
+  IGraphics *graphics = Statics::Get<IGraphics>();
+  ActiveCommandBuffer =
+      graphics->GetCommandBuffer(IGraphics::CommandBufferType::Main);
+  ICommandBuffer *initBuffer =
+      graphics->GetCommandBuffer(IGraphics::CommandBufferType::FrameInit);
 
-  ActiveCommandBuffer->EnableDepth();
-  ActiveCommandBuffer->EnableCullFace();
-  ActiveCommandBuffer->Clear();
+  initBuffer->EnableDepth();
+  initBuffer->EnableCullFace();
+  initBuffer->Clear();
 
   // Update projection matrix, then draw meshes
   CameraComponent *camera = Statics::Get<IActiveCamera>()->GetCameraComponent();

@@ -8,9 +8,10 @@ REGISTER_SERIALIZED_CLASS(Graphics)
 
 bool Graphics::Render() {
   // create window if not created
-
-  DefaultCommandBuffer->Execute();
-  DefaultCommandBuffer->ResetCommandBuffer();
+  for (unsigned char x = 0; x < CommandBufferType::COUNT; x++) {
+    CommandBuffers[x]->Execute();
+    CommandBuffers[x]->ResetCommandBuffer();
+  }
   // Finalize rendering
   RenderContext->Update();
   return !RenderContext->WindowShouldClose();
@@ -34,13 +35,13 @@ Graphics::Graphics() {
 
   // TODO make a factory class for making render context
   RenderContext = new OpenGLRender();
-  DefaultCommandBuffer = new OglCommandBuffer();
+  for (unsigned int x = 0; x < CommandBufferType::COUNT; x++)
+    CommandBuffers[x] = new OglCommandBuffer();
 }
 
 IRenderContext *Graphics::GetContext() { return RenderContext; }
-
-ICommandBuffer *Graphics::CommandBuffer() { return DefaultCommandBuffer; }
-
+ICommandBuffer *Graphics::GetCommandBuffer(IGraphics::CommandBufferType type) {
+  return CommandBuffers[type];
+}
 void Graphics::SetDefaultShader(IShader *shader) { defaultShader = shader; }
-
 IShader *Graphics::DefaultShader() { return defaultShader; }

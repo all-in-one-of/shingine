@@ -17,7 +17,9 @@ public:
   virtual bool GetAssetIteratorOfType(const String &typeName,
                                       StringMap::iterator &iterator);
   virtual void AddInstance(ISerializedClass *newAsset);
-
+  virtual void SaveExternalAssetPath(const std::string &path,
+                                     unsigned int assetId);
 private:
   StringMap Assets;
+  std::unordered_map<std::string, unsigned int> ExternalPathToAssetId;
 };

@@ -6,6 +6,6 @@ class IScene;
 class ISceneManager {
 public:
   virtual ~ISceneManager() {}
-  virtual void AddScene(const String &fileName, IScene *scene) = 0;
-  virtual IScene *CurrentScene() = 0;
+  virtual void SetCurrentScene(const String &fileName) = 0;
+  virtual String GetCurrentSceneFileName() = 0;
 };

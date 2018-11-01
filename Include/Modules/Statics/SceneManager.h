@@ -8,10 +8,9 @@ public:
   SERIALIZE_CLASS(SceneManager);
   SceneManager();
   virtual ~SceneManager() {}
-  virtual void AddScene(const String &fileName, IScene *scene);
-  virtual IScene *CurrentScene();
+  virtual void SetCurrentScene(const String &fileName);
+  virtual String GetCurrentSceneFileName();
 
 private:
-  std::map<String, IScene *> Scenes;
-  IScene *CurrentSceneInstance = nullptr;
+  String CurrentSceneFileName = "";
 };

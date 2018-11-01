@@ -16,6 +16,8 @@ public:
   virtual bool GetAssetIteratorOfType(const String &typeName,
                                       StringMap::iterator &iterator) = 0;
   virtual void AddInstance(ISerializedClass *newAsset) = 0;
+  virtual void SaveExternalAssetPath(const std::string &path,
+                                     unsigned int assetId) = 0;
 
   template <class T> T *GetAssetOfType(unsigned int assetId = 0) {
     String typeName = typeid(T).name();

@@ -36,6 +36,11 @@ void AssetManager::AddInstance(ISerializedClass *newAsset) {
       newAsset;
 }
 
+void AssetManager::SaveExternalAssetPath(const std::string &path,
+                                         unsigned int assetId) {
+  ExternalPathToAssetId[path] = assetId;
+}
+
 void AssetManager::RemoveAssetType(String assetType) {
   Assets.erase(assetType.GetStdString());
 }

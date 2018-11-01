@@ -44,8 +44,6 @@ void main()
 	vec3 normal = normalize(_Normal);
 	vec3 lightColor = vec3(0.0);
 	// directional light
-
-
 	// Point / Spot Light calculation
 	for (int x = 0; x < MAX_LIGHTS; x++)
 	{

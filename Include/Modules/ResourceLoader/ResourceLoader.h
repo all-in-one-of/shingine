@@ -6,7 +6,7 @@ class ISerializedClass;
 
 class ResourceLoader {
 public:
-  static bool Load(const String &fileName);
+  static bool LoadScene(const String &fileName);
   static bool LoadText(const String &fileName, String &data);
   static bool LoadBitmap(const String &fileName,
                          ISerializedClass *&textureAsset);

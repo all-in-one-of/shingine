@@ -101,6 +101,8 @@ void ResourceLoader::LoadExternalAsset(ISerialized *obj,
   // set run time parameters
   asset->SetOrigin(Asset::OriginType::External);
   asset->SetFileName(fileName);
+  Statics::Get<IAssetManager>()->SaveExternalAssetPath(fileName.GetStdString(),
+                                                       uniqueId);
 }
 
 bool ResourceLoader::LoadSsd(const String &fileName,
@@ -129,8 +131,7 @@ bool ResourceLoader::LoadSsd(const String &fileName,
   return true;
 }
 
-bool ResourceLoader::Load(const String &fileName) {
-
+bool ResourceLoader::LoadScene(const String &fileName) {
   std::vector<IDataNode *> nodes;
   if (!LoadSsd(fileName, nodes))
     return false;
@@ -176,7 +177,7 @@ bool ResourceLoader::Load(const String &fileName) {
       LoadExternalAsset(deserializedNodes[x], fileName);
     }
   }
-  
+
   IAssetManager *assetManager = Statics::Get<IAssetManager>();
   // helper types which are supposed to be deleted once the scene is loaded
   assetManager->RemoveAssetType("Entity");
@@ -184,11 +185,8 @@ bool ResourceLoader::Load(const String &fileName) {
   assetManager->RemoveAssetType("ExternalAsset");
 
   // check if the ssd file contains entities
-  if (entities.size() > 0)
-    Statics::Get<ISceneManager>()->AddScene(fileName,
-                                            SceneMaker::Create(nodes));
-  else
-    for (size_t x = 0; x < nodes.size(); x++)
-      delete nodes[x];
+  Statics::Get<ISceneManager>()->SetCurrentScene(fileName);
+  for (size_t x = 0; x < nodes.size(); x++)
+    delete nodes[x];
   return true;
 }

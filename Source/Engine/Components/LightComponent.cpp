@@ -25,3 +25,7 @@ LightComponent::LightComponent() {
 };
 
 LightComponent::~LightComponent() {}
+
+glm::vec4 LightComponent::GetColor() {
+  return glm::vec4(Color[0], Color[1], Color[2], 1.f);
+}

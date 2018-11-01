@@ -1,5 +1,6 @@
 #pragma once
 #include "ComponentSetup.h"
+#include <glm/glm.hpp>
 
 #define POINT_LIGHT_TYPE 0
 #define SPOT_LIGHT_TYPE 1
@@ -29,4 +30,6 @@ public:
   ATTRIBUTE_VALUE(float, CutOff);
 
   ATTRIBUTE_VALUE(unsigned char, ShadowEnabled);
+
+  glm::vec4 GetColor();
 };

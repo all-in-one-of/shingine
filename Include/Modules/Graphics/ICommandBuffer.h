@@ -26,7 +26,7 @@ public:
   virtual void SetFloat(const std::string &name, unsigned int shaderId,
                         float value) = 0;
   virtual void SetVector(const std::string &name, unsigned int shaderId,
-                         glm::vec4 &vector) = 0;
+                         const glm::vec4 &vector) = 0;
   virtual void SetTexture(const std::string &name, unsigned int shaderId,
                           unsigned int textureId) = 0;
 };

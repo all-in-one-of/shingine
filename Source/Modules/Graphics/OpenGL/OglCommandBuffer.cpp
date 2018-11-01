@@ -36,6 +36,7 @@ void OglCommandBuffer::EnableCullFace() { AddCommand(CB_ENABLE_CULL_FACE); }
 void OglCommandBuffer::Clear() { AddCommand(CB_CLEAR); }
 
 void OglCommandBuffer::UseProgram(int programId) {
+  CurrentShaderProgram = programId;
   AddCommand(CB_USE_PROGRAM);
   WRITE_INT(programId)
 }
@@ -86,11 +87,12 @@ void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv,
                                                indexCount);
 
   SetPolygonMode(ICommandBuffer::EDrawPolygonMode::Fill);
-
+  if (CurrentShaderProgram != programId)
+    UseProgram(programId);
   AddCommand(CB_DRAW_MESH);
-  { WRITE_INT(programId); }
   { WRITE_UINT(vaoId); }
   { WRITE_UINT(indexCount); }
+  UseProgram(0);
 }
 
 void OglCommandBuffer::ReadValue(unsigned char &cmd) {
@@ -146,7 +148,7 @@ void OglCommandBuffer::SetFloat(const std::string &name, unsigned int shaderId,
 }
 
 void OglCommandBuffer::SetVector(const std::string &name, unsigned int shaderId,
-                                 glm::vec4 &vector) {
+                                 const glm::vec4 &vector) {
   int programId =
       GetContext()->GetShaderManager()->GetShaderProgramId(shaderId);
   SetVectorOgl(name, programId, vector);
@@ -154,6 +156,8 @@ void OglCommandBuffer::SetVector(const std::string &name, unsigned int shaderId,
 
 void OglCommandBuffer::SetMatrixOgl(const std::string &name, int programId,
                                     glm::mat4 matrix) {
+  if (CurrentShaderProgram != programId)
+    UseProgram(programId);
   int uniformLoc;
   GetContext()->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
   SetMatrixOgl(uniformLoc, matrix);
@@ -161,13 +165,17 @@ void OglCommandBuffer::SetMatrixOgl(const std::string &name, int programId,
 
 void OglCommandBuffer::SetFloatOgl(const std::string &name, int programId,
                                    float value) {
+  if (CurrentShaderProgram != programId)
+    UseProgram(programId);
   int uniformLoc;
   GetContext()->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
   SetFloatOgl(uniformLoc, value);
 }
 
 void OglCommandBuffer::SetVectorOgl(const std::string &name, int programId,
-                                    glm::vec4 &vector) {
+                                    const glm::vec4 &vector) {
+  if (CurrentShaderProgram != programId)
+    UseProgram(programId);
   int uniformLoc;
   GetContext()->GetShaderManager()->GetUniformId(name, programId, uniformLoc);
   SetVectorOgl(uniformLoc, vector);
@@ -200,7 +208,8 @@ void OglCommandBuffer::SetFloatOgl(int uniformLocation, float value) {
   { WRITE_FLOAT(value); }
 }
 
-void OglCommandBuffer::SetVectorOgl(int uniformLocation, glm::vec4 &vector) {
+void OglCommandBuffer::SetVectorOgl(int uniformLocation,
+                                    const glm::vec4 &vector) {
   AddCommand(CB_SET_VECTOR_UNIFORM);
   WRITE_INT(uniformLocation);
   { WRITE_FLOAT(vector.x); }
@@ -302,11 +311,8 @@ void OglCommandBuffer::Execute() {
     } break;
     case CB_DRAW_MESH: {
       unsigned int vaoId, indexCount;
-      int programId;
-      { READ_INT(programId); }
       { READ_UINT(vaoId); }
       { READ_UINT(indexCount); }
-      glUseProgram(programId);
       glBindVertexArray(vaoId);
       glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
       glBindVertexArray(0);

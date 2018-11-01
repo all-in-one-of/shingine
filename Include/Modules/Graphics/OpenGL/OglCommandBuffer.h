@@ -26,7 +26,7 @@ public:
   virtual void SetFloat(const std::string &name, unsigned int shaderId,
                         float value);
   virtual void SetVector(const std::string &name, unsigned int shaderId,
-                         glm::vec4 &vector);
+                         const glm::vec4 &vector);
 
   virtual void SetTexture(const std::string &name, unsigned int shaderId,
                           unsigned int textureId);
@@ -42,15 +42,16 @@ private:
                             glm::mat4 matrix);
   virtual void SetFloatOgl(const std::string &name, int programId, float value);
   virtual void SetVectorOgl(const std::string &name, int programId,
-                            glm::vec4 &vector);
+                            const glm::vec4 &vector);
 
   virtual void SetMatrixOgl(int uniformLocation, glm::mat4 &matrix);
   virtual void SetFloatOgl(int uniformLocation, float value);
-  virtual void SetVectorOgl(int uniformLocation, glm::vec4 &vector);
+  virtual void SetVectorOgl(int uniformLocation, const glm::vec4 &vector);
 
   void UseProgram(int programId);
 
   OpenGLRender *GetContext();
 
   OpenGLRender *CachedRenderContext = nullptr;
+  int CurrentShaderProgram = 0;
 };

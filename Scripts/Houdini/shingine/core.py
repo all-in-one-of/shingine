@@ -36,6 +36,8 @@ FILE
     nodes NODE[node_count]
 }
 '''
+file_name_extension = ".ssd"
+
 DataType_NONE = 0
 DataType_BYTE = 1
 DataType_UINT = 2
@@ -80,6 +82,9 @@ def GetUid():
     uid = NextId
     NextId += 1
     return uid
+
+def get_attribute(node, attribute_name):
+    return next(attr for attr in node.attributes if attr.name == attribute_name)
 
 class Node:
     def __init__(self, name="Node"):

@@ -10,6 +10,12 @@ public:
   static void AddStaticObject(const String &interfaceName,
                               const String &typeName);
 
+  // this is called once a new instance of ISerializedClass is created
+  // which obtained a unique id
+  static void RegisterSerializedObject(ISerializedClass *object);
+  static ISerializedClass *FindSerializedObject(unsigned int objectId);
+
+  // Checks wheter it's a component or not
   static void AddSerializedObject(ISerializedClass *object);
   static void Destroy(ISerializedClass *object);
   static unsigned int GetUniqueId();
@@ -52,6 +58,9 @@ private:
   std::vector<unsigned int> IdPool;
   unsigned int NextId = 1000;
 
+  typedef std::unordered_map<unsigned int, ISerializedClass *>
+      GlobalRegistryMap;
   typedef std::unordered_map<std::string, ISerializedClass *> StaticObjectMap;
   StaticObjectMap StaticObjects;
+  GlobalRegistryMap SerializedObjects;
 };

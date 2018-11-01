@@ -26,6 +26,7 @@ ISerialized *SerializedFactory::CreateInstance(const std::string &s,
   if (setUid) {
     unsigned int uniqueId = Statics::GetUniqueId();
     serializedClass->SetUniqueID(uniqueId);
+    Statics::RegisterSerializedObject(serializedClass);
 
     // initialize classes
     std::vector<ISerialized *> serializedAttributes;

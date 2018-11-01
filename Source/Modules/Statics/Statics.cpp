@@ -27,9 +27,23 @@ void Statics::Destroy(ISerializedClass *object) {
 
 void Statics::AddSerializedObject(ISerializedClass *object) {
   Statics *instance = GetInstance();
+  // add to the global map
   IComponent *component = dynamic_cast<IComponent *>(object);
   if (component)
     instance->Get<IComponentManager>()->AddGenericComponent(component);
   else
     instance->Get<IAssetManager>()->AddInstance(object);
+  RegisterSerializedObject(object);
+}
+
+void Statics::RegisterSerializedObject(ISerializedClass *object) {
+  GetInstance()->SerializedObjects[object->UniqueID()] = object;
+}
+
+ISerializedClass *Statics::FindSerializedObject(unsigned int objectId) {
+  Statics *instance = GetInstance();
+  GlobalRegistryMap::iterator it = instance->SerializedObjects.find(objectId);
+  if (it == instance->SerializedObjects.end())
+    return nullptr;
+  return it->second;
 }

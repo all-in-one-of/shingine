@@ -14,9 +14,8 @@ void ComponentManager::AddGenericComponent(IComponent *component) {
   if (entityId == 0)
     entityId = component->Id();
 
-  std::string typeName = dynamic_cast<ISerializedClass *>(component)
-                             ->SerializedName()
-                             .GetStdString();
+  std::string typeName =
+      dynamic_cast<ISerializedClass *>(component)->SerializedName();
   StringCompMap::iterator stringMapIterator = Components.find(typeName);
   IComponentMap *componentMap = nullptr;
   // first find out if there is  a map for this type
@@ -30,8 +29,7 @@ void ComponentManager::AddGenericComponent(IComponent *component) {
 }
 
 IComponent *ComponentManager::AddComponent(String type, unsigned int entityId) {
-  ISerialized *serializedObject =
-      SerializedFactory::CreateInstance(type.GetStdString());
+  ISerialized *serializedObject = SerializedFactory::CreateInstance(type);
   if (!serializedObject)
     return nullptr;
   IComponent *component = dynamic_cast<IComponent *>(serializedObject);
@@ -43,7 +41,7 @@ IComponent *ComponentManager::AddComponent(String type, unsigned int entityId) {
 }
 
 IComponentMap *ComponentManager::GetComponentMap(const String &typeName) {
-  std::string typeNameStdString = typeName.GetStdString();
+  std::string typeNameStdString = typeName;
   StringCompMap::iterator stringMapIterator =
       Components.find(typeNameStdString);
   if (stringMapIterator == Components.end())
@@ -65,8 +63,7 @@ void ComponentManager::UpdateComponentEntityId(IComponent *component) {
       dynamic_cast<ISerializedClass *>(component);
   unsigned int uniqueId = serializedComponent->UniqueID();
 
-  std::string serializedName =
-      serializedComponent->SerializedName().GetStdString();
+  std::string serializedName = serializedComponent->SerializedName();
 
   IComponentMap *componentMap = Components[serializedName];
   componentMap->Erase(uniqueId);

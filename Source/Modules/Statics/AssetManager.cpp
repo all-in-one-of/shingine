@@ -1,7 +1,7 @@
 #include "Modules/Statics/AssetManager.h"
+#include "Engine/AssetTypes/Asset.h"
 #include "Utility/Data/ISerialized.h"
 #include "Utility/Data/SerializedFactory.h"
-#include "Engine/AssetTypes/Asset.h"
 
 REGISTER_SERIALIZED_CLASS(AssetManager)
 ISerializedClass *AssetManager::GetAssetOfType(const String &typeName,
@@ -26,8 +26,7 @@ ISerializedClass *AssetManager::GetAssetOfType(const String &typeName,
 }
 
 ISerializedClass *AssetManager::GetAssetByFileName(const String &fileName) {
-  ExternalPathMap::iterator it =
-      ExternalPathToAssetId.find(fileName.GetStdString());
+  ExternalPathMap::iterator it = ExternalPathToAssetId.find(fileName);
   if (it == ExternalPathToAssetId.end()) {
     // attempt to load it from file
     Asset *newAsset = nullptr;
@@ -40,14 +39,13 @@ ISerializedClass *AssetManager::GetAssetByFileName(const String &fileName) {
 
 ISerializedClass *AssetManager::AddAssetOfType(const String &typeName) {
   ISerializedClass *newAsset = dynamic_cast<ISerializedClass *>(
-      SerializedFactory::CreateInstance(typeName.GetStdString()));
+      SerializedFactory::CreateInstance(typeName));
   AddInstance(newAsset);
   return newAsset;
 }
 
 void AssetManager::AddInstance(ISerializedClass *newAsset) {
-  Assets[newAsset->SerializedName().GetStdString()][newAsset->UniqueID()] =
-      newAsset;
+  Assets[newAsset->SerializedName()][newAsset->UniqueID()] = newAsset;
 }
 
 void AssetManager::SaveExternalAssetPath(const std::string &path,
@@ -56,12 +54,12 @@ void AssetManager::SaveExternalAssetPath(const std::string &path,
 }
 
 void AssetManager::RemoveAssetType(String assetType) {
-  Assets.erase(assetType.GetStdString());
+  Assets.erase(assetType);
 }
 
 bool AssetManager::GetAssetIteratorOfType(const String &typeName,
                                           StringMap::iterator &iterator) {
-  StringMap::iterator it = Assets.find(typeName.GetStdString());
+  StringMap::iterator it = Assets.find(typeName);
   if (it == Assets.end())
     return false;
   iterator = it;

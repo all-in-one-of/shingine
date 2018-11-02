@@ -86,8 +86,7 @@ int OglShaderManager::CreateVertexFragmentShaderProgram(IShader *shader) {
 
   String errorText;
   if (!DidProgramLink(programId, errorText)) {
-    std::cout << "Program link error: " << errorText.GetStdString()
-              << std::endl;
+    std::cout << "Program link error: " << errorText << std::endl;
     throw 1;
   }
   return programId;
@@ -140,7 +139,7 @@ int OglShaderManager::CompileShaderSource(int shaderType,
   String errorText;
   if (!DidShaderCompile(shaderId, errorText)) {
     std::cout << "Shader compilation error " << shaderTypeName << " : "
-              << errorText.GetStdString() << std::endl;
+              << errorText << std::endl;
     throw 1;
   }
 

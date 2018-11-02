@@ -27,11 +27,28 @@ String::String(const char *sourceString) {
   Data[ArrayLength] = '\0';
 }
 
+String::operator std::string() const {
+  return std::string(Data);
+}
+
 bool String::StartsWith(const String &inputString) {
   return ArrayLength < inputString.Length()
              ? false
              : strncmp(inputString.GetCharArray(), Data,
                        inputString.Length()) == 0;
+}
+
+std::ostream &operator<<(std::ostream &outStream, const String &str) {
+  for (unsigned int x = 0; x < str.Length(); x++)
+    outStream << str[x];
+  return outStream;
+}
+
+std::istream &operator>>(std::istream &inStream, String &str) {
+  char *input = new char[1024];
+  inStream >> input;
+  delete[] input;
+  return inStream;
 }
 
 String::String(std::string sourceStdString) : String(sourceStdString.c_str()){};
@@ -128,10 +145,9 @@ String::~String() { delete[] Data; }
 
 unsigned int String::Length() const { return ArrayLength; }
 const char *String::GetCharArray() const { return Data; }
-std::string String::GetStdString() const { return std::string(Data); }
 
 std::vector<String> String::Split(char delimeter) const {
-  std::stringstream stringStream(GetStdString());
+  std::stringstream stringStream(Data);
   std::vector<String> e;
   std::string part;
   while (std::getline(stringStream, part, delimeter))

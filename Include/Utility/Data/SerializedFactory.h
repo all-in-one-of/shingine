@@ -28,8 +28,7 @@ private:
 template <typename T> class SerializedRegistry : SerializedFactory {
 public:
   SerializedRegistry(const String &typeName, const String &mangledName) {
-    GetMap()->insert(std::make_pair(typeName.GetStdString(), &createT<T>));
-    GetTypeNameMap()->insert(
-        std::make_pair(mangledName.GetStdString(), typeName.GetStdString()));
+    GetMap()->insert(std::make_pair(typeName, &createT<T>));
+    GetTypeNameMap()->insert(std::make_pair(mangledName, typeName));
   }
 };

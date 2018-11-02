@@ -92,8 +92,7 @@ bool ResourceLoader::LoadAsset(const String &fileName, Asset *&loadedAsset,
   // set run time parameters
   loadedAsset->SetOrigin(Asset::OriginType::External);
   loadedAsset->SetFileName(fileName);
-  Statics::Get<IAssetManager>()->SaveExternalAssetPath(fileName.GetStdString(),
-                                                       uniqueId);
+  Statics::Get<IAssetManager>()->SaveExternalAssetPath(fileName, uniqueId);
   // clean up
   delete nodes[0];
   return true;

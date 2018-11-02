@@ -6,7 +6,7 @@
 Solver_Impl::Solver_Impl() {}
 
 void Solver_Impl::AddSystem(const String &systemTypeName) {
-  std::string typeName = systemTypeName.GetStdString();
+  std::string typeName = systemTypeName;
   ISerialized *newSystem = SerializedFactory::CreateInstance(typeName);
   if (!newSystem)
     return;
@@ -14,7 +14,7 @@ void Solver_Impl::AddSystem(const String &systemTypeName) {
 }
 
 void Solver_Impl::SetActive(bool active, const String &systemTypeName) {
-  ISystem *sys = Systems.at(systemTypeName.GetStdString());
+  ISystem *sys = Systems.at(systemTypeName);
   if (!sys)
     return;
   sys->SetActive(active);

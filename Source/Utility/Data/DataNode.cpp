@@ -31,7 +31,7 @@ DataNode::~DataNode() {
 
 ISerialized *DataNode::Deserialize() {
   ISerializedClass *serializedClass = dynamic_cast<ISerializedClass *>(
-      SerializedFactory::CreateInstance(Name().GetStdString(), false));
+      SerializedFactory::CreateInstance(Name(), false));
 
   serializedClass->SetUniqueID(UniqueID);
 

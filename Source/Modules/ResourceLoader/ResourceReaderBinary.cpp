@@ -17,7 +17,7 @@ ResourceReaderBinary::ResourceReaderBinary(const String &fileName) {
 }
 
 bool ResourceReaderBinary::Open() {
-  FileStream.open(FileName.GetStdString(), std::ios::binary | std::ios::in);
+  FileStream.open(FileName, std::ios::binary | std::ios::in);
   bool success = FileStream.is_open();
   if (!success) {
     LastError = "Couldn't open the file " + FileName;

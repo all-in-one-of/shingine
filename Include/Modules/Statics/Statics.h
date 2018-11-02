@@ -23,8 +23,7 @@ public:
   template <typename InterfaceTypeName> static InterfaceTypeName *Get() {
     Statics *instance = GetInstance();
     String typeName = typeid(InterfaceTypeName).name();
-    StaticObjectMap::iterator it =
-        instance->StaticObjects.find(typeName.GetStdString());
+    StaticObjectMap::iterator it = instance->StaticObjects.find(typeName);
 
     if (it == instance->StaticObjects.end()) {
       printf("Couldn't find static object of type : %s",
@@ -42,8 +41,8 @@ public:
     String typeName = typeid(TypeName).name();
     SerializedFactory::GetDemangledName(typeName);
     ISerializedClass *newObject = dynamic_cast<ISerializedClass *>(
-        SerializedFactory::CreateInstance(typeName.GetStdString()));
-    instance->StaticObjects[interfaceName.GetStdString()] = newObject;
+        SerializedFactory::CreateInstance(typeName));
+    instance->StaticObjects[interfaceName] = newObject;
   }
 
 private:

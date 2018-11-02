@@ -70,7 +70,7 @@ void Material::GetFloatUniforms(std::vector<std::string> &names,
                                 std::vector<float> &values) {
   names.clear();
   for (size_t x = 0; x < FloatUniformNames.size(); x++) {
-    names.push_back(FloatUniformNames[x].GetStdString());
+    names.push_back(FloatUniformNames[x]);
     values.push_back(FloatUniformValues[x]);
   }
 }
@@ -79,7 +79,7 @@ void Material::GetVectorUniforms(std::vector<std::string> &names,
                                  std::vector<glm::vec4> &values) {
   names.clear();
   for (size_t x = 0; x < VectorUniformNames.size(); x++) {
-    names.push_back(VectorUniformNames[x].GetStdString());
+    names.push_back(VectorUniformNames[x]);
     size_t y = x * 4; // vec4
     if (y >= VectorUniformValues.size())
       throw 1;
@@ -93,7 +93,7 @@ void Material::GetTextureUniforms(std::vector<std::string> &names,
                                   std::vector<unsigned int> &values) {
   names.clear();
   for (size_t x = 0; x < TextureUniformNames.size(); x++) {
-    names.push_back(TextureUniformNames[x].GetStdString());
+    names.push_back(TextureUniformNames[x]);
     values.push_back(TextureUniformValues[x]);
   }
 }

@@ -31,15 +31,14 @@ class ISerialized;
   };                                                                           \
   virtual void SetAttribute(const String &serializedName,                      \
                             ISerialized *&attr) {                              \
-    std::string mapName = std::string("Set_") + serializedName.GetStdString(); \
+    std::string mapName = std::string("Set_") + serializedName;                \
     if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end())      \
       return;                                                                  \
     MFP fp = AttributeFunctionMap[mapName];                                    \
     (this->*fp)(attr);                                                         \
   };                                                                           \
   virtual void GetAttribute(ISerialized *&attr) {                              \
-    std::string mapName =                                                      \
-        std::string("Get_") + attr->SerializedName().GetStdString();           \
+    std::string mapName = std::string("Get_") + attr->SerializedName();        \
     if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end())      \
       return;                                                                  \
     MFP fp = AttributeFunctionMap[mapName];                                    \

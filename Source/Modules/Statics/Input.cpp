@@ -60,8 +60,8 @@ void Input::Update() {}
 void Input::SetKeyEvent(int key, int scanCode, int action, int mods) {
   int keyAction = Keys[key];
   // track the key up event here
-  if ((keyAction ==
-          S_INPUT_ACTION_PRESSED || keyAction == S_INPUT_ACTION_REPEAT) &&
+  if ((keyAction == S_INPUT_ACTION_PRESSED ||
+       keyAction == S_INPUT_ACTION_REPEAT) &&
       action == S_INPUT_ACTION_RELEASE)
     Keys[key] = S_INPUT_ACTION_KEY_UP;
   else

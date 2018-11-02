@@ -7,4 +7,5 @@ public:
 
   virtual void SetActive(bool active) = 0;
   virtual bool IsActive() = 0;
+  
 };

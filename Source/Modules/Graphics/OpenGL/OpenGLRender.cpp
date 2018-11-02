@@ -27,7 +27,6 @@ void KeyCallback(GLFWwindow *window, int key, int scanCode, int action,
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
   }
-
   Statics::Get<IInput>()->SetKeyEvent(key, scanCode, action, mods);
 }
 

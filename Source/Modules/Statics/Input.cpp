@@ -27,28 +27,45 @@ bool Input::GetMousePressed(int keyCode) {
     return false;
   int action = it->second;
 
-  if (action == S_INPUT_ACTION_PRESSED)
-    return true;
+  return action == S_INPUT_ACTION_PRESSED;
+}
 
-  return false;
+int Input::GetKeyAction(int keyCode) {
+  KeyMap::iterator it = Keys.find(keyCode);
+  if (it == Keys.end())
+    return -1;
+  int action = it->second;
+  if (action == S_INPUT_ACTION_KEY_UP)
+    Keys[keyCode] = S_INPUT_ACTION_RELEASE;
+  return action;
 }
 
 bool Input::GetKeyPressed(int keyCode) {
-  KeyMap::iterator it = Keys.find(keyCode);
-  if (it == Keys.end())
+  int action = GetKeyAction(keyCode);
+  if (action == -1)
     return false;
-  int action = it->second;
 
-  if (action == S_INPUT_ACTION_PRESSED || action == S_INPUT_ACTION_REPEAT)
-    return true;
+  return action == S_INPUT_ACTION_PRESSED || action == S_INPUT_ACTION_REPEAT;
+}
 
-  return false;
+bool Input::GetKeyUp(int keyCode) {
+  int action = GetKeyAction(keyCode);
+  if (action == -1)
+    return false;
+  return action == S_INPUT_ACTION_KEY_UP;
 }
 
 void Input::Update() {}
 
 void Input::SetKeyEvent(int key, int scanCode, int action, int mods) {
-  Keys[key] = action;
+  int keyAction = Keys[key];
+  // track the key up event here
+  if ((keyAction ==
+          S_INPUT_ACTION_PRESSED || keyAction == S_INPUT_ACTION_REPEAT) &&
+      action == S_INPUT_ACTION_RELEASE)
+    Keys[key] = S_INPUT_ACTION_KEY_UP;
+  else
+    Keys[key] = action;
 }
 
 float Input::GetAxis(AxisType axis) {

@@ -15,11 +15,13 @@ public:
   virtual float GetAxis(AxisType axis);
 
   virtual bool GetKeyPressed(int keyCode);
+  virtual bool GetKeyUp(int keyCode);
   virtual bool GetMousePressed(int keyCode);
 
   virtual void SetScreenReferenceSize(unsigned int width, unsigned int height);
 
 private:
+  int GetKeyAction(int keyCode);
   typedef std::unordered_map<int, int> KeyMap;
 
   KeyMap Keys;

@@ -6,7 +6,7 @@
 #include "Utility/Data/SerializedFactory.h"
 
 namespace BitmapReader {
-bool ReadBitmapToTexture(const char *fileName, ISerializedClass *texture) {
+bool ReadBitmapToTexture(const char *fileName, IObject *texture) {
   unsigned char headerInfo[54] = {0};
   unsigned int width = 0;
   unsigned int height = 0;

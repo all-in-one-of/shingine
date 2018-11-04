@@ -2,7 +2,7 @@
 #include "Asset.h"
 #include "Utility/Data/Serialization.h"
 
-class ExternalAsset : public ISerializedClass {
+class ExternalAsset : public IObject {
 public:
   SERIALIZE_CLASS(ExternalAsset);
   ExternalAsset() {

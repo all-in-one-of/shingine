@@ -1,7 +1,7 @@
 #pragma once
 #include "Utility/Data/Serialization.h"
 
-class RenderSettings : public ISerializedClass {
+class RenderSettings : public IObject {
 public:
   SERIALIZE_CLASS(RenderSettings)
   RenderSettings() {

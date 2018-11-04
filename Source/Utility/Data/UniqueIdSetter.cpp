@@ -4,8 +4,52 @@
 #include "Utility/Data/TypedAttribute.h"
 
 void UniqueIdSetter::SetIds(const std::vector<IDataNode *> &newNodes) {
-  UniqueIdSetter a = UniqueIdSetter(newNodes);
+  (void)UniqueIdSetter(newNodes);
 }
+
+void ReplaceUid(IDataNode *node, unsigned int oldId, unsigned int newId) {
+  if (node->GetUniqueID() == oldId)
+    node->SetUniqueID(newId);
+  std::vector<IDataNode *> nodes = node->GetNodes();
+  for (unsigned int x = 0; x < nodes.size(); x++)
+    ReplaceUid(nodes[x], oldId, newId);
+
+  std::vector<ISerialized *> attributes = node->GetAttributes();
+  for (unsigned int x = 0; x < attributes.size(); x++) {
+    if ((attributes[x]->TypeName() == "uid") == false)
+      continue;
+    TypedAttributeValue<unsigned int> *uniqueIdAttribute =
+        dynamic_cast<TypedAttributeValue<unsigned int> *>(attributes[x]);
+    TypedAttribute<unsigned int> *uniqueIdAttributeVector =
+        dynamic_cast<TypedAttribute<unsigned int> *>(attributes[x]);
+    if (uniqueIdAttribute) {
+      if (uniqueIdAttribute->Get() == oldId)
+        uniqueIdAttribute->Set(newId);
+    } else if (uniqueIdAttributeVector) {
+      std::vector<unsigned int> ids = uniqueIdAttributeVector->Get();
+      for (unsigned int y = 0; y < ids.size(); y++) {
+        if (ids[y] == oldId)
+          ids[y] = newId;
+      }
+      uniqueIdAttributeVector->Set(ids);
+    }
+  }
+}
+
+void UniqueIdSetter::ReplaceIds(
+    std::vector<IDataNode *> &nodes,
+    std::unordered_map<unsigned int, unsigned int> &oldToNewIdPairs) {
+  std::unordered_map<unsigned int, unsigned int>::iterator pairIterator;
+  for (pairIterator = oldToNewIdPairs.begin();
+       pairIterator != oldToNewIdPairs.end(); pairIterator++) {
+    unsigned int oldId = pairIterator->first;
+    unsigned int newId = pairIterator->second;
+    for (unsigned int x = 0; x < nodes.size(); x++) {
+      ReplaceUid(nodes[x], oldId, newId);
+    }
+  }
+}
+
 UniqueIdSetter::UniqueIdSetter(const std::vector<IDataNode *> &newNodes) {
   Nodes = newNodes;
   // update ids for nodes first, then for attributes

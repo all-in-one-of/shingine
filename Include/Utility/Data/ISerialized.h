@@ -9,9 +9,9 @@ public:
   virtual String TypeName() = 0;
 };
 
-class ISerializedClass : public ISerialized {
+class IObject : public ISerialized {
 public:
-  virtual ~ISerializedClass(){};
+  virtual ~IObject(){};
   virtual unsigned int UniqueID() = 0;
   virtual void SetUniqueID(unsigned int newId) = 0;
   virtual String TypeName() { return "SerializedClass"; };

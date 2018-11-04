@@ -10,6 +10,7 @@ class Solver_Impl {
 public:
   typedef std::unordered_map<std::string, ISystem *> SystemsMap;
   Solver_Impl();
+  ~Solver_Impl();
   void AddSystem(const String &systemTypeName);
   void SetActive(bool active, const String &systemTypeName);
   void InitializeSystems();

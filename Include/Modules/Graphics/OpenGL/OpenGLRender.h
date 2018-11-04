@@ -6,7 +6,7 @@
 class VaoMeshManager;
 class OglShaderManager;
 class OglTextureManager;
-class ISerializedClass;
+class IObject;
 
 class OpenGLRender : public IRenderContext {
 public:
@@ -21,6 +21,7 @@ public:
   virtual void SetFramebufferSize(int &width, int &height);
   virtual bool IsWindowCreated();
   virtual void Update();
+  virtual void Cleanup();
 
   VaoMeshManager *GetMeshManager();
   OglShaderManager *GetShaderManager();
@@ -36,4 +37,5 @@ private:
   VaoMeshManager *MeshManager = nullptr;
   OglShaderManager *ShaderManager = nullptr;
   OglTextureManager *TextureManager = nullptr;
+
 };

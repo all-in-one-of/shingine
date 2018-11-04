@@ -18,8 +18,8 @@ ISerialized *SerializedFactory::CreateInstance(const std::string &s,
     return nullptr;
 
   ISerialized *createdInstance = it->second();
-  ISerializedClass *serializedClass =
-      dynamic_cast<ISerializedClass *>(createdInstance);
+  IObject *serializedClass =
+      dynamic_cast<IObject *>(createdInstance);
   if (!serializedClass)
     return createdInstance;
   // set unique id

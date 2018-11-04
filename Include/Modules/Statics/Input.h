@@ -2,7 +2,7 @@
 #include "IInput.h"
 #include "Utility/Data/Serialization.h"
 
-class Input : public IInput, public ISerializedClass {
+class Input : public IInput, public IObject {
 public:
   SERIALIZE_CLASS(Input);
   Input();

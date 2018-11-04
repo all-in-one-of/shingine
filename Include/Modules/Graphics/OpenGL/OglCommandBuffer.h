@@ -52,6 +52,10 @@ private:
 
   OpenGLRender *GetContext();
 
+  class CameraComponent *ActiveCamera;
+  class TransformComponent *ActiveCameraTransform;
+  void UpdateCamera();
+
   OpenGLRender *CachedRenderContext = nullptr;
   int CurrentShaderProgram = 0;
 };

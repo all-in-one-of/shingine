@@ -13,6 +13,10 @@ public:
   ComponentMap() {}
   virtual ~ComponentMap() {}
   virtual unsigned int Count() { return Items.size(); }
+  virtual IComponent *IComponentAt(unsigned int entityId) {
+    T *component = At(entityId);
+    return dynamic_cast<IComponent *>(component);
+  }
 
   void Set(unsigned int entityId, IComponent *component) {
     T *newComponent = dynamic_cast<T *>(component);
@@ -27,7 +31,7 @@ public:
       return;
     int indexInVector = -1;
     for (int x = 0; x < Items.size(); x++) {
-      if (Items[x]->EntityId() == entityId)
+      if (Items[x] == component)
         indexInVector = x;
     }
     if (indexInVector != -1)

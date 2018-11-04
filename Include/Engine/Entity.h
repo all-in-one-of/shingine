@@ -2,14 +2,14 @@
 #include "Utility/Data/Serialization.h"
 #include <unordered_map>
 
-class Entity : public ISerializedClass {
+class Entity : public IObject {
 public:
   SERIALIZE_CLASS(Entity);
   Entity(){};
   virtual ~Entity(){};
 };
 
-class ComponentIdCollection : public ISerializedClass {
+class ComponentIdCollection : public IObject {
 public:
   SERIALIZE_CLASS(ComponentIdCollection);
   ComponentIdCollection() { ATTRIBUTE_REGISTER(ComponentIdCollection, Ids); };
@@ -17,7 +17,7 @@ public:
   ATTRIBUTE_ID_VECTOR(Ids);
 };
 
-class EntityIdCollection : public ISerializedClass {
+class EntityIdCollection : public IObject {
 public:
   SERIALIZE_CLASS(EntityIdCollection);
   EntityIdCollection() {

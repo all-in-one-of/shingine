@@ -9,6 +9,7 @@ public:
   void GetTextureSlotForShaderProgramByName(const std::string &name,
                                             int programId, int &textureSlot,
                                             bool &isNew);
+  void DeleteUnusedResources();                                          
 
 private:
   typedef std::unordered_map<unsigned int, unsigned int> AssetTextureMapType;

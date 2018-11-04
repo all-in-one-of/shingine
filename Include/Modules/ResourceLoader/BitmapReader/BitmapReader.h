@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-class ISerializedClass;
+class IObject;
 namespace BitmapReader {
-bool ReadBitmapToTexture(const char *fileName, ISerializedClass *texture);
+bool ReadBitmapToTexture(const char *fileName, IObject *texture);
 };

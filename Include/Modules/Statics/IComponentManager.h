@@ -11,10 +11,13 @@ public:
 
   virtual void AddGenericComponent(IComponent *component) = 0;
   virtual IComponent *AddComponent(String type, unsigned int entityId = 0) = 0;
-
   virtual void UpdateComponentEntityId(IComponent *component) = 0;
   virtual void GetAllComponents(std::vector<IComponent *> &components) = 0;
   virtual IComponentMap *GetComponentMap(const String &typeName) = 0;
+  virtual void DestroyComponent(IComponent *component) = 0;
+  virtual void
+  GetComponentsForEntity(unsigned int entityId,
+                         std::vector<IComponent *> &components) = 0;
 
   template <class T> ComponentMap<T> *GetComponentMap() {
     String typeName = typeid(T).name();

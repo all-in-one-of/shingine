@@ -7,7 +7,6 @@
 
 #include "Engine/AssetTypes/Material.h"
 #include "Modules/Statics/AssetManager.h"
-#include "Modules/Statics/IActiveCamera.h"
 #include "Modules/Statics/IGraphics.h"
 
 #include "Modules/Statics/IInput.h"
@@ -132,4 +131,9 @@ void OpenGLRender::Update() {
   double x, y;
   glfwGetCursorPos(Window, &x, &y);
   Statics::Get<IInput>()->SetMousePosition(x, y);
+}
+
+void OpenGLRender::Cleanup() {
+  MeshManager->DeleteUnusedResources();
+  TextureManager->DeleteUnusedResources();
 }

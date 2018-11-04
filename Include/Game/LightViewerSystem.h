@@ -6,7 +6,7 @@
 class LightComponent;
 template <class T> class ComponentMap;
 
-class LightViewerSystem : public System, public ISerializedClass {
+class LightViewerSystem : public System, public IObject {
 public:
   SERIALIZE_CLASS(LightViewerSystem);
   ~LightViewerSystem(){};

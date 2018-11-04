@@ -21,7 +21,6 @@ public:
   void SetPosition(glm::vec3 &val);
   void SetRotation(glm::quat &val);
   void SetScale(glm::vec3 &val);
-
   // cached values
   glm::mat4 LocalTransform;
   glm::mat4 LocalTransformUniformScale;
@@ -33,7 +32,6 @@ public:
   glm::vec3 WorldPosition;
   glm::quat WorldRotation;
   glm::vec3 WorldScale;
-
 private:
   ATTRIBUTE_VECTOR(float, LocalPosition)
   ATTRIBUTE_VECTOR(float, LocalScale)

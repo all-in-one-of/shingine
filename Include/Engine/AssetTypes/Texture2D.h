@@ -6,7 +6,7 @@ struct Pixel32 {
   float r, g, b, a;
 };
 
-class Texture2D : public Asset, public ISerializedClass {
+class Texture2D : public Asset, public IObject {
 public:
   SERIALIZE_CLASS(Texture2D);
   Texture2D() {

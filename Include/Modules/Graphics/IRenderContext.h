@@ -14,4 +14,5 @@ public:
   virtual bool IsWindowCreated() = 0;
 
   virtual void Update() = 0;
+  virtual void Cleanup() = 0;
 };

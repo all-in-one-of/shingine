@@ -6,9 +6,10 @@
 #include "Modules/Graphics/OpenGL/OpenGLRender.h"
 #include "Modules/Graphics/OpenGL/VaoMeshManager.h"
 
-#include "Modules/Statics/IActiveCamera.h"
 #include "Modules/Statics/IGraphics.h"
+#include "Modules/Utility/SceneUtils.h"
 
+#include "Engine/Components/CameraComponent.h"
 #include "Engine/Components/TransformComponent.h"
 
 #include "Utility/Graphics.h"
@@ -30,9 +31,7 @@ void OglCommandBuffer::AddCommand(const unsigned char &cmd) {
 }
 
 void OglCommandBuffer::EnableDepth() { AddCommand(CB_ENABLE_DEPTH); }
-
 void OglCommandBuffer::EnableCullFace() { AddCommand(CB_ENABLE_CULL_FACE); }
-
 void OglCommandBuffer::Clear() { AddCommand(CB_CLEAR); }
 
 void OglCommandBuffer::UseProgram(int programId) {
@@ -63,9 +62,15 @@ void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, unsigned int &meshAssetId,
   DrawMesh(matrix, matrixInv, meshAssetId, shaderId);
 }
 
+void OglCommandBuffer::UpdateCamera() {
+  if (ActiveCamera == nullptr || ActiveCameraTransform == nullptr)
+    SceneUtils::GetActiveCamera(ActiveCamera, ActiveCameraTransform);
+}
+
 void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv,
                                 unsigned int &meshAssetId,
                                 unsigned int &shaderId) {
+  UpdateCamera();
   OpenGLRender *oglRender = GetContext();
 
   // set material uniforms
@@ -74,12 +79,11 @@ void OglCommandBuffer::DrawMesh(glm::mat4 &matrix, glm::mat4 &matrixInv,
   SetMatrixOgl(ModelMatrixName, programId, matrix);
   SetMatrixOgl(ModelMatrixInverseName, programId, matrixInv);
   SetMatrixOgl(ProjectionMatrixName, programId,
-               Statics::Get<IActiveCamera>()->ProjectionMatrix());
-  SetMatrixOgl(ViewMatrixName, programId,
-               Statics::Get<IActiveCamera>()->ViewMatrix());
+               ActiveCamera->GetProjectionMatrix());
+  SetMatrixOgl(ViewMatrixName, programId, ActiveCamera->GetViewMatrix());
 
   glm::vec4 pos;
-  Statics::Get<IActiveCamera>()->GetTransformComponent()->GetPosition(pos);
+  ActiveCameraTransform->GetPosition(pos);
   SetVectorOgl(CameraWorldPositionName, programId, pos);
 
   unsigned int vaoId, indexCount;

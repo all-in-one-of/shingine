@@ -8,7 +8,7 @@
 class IComponent;
 class TransformComponent;
 template <class T> class ComponentMap;
-class TransformSystem : public System, public ISerializedClass {
+class TransformSystem : public System, public IObject {
 public:
   SERIALIZE_CLASS(TransformSystem);
   TransformSystem(){};
@@ -17,6 +17,7 @@ public:
   virtual bool Update();
 
 private:
+  void OnSceneReload();
   void CalculateLocalTransforms(bool ignoreStatic = true);
   void CalculateTransforms(bool ignoreStatic = true);
   typedef std::unordered_map<std::string,

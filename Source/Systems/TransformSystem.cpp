@@ -1,6 +1,7 @@
 #include "Systems/TransformSystem.h"
 #include "Engine/Components/TransformComponent.h"
 #include "Modules/Statics/IComponentManager.h"
+#include "Modules/Statics/IEventSystem.h"
 
 #include <algorithm>
 #include <glm/gtx/matrix_decompose.hpp>
@@ -12,10 +13,17 @@ bool TransformSystem::Initialize() {
   TransformComponentMap =
       Statics::Get<IComponentManager>()->GetComponentMap<TransformComponent>();
   // calculate transform component for dynamic and static objects
+
+  Delegate delegate;
+  delegate.SetFunction<TransformSystem, &TransformSystem::OnSceneReload>(this);
+  Statics::Get<IEventSystem>()->AddDelegate(EventType::OnSceneLoad, delegate);
+
   CalculateTransforms(false);
   Active = true;
   return Active;
 }
+
+void TransformSystem::OnSceneReload() { CalculateTransforms(false); }
 
 void TransformSystem::CalculateTransforms(bool ignoreStatic) {
   // recalculate matrices based on local PSR values

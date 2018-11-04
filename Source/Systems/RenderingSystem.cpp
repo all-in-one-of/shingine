@@ -8,9 +8,9 @@
 
 #include "Engine/AssetTypes/Settings/RenderSettings.h"
 
-#include "Modules/Graphics/GraphicsUtils.h"
 #include "Modules/Graphics/ICommandBuffer.h"
-#include "Modules/Statics/IActiveCamera.h"
+#include "Modules/Utility/SceneUtils.h"
+#include "Modules/Utility/GraphicsUtils.h"
 
 #include "Engine/Components/CameraComponent.h"
 #include "Engine/Components/LightComponent.h"
@@ -39,12 +39,13 @@ bool RenderingSystem::Update() {
   initBuffer->EnableCullFace();
   initBuffer->Clear();
 
+
   // Update projection matrix, then draw meshes
-  CameraComponent *camera = Statics::Get<IActiveCamera>()->GetCameraComponent();
-  camera->ProjectionMatrix = glm::perspective(
-      camera->FOV,
+  CameraComponent *camera = SceneUtils::GetActiveCamera();
+  camera->SetProjectionMatrix(glm::perspective(
+      camera->GetFOV(),
       Statics::Get<IGraphics>()->GetContext()->GetFrameAspectRatio(),
-      camera->NearPlane, camera->FarPlane);
+      camera->GetNearPlane(), camera->GetFarPlane()));
 
   // TODO Draw Skybox
   FindLights();

@@ -6,16 +6,12 @@
 #include "Modules/ResourceLoader/ResourceLoader.h"
 
 #include "Modules/Scene/SceneMaker.h"
-#include "Utility/Data/EntityComponentIdSetter.h"
-#include "Utility/Data/IDataNode.h"
 #include "Utility/Data/ISerialized.h"
 #include "Utility/Data/UniqueIdSetter.h"
 
 #include "Modules/Statics/IAssetManager.h"
-#include "Modules/Statics/ISceneManager.h"
 
 #include "Engine/AssetTypes/Asset.h"
-#include "Engine/AssetTypes/ExternalAsset.h"
 #include "Modules/ResourceLoader/BitmapReader/BitmapReader.h"
 
 String ResourceLoader::LastError = "";
@@ -27,7 +23,7 @@ void ResourceLoader::SetupPath(const String &localPath, String &outPath) {
 }
 
 bool ResourceLoader::LoadBitmap(const String &fileName,
-                                ISerializedClass *&textureAsset) {
+                                IObject *&textureAsset) {
   String updatedFileName;
   SetupPath(fileName, updatedFileName);
   textureAsset = Statics::Get<IAssetManager>()->AddAssetOfType("Texture2D");
@@ -78,8 +74,8 @@ bool ResourceLoader::LoadAsset(const String &fileName, Asset *&loadedAsset,
     UniqueIdSetter::SetIds(nodes);
 
   ISerialized *deserializedObj = nodes[0]->Deserialize();
-  ISerializedClass *serializedClass =
-      dynamic_cast<ISerializedClass *>(deserializedObj);
+  IObject *serializedClass =
+      dynamic_cast<IObject *>(deserializedObj);
   // TODO fix
   // if it's a complex asset which contains serialized objects inside,
   // those won't get a global unique id.
@@ -92,29 +88,10 @@ bool ResourceLoader::LoadAsset(const String &fileName, Asset *&loadedAsset,
   // set run time parameters
   loadedAsset->SetOrigin(Asset::OriginType::External);
   loadedAsset->SetFileName(fileName);
-  Statics::Get<IAssetManager>()->SaveExternalAssetPath(fileName, uniqueId);
+  Statics::Get<IAssetManager>()->SaveExternalAssetPath(fileName, serializedClass->UniqueID());
   // clean up
   delete nodes[0];
   return true;
-}
-
-void ResourceLoader::LoadExternalAssetFromScene(ISerialized *obj,
-                                                const String &sceneFileName) {
-  ExternalAsset *externalAsset = dynamic_cast<ExternalAsset *>(obj);
-
-  String sceneRootDir;
-  // Get directory of the scene file
-  std::vector<String> fileSegments = sceneFileName.Split('/');
-  for (unsigned int x = 0; x < fileSegments.size() - 1; x++)
-    sceneRootDir += fileSegments[x] + "/";
-
-  const String fileNameRel = externalAsset->FileName;
-  const String fileName = sceneRootDir + fileNameRel;
-
-  unsigned int uniqueId = externalAsset->UniqueID();
-  delete externalAsset;
-  Asset *loadedAsset;
-  assert(LoadAsset(fileName, loadedAsset, uniqueId));
 }
 
 bool ResourceLoader::LoadSsd(const String &fileName,
@@ -140,65 +117,5 @@ bool ResourceLoader::LoadSsd(const String &fileName,
   reader->Close();
 
   delete reader;
-  return true;
-}
-
-bool ResourceLoader::LoadScene(const String &fileName) {
-  std::vector<IDataNode *> nodes;
-  if (!LoadSsd(fileName, nodes))
-    return false;
-  // traverse through each node, create unique ids
-  UniqueIdSetter::SetIds(nodes);
-
-  std::vector<ISerialized *> deserializedNodes;
-  for (size_t x = 0; x < nodes.size(); x++) {
-    ISerialized *deserializedDataNode = nodes[x]->Deserialize();
-    if (deserializedDataNode)
-      deserializedNodes.push_back(deserializedDataNode);
-
-    // add instance
-    ISerializedClass *serializedObject =
-        dynamic_cast<ISerializedClass *>(deserializedDataNode);
-
-    Statics::AddSerializedObject(serializedObject);
-  }
-
-  std::vector<ISerialized *> entities;
-
-  for (unsigned int x = 0; x < deserializedNodes.size(); x++) {
-    Asset *asset = dynamic_cast<Asset *>(deserializedNodes[x]);
-    if (asset) {
-      asset->SetOrigin(Asset::OriginType::Scene);
-      asset->SetFileName(fileName);
-    }
-
-    if (deserializedNodes[x]->SerializedName() == "Entity") {
-      entities.push_back(deserializedNodes[x]);
-      // won't return the unique id
-      delete deserializedNodes[x];
-    }
-
-    else if (deserializedNodes[x]->SerializedName() == "EntityIdCollection") {
-      EntityComponentIdSetter::UpdateIds(deserializedNodes[x]);
-      // will return the unique id
-      Statics::Destroy(dynamic_cast<ISerializedClass *>(deserializedNodes[x]));
-    }
-
-    // handle external node
-    else if (deserializedNodes[x]->SerializedName() == "ExternalAsset") {
-      LoadExternalAssetFromScene(deserializedNodes[x], fileName);
-    }
-  }
-
-  IAssetManager *assetManager = Statics::Get<IAssetManager>();
-  // helper types which are supposed to be deleted once the scene is loaded
-  assetManager->RemoveAssetType("Entity");
-  assetManager->RemoveAssetType("EntityIdCollection");
-  assetManager->RemoveAssetType("ExternalAsset");
-
-  // check if the ssd file contains entities
-  Statics::Get<ISceneManager>()->SetCurrentScene(fileName);
-  for (size_t x = 0; x < nodes.size(); x++)
-    delete nodes[x];
   return true;
 }

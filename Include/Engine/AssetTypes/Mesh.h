@@ -2,7 +2,7 @@
 #include "Asset.h"
 #include "Utility/Data/Serialization.h"
 
-class Mesh : public Asset, public ISerializedClass {
+class Mesh : public Asset, public IObject {
 public:
   SERIALIZE_CLASS(Mesh);
   Mesh() {

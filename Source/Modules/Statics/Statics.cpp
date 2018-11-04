@@ -19,13 +19,17 @@ unsigned int Statics::GetUniqueId() {
   return id;
 }
 
-void Statics::Destroy(ISerializedClass *object) {
+void Statics::ReturnUniqueId(unsigned int uid) {
+  GetInstance()->IdPool.push_back(uid);
+}
+
+void Statics::Destroy(IObject *object) {
   Statics *instance = GetInstance();
   (instance->IdPool).push_back(object->UniqueID());
   delete object;
 }
 
-void Statics::AddSerializedObject(ISerializedClass *object) {
+void Statics::AddSerializedObject(IObject *object) {
   Statics *instance = GetInstance();
   // add to the global map
   IComponent *component = dynamic_cast<IComponent *>(object);
@@ -36,11 +40,11 @@ void Statics::AddSerializedObject(ISerializedClass *object) {
   RegisterSerializedObject(object);
 }
 
-void Statics::RegisterSerializedObject(ISerializedClass *object) {
+void Statics::RegisterSerializedObject(IObject *object) {
   GetInstance()->SerializedObjects[object->UniqueID()] = object;
 }
 
-ISerializedClass *Statics::FindSerializedObject(unsigned int objectId) {
+IObject *Statics::FindSerializedObject(unsigned int objectId) {
   Statics *instance = GetInstance();
   GlobalRegistryMap::iterator it = instance->SerializedObjects.find(objectId);
   if (it == instance->SerializedObjects.end())

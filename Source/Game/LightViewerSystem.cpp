@@ -5,7 +5,7 @@
 
 #include "Engine/Components/LightComponent.h"
 #include "Engine/Components/TransformComponent.h"
-#include "Modules/Graphics/GraphicsUtils.h"
+#include "Modules/Utility/GraphicsUtils.h"
 #include "Modules/Graphics/ICommandBuffer.h"
 #include "Modules/Graphics/IShader.h"
 #include "Utility/Typedefs.h"
@@ -21,7 +21,7 @@ bool LightViewerSystem::Initialize() {
   LightComponentMap =
       Statics::Get<IComponentManager>()->GetComponentMap<LightComponent>();
   // load cube mesh
-  ISerializedClass *cube =
+  IObject *cube =
       Statics::Get<IAssetManager>()->GetAssetByFileName(cubeObjectPath);
   CubeMeshAssetId = cube->UniqueID();
   // add shader

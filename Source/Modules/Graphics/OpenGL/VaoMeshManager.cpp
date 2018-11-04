@@ -9,6 +9,68 @@
 
 VaoMeshManager::VaoMeshManager() {}
 
+void VaoMeshManager::DeleteUnusedResources() {
+  typedef std::unordered_map<unsigned int, unsigned int> IntMapType;
+  typedef std::unordered_map<int, IntMapType> VaoMapType;
+
+  VaoMapType::iterator programIdIterator;
+  IntMapType::iterator uintMapIterator;
+
+  IntMapType VaoIdToMeshId;
+  for (programIdIterator = VaoMap.begin(); programIdIterator != VaoMap.end();
+       programIdIterator++) {
+    IntMapType &map = programIdIterator->second;
+    for (uintMapIterator = map.begin(); uintMapIterator != map.end();
+         uintMapIterator++)
+      VaoIdToMeshId[uintMapIterator->second] = uintMapIterator->first;
+  }
+
+  std::vector<unsigned int> meshesToRemove;
+  IAssetManager *assetManager = Statics::Get<IAssetManager>();
+  for (uintMapIterator = VaoIdToMeshId.begin();
+       uintMapIterator != VaoIdToMeshId.end(); uintMapIterator++) {
+    unsigned int meshId = uintMapIterator->second;
+    Mesh *mesh = assetManager->GetAssetOfType<Mesh>(meshId);
+    if (mesh)
+      continue;
+    // mesh was deleted
+    meshesToRemove.push_back(uintMapIterator->second);
+    std::vector<int> vboToDelete;
+    unsigned vaoId = uintMapIterator->first;
+    int attribCount = 0;
+    
+    std::unordered_map<unsigned int, unsigned int>::iterator
+        indexCountIterator = IndexCountMap.find(vaoId);
+    if (indexCountIterator != IndexCountMap.end())
+      IndexCountMap.erase(indexCountIterator);
+      
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &attribCount);
+    glBindVertexArray(vaoId);
+    for (int currentAttrib = 0; currentAttrib < attribCount; currentAttrib++) {
+      int vboId = 0;
+      glGetVertexAttribiv(currentAttrib, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+                          &vboId);
+      if (vboId > 0)
+        vboToDelete.push_back(vboId);
+    }
+    glDeleteVertexArrays(1, &vaoId);
+    for (unsigned int x = 0; x < vboToDelete.size(); x++) {
+      unsigned int vboId = vboToDelete[x];
+      glDeleteBuffers(1, &vboId);
+    }
+  }
+  // delete records of the mesh asset
+  for (programIdIterator = VaoMap.begin(); programIdIterator != VaoMap.end();
+       programIdIterator++) {
+    IntMapType &map = programIdIterator->second;
+    for (unsigned int x = 0; x < meshesToRemove.size(); x++) {
+      uintMapIterator = map.find(meshesToRemove[x]);
+      if (uintMapIterator != map.end())
+        map.erase(uintMapIterator);
+    }
+  }
+}
+
 struct Vertex_xyz_nxnynz_txtytz {
   float x, y, z, nx, ny, nz, tx, ty, tz;
 };
@@ -26,8 +88,6 @@ void VaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId,
         Statics::Get<IAssetManager>()->GetAssetOfType<Mesh>(meshAssetId);
     if (!mesh)
       throw 1;
-
-    std::cout << "Loading Mesh : " << meshAssetId << std::endl;
 
     // load mesh data to gpu
     glGenVertexArrays(1, &(vaoId));

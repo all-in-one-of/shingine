@@ -30,7 +30,7 @@ DataNode::~DataNode() {
 }
 
 ISerialized *DataNode::Deserialize() {
-  ISerializedClass *serializedClass = dynamic_cast<ISerializedClass *>(
+  IObject *serializedClass = dynamic_cast<IObject *>(
       SerializedFactory::CreateInstance(Name(), false));
 
   serializedClass->SetUniqueID(UniqueID);

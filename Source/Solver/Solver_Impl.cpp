@@ -1,9 +1,11 @@
 #include "Solver/Solver_Impl.h"
+#include "Modules/Statics/IEventSystem.h"
 #include "Systems/ISystem.h"
 #include "Utility/Data/SerializedFactory.h"
 #include <string>
 
 Solver_Impl::Solver_Impl() {}
+Solver_Impl::~Solver_Impl() {}
 
 void Solver_Impl::AddSystem(const String &systemTypeName) {
   std::string typeName = systemTypeName;

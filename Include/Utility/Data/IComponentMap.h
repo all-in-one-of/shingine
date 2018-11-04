@@ -8,4 +8,5 @@ public:
   virtual void Erase(unsigned int entityId) = 0;
   virtual void GetAllComponents(std::vector<IComponent *> &componentVector) = 0;
   virtual unsigned int Count() = 0;
+  virtual IComponent *IComponentAt(unsigned int entityId = 0) = 0;
 };

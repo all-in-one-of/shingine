@@ -4,6 +4,28 @@
 
 #include "Utility/Graphics.h"
 
+void OglTextureManager::DeleteUnusedResources() {
+  IAssetManager *assetManager = Statics::Get<IAssetManager>();
+  AssetTextureMapType::iterator textureMapIterator;
+  std::vector<unsigned int> texturesToDelete;
+  for (textureMapIterator = AssetIdToTextureId.begin();
+       textureMapIterator != AssetIdToTextureId.end(); textureMapIterator++) {
+    unsigned int assetId = textureMapIterator->first;
+    Texture2D *tex = assetManager->GetAssetOfType<Texture2D>(assetId);
+    if (tex)
+      continue;
+    GLuint textureToDelete = textureMapIterator->second;
+    glDeleteTextures(1, &textureToDelete); // & means 'pointer to'
+    texturesToDelete.push_back(assetId);
+  }
+
+  for (unsigned int x = 0; x < texturesToDelete.size(); x++) {
+    textureMapIterator = AssetIdToTextureId.find(texturesToDelete[x]);
+    if (textureMapIterator != AssetIdToTextureId.end())
+      AssetIdToTextureId.erase(textureMapIterator);
+  }
+}
+
 unsigned int
 OglTextureManager::GetTextureIdByAssetId(unsigned int textureAssetId) {
   AssetTextureMapType::iterator it = AssetIdToTextureId.find(textureAssetId);

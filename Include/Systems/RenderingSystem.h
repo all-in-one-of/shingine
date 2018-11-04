@@ -4,7 +4,7 @@
 
 class IRenderContext;
 class ICommandBuffer;
-class RenderingSystem : public System, public ISerializedClass {
+class RenderingSystem : public System, public IObject {
 public:
   SERIALIZE_CLASS(RenderingSystem);
   RenderingSystem(){};

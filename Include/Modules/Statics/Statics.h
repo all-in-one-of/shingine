@@ -2,7 +2,7 @@
 #include "Utility/Data/SerializedFactory.h"
 #include <vector>
 
-class ISerializedClass;
+class IObject;
 class String;
 
 class Statics {
@@ -12,13 +12,14 @@ public:
 
   // this is called once a new instance of ISerializedClass is created
   // which obtained a unique id
-  static void RegisterSerializedObject(ISerializedClass *object);
-  static ISerializedClass *FindSerializedObject(unsigned int objectId);
+  static void RegisterSerializedObject(IObject *object);
+  static IObject *FindSerializedObject(unsigned int objectId);
 
   // Checks wheter it's a component or not
-  static void AddSerializedObject(ISerializedClass *object);
-  static void Destroy(ISerializedClass *object);
+  static void AddSerializedObject(IObject *object);
+  static void Destroy(IObject *object);
   static unsigned int GetUniqueId();
+  static void ReturnUniqueId(unsigned int uid);
 
   template <typename InterfaceTypeName> static InterfaceTypeName *Get() {
     Statics *instance = GetInstance();
@@ -40,7 +41,7 @@ public:
     String interfaceName = typeid(InterfaceTypeName).name();
     String typeName = typeid(TypeName).name();
     SerializedFactory::GetDemangledName(typeName);
-    ISerializedClass *newObject = dynamic_cast<ISerializedClass *>(
+    IObject *newObject = dynamic_cast<IObject *>(
         SerializedFactory::CreateInstance(typeName));
     instance->StaticObjects[interfaceName] = newObject;
   }
@@ -57,9 +58,9 @@ private:
   std::vector<unsigned int> IdPool;
   unsigned int NextId = 1000;
 
-  typedef std::unordered_map<unsigned int, ISerializedClass *>
+  typedef std::unordered_map<unsigned int, IObject *>
       GlobalRegistryMap;
-  typedef std::unordered_map<std::string, ISerializedClass *> StaticObjectMap;
+  typedef std::unordered_map<std::string, IObject *> StaticObjectMap;
   StaticObjectMap StaticObjects;
   GlobalRegistryMap SerializedObjects;
 };

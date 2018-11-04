@@ -126,7 +126,8 @@ bool FirstPersonSystem::Update() {
   UpdateRotation(Front, Horizontal, cameraFront, cameraUp);
   UpdateMovement(position, Front, Horizontal);
 
-  Camera->ViewMatrix = glm::lookAt(position, position + cameraFront, cameraUp);
+  Camera->SetViewMatrix(
+      glm::lookAt(position, position + cameraFront, cameraUp));
 
   PlayerTransform->SetPosition(position);
 

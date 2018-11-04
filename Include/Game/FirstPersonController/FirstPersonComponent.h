@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 
 namespace FirstPersonController {
-class ViewSettings : public ISerializedClass {
+class ViewSettings : public IObject {
 public:
   SERIALIZE_CLASS(ViewSettings)
   ViewSettings() {
@@ -31,7 +31,7 @@ public:
   ATTRIBUTE_VALUE(float, MaxX);
 };
 
-class MovementSettings : public ISerializedClass {
+class MovementSettings : public IObject {
 public:
   SERIALIZE_CLASS(MovementSettings)
   MovementSettings() {

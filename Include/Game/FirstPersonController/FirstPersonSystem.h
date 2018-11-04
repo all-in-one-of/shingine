@@ -6,7 +6,7 @@
 class TransformComponent;
 class CameraComponent;
 namespace FirstPersonController {
-class FirstPersonSystem : public System, public ISerializedClass {
+class FirstPersonSystem : public System, public IObject {
 public:
   SERIALIZE_CLASS(FirstPersonSystem);
   ~FirstPersonSystem(){};

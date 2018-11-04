@@ -1,26 +1,27 @@
 #include "Application/Setup.h"
 
-#include "Modules/Statics/ActiveCamera.h"
 #include "Modules/Statics/AssetManager.h"
 #include "Modules/Statics/ComponentManager.h"
 #include "Modules/Statics/EntityManager.h"
 #include "Modules/Statics/Graphics.h"
 #include "Modules/Statics/Input.h"
 #include "Modules/Statics/SceneManager.h"
+#include "Modules/Statics/EventSystem.h"
 
 #include "Modules/Graphics/IShader.h"
 
 #include "Engine/Components/TransformComponent.h"
 
-#include "Modules/Graphics/GraphicsUtils.h"
+#include "Modules/Utility/GraphicsUtils.h"
+#include "Modules/Utility/SceneUtils.h"
 
 void SetStaticObjects() {
+  Statics::AddStaticObject<IEventSystem, EventSystem>();
   Statics::AddStaticObject<IEntityManager, EntityManager>();
   Statics::AddStaticObject<IAssetManager, AssetManager>();
   Statics::AddStaticObject<IComponentManager, ComponentManager>();
   Statics::AddStaticObject<IInput, Input>();
   Statics::AddStaticObject<ISceneManager, SceneManager>();
-  Statics::AddStaticObject<IActiveCamera, ActiveCamera>();
   Statics::AddStaticObject<IGraphics, Graphics>();
 }
 
@@ -34,8 +35,9 @@ void SetupDefaults() {
 
 void AddDefaultCamera() {
   // set camera
-  TransformComponent *transformComponent =
-      Statics::Get<IActiveCamera>()->GetTransformComponent();
+  CameraComponent *cameraComponent;
+  TransformComponent *transformComponent;
+  SceneUtils::GetActiveCamera(cameraComponent, transformComponent);
   transformComponent->SetPosition(0, 1, -6.f);
   // add render settings
   Statics::Get<IAssetManager>()->AddAssetOfType("RenderSettings");

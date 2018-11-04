@@ -1,5 +1,5 @@
 #pragma once
-#include "IShader.h"
+#include "Modules/Graphics/IShader.h"
 class ICommandBuffer;
 class String;
 

@@ -2,7 +2,7 @@
 #include "IShader.h"
 #include "Utility/Data/Serialization.h"
 
-class ShaderSource : public ISerializedClass {
+class ShaderSource : public IObject {
 public:
   SERIALIZE_CLASS(ShaderSource);
   ShaderSource() {
@@ -13,7 +13,7 @@ public:
   ATTRIBUTE_VALUE(String, Source);
 };
 
-class Shader : public IShader, public ISerializedClass {
+class Shader : public IShader, public IObject {
 public:
   SERIALIZE_CLASS(Shader);
   Shader() {

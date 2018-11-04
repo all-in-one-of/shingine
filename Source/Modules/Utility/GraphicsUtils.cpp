@@ -1,4 +1,4 @@
-#include "Modules/Graphics/GraphicsUtils.h"
+#include "Modules/Utility/GraphicsUtils.h"
 #include "Engine/AssetTypes/Material.h"
 #include "Modules/Graphics/ICommandBuffer.h"
 #include "Modules/Statics/IAssetManager.h"
@@ -12,11 +12,11 @@ namespace GraphicsUtils {
 void SetUniformsFromMaterial(ICommandBuffer *buffer, unsigned int materialId,
                              unsigned int &shaderId) {
   std::unordered_map<std::string,
-                     std::unordered_map<unsigned int, ISerializedClass *>>::
+                     std::unordered_map<unsigned int, IObject *>>::
       iterator MaterialIterator;
 
-  Statics::Get<IAssetManager>()->GetAssetIteratorOfType("Material",
-                                                        MaterialIterator);
+  IAssetManager *assetManager = Statics::Get<IAssetManager>();
+  assetManager->GetAssetIteratorOfType("Material", MaterialIterator);
   Material *material;
   if (materialId == 0)
     materialId = MaterialIterator->second.begin()->first;

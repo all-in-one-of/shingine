@@ -6,7 +6,7 @@
 class IComponentMap;
 class IComponent;
 
-class ComponentManager : public IComponentManager, public ISerializedClass {
+class ComponentManager : public IComponentManager, public IObject {
 public:
   SERIALIZE_CLASS(ComponentManager);
   ComponentManager();
@@ -18,7 +18,9 @@ public:
 
   virtual void GetAllComponents(std::vector<IComponent *> &components);
   virtual IComponentMap *GetComponentMap(const String &typeName);
-  
+  virtual void GetComponentsForEntity(unsigned int entityId,
+                                      std::vector<IComponent *> &components);
+  virtual void DestroyComponent(IComponent *component);
 
 private:
   IComponentMap *AddComponentMap(const std::string &typeName);

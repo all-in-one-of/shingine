@@ -7,7 +7,7 @@
 class IShader;
 class RenderSettings;
 
-class Graphics : public IGraphics, public ISerializedClass {
+class Graphics : public IGraphics, public IObject {
 public:
   SERIALIZE_CLASS(Graphics);
   Graphics();

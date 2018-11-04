@@ -3,7 +3,7 @@
 #include "Utility/Data/ComponentMap.h"
 #include "Utility/Data/Serialization.h"
 
-class Component : public IComponent, public ISerializedClass {
+class Component : public IComponent, public IObject {
 public:
   Component() {}
   virtual ~Component();

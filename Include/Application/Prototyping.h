@@ -1,11 +1,11 @@
 #pragma once
-#include "Modules/Statics/IActiveCamera.h"
 #include "Modules/Statics/IComponentManager.h"
 #include "Modules/Statics/IEntityManager.h"
+#include "Modules/Utility/SceneUtils.h"
 
 #include "Engine/AssetTypes/Material.h"
-#include "Modules/Graphics/GraphicsUtils.h"
 #include "Modules/Statics/IAssetManager.h"
+#include "Modules/Utility/GraphicsUtils.h"
 
 #include "Engine/Components/LightComponent.h"
 #include "Engine/Components/RendererComponent.h"
@@ -14,8 +14,9 @@
 #include "Game/FirstPersonController/FirstPersonComponent.h"
 
 void AddFirstPersonController() {
-  TransformComponent *transformComponent =
-      Statics::Get<IActiveCamera>()->GetTransformComponent();
+  CameraComponent *cam;
+  TransformComponent *transformComponent;
+  SceneUtils::GetActiveCamera(cam, transformComponent);
   // Add first person component
   FirstPersonController::FirstPersonComponent *comp =
       Statics::Get<IComponentManager>()
@@ -26,18 +27,21 @@ void AddFirstPersonController() {
   comp->PlayerMovementSettings->ForwardSpeed = 13.f;
   // Won't recalculate transform matrices without this set to 1
   transformComponent->IsDynamic = 1;
+  Statics::Get<IEntityManager>()->SetPersistentEntity(
+      transformComponent->EntityId());
 }
 
-void TestStuff() {
+void SetTexturedMaterial() {
   IComponentManager *componentManager = Statics::Get<IComponentManager>();
 
   // load texture
-  ISerializedClass *tex;
+  IObject *tex;
   ResourceLoader::LoadBitmap("Assets/Textures/uv_checker.bmp", tex);
   // add default shader
   IShader *shader = GraphicsUtils::CreateVertexFragmentShader(
       "Assets/Shaders/SimpleLighting.vert",
       "Assets/Shaders/SimpleLighting.frag");
+
   // add material with the lighting
   Material *mat = Statics::Get<IAssetManager>()->AddAssetOfType<Material>();
   mat->Name = "TexturePreviewMaterial";
@@ -54,18 +58,24 @@ void TestStuff() {
       r->MaterialReference = mat->UniqueID();
     }
   }
+}
 
+void AddSkyLight() {
+  IComponentManager *componentManager = Statics::Get<IComponentManager>();
   // add skylight component if there isn't
+
   SkyLightComponent *skyLight =
       componentManager->GetComponentOfType<SkyLightComponent>();
-  if (!skyLight)
-    Statics::Get<IEntityManager>()->CreateEntity(
+  IEntityManager *entityManager = Statics::Get<IEntityManager>();
+  if (!skyLight) {
+    unsigned int newEntity = entityManager->CreateEntity(
         {"TransformComponent", "SkyLightComponent", "ObjectMetadataComponent"});
-
+    entityManager->SetPersistentEntity(newEntity);
+  }
   {
     ComponentMap<LightComponent> *lightMap =
         componentManager->GetComponentMap<LightComponent>();
-  
+
     bool directionalLight = false;
 
     for (unsigned int x = 0; x < lightMap->Count(); x++) {
@@ -76,8 +86,9 @@ void TestStuff() {
     }
 
     if (!directionalLight) {
-      unsigned int newEntity = Statics::Get<IEntityManager>()->CreateEntity(
+      unsigned int newEntity = entityManager->CreateEntity(
           {"TransformComponent", "LightComponent", "ObjectMetadataComponent"});
+      entityManager->SetPersistentEntity(newEntity);
       LightComponent *light =
           componentManager->GetComponentOfType<LightComponent>(newEntity);
 
@@ -91,4 +102,10 @@ void TestStuff() {
       xform->SetRotation(rotation);
     }
   }
+}
+
+void TestStuff() {
+  AddFirstPersonController();
+  SetTexturedMaterial();
+  AddSkyLight();
 }

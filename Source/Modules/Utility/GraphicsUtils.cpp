@@ -41,8 +41,11 @@ void SetUniformsFromMaterial(ICommandBuffer *buffer, unsigned int materialId,
 
     std::vector<unsigned int> textureIds;
     material->GetTextureUniforms(names, textureIds);
-    for (size_t x = 0; x < names.size(); x++)
+    for (size_t x = 0; x < names.size(); x++) {
+      if (textureIds[x] == 0)
+        continue;
       buffer->SetTexture(names[x], shaderId, textureIds[x]);
+    }
   }
 }
 

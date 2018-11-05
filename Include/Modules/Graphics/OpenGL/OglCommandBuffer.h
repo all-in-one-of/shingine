@@ -52,8 +52,8 @@ private:
 
   OpenGLRender *GetContext();
 
-  class CameraComponent *ActiveCamera;
-  class TransformComponent *ActiveCameraTransform;
+  class CameraComponent *ActiveCamera = nullptr;
+  class TransformComponent *ActiveCameraTransform = nullptr;
   void UpdateCamera();
 
   OpenGLRender *CachedRenderContext = nullptr;

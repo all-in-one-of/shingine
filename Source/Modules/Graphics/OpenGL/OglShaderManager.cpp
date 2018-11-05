@@ -39,6 +39,8 @@ void OglShaderManager::GetUniformId(const std::string &uniformName,
     glUseProgram(programId);
     uniformLoc = glGetUniformLocation(programId, uniformName.c_str());
     UniformLocations[programId][uniformName] = uniformLoc;
+    
+    std::cout << "Getting uniform location for " << uniformName << std::endl;
   } else
     uniformLoc = it->second;
 }

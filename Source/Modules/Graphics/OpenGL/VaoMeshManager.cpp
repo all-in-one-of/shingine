@@ -119,6 +119,8 @@ void VaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId,
       vboVertices[x].ty = mesh->TexCoord[x].y;
       vboVertices[x].tz = mesh->TexCoord[x].z;
     }
+    
+    std::cout << "Loaded mesh #" << mesh->UniqueID() << std::endl;
 
     // static draw
     glBufferData(GL_ARRAY_BUFFER, vertexBufferSizeInBytes, vboVertices,

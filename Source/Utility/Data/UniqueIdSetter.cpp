@@ -107,7 +107,6 @@ void UniqueIdSetter::UpdateAttributeUid(IDataNode *node) {
       TypedAttributeValue<unsigned int> *uniqueIdAttribute =
           dynamic_cast<TypedAttributeValue<unsigned int> *>(attributes[x]);
       if (uniqueIdAttribute) {
-
         unsigned int currentId = uniqueIdAttribute->Get();
         std::map<unsigned int, unsigned int>::iterator it =
             LocalToGlobalUid.find(currentId);

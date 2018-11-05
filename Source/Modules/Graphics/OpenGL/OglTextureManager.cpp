@@ -45,6 +45,8 @@ void OglTextureManager::LoadTextureToGpu(unsigned int textureAssetId,
   textureAsset->GetResolution(width, height);
 
   float *data = textureAsset->GetPixels();
+  
+  std::cout << "Loaded texture #" << textureAsset->UniqueID() << std::endl;
 
   // get a texture asset
   glGenTextures(1, &texture);

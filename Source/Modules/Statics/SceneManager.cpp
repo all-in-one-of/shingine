@@ -143,6 +143,7 @@ bool SceneManager::LoadScene(const String &fileName) {
     
   Statics::Get<IEventSystem>()->DispatchEvent(EventType::OnSceneLoad);
   SetCurrentScene(fileName);
+  
   return true;
 }
 

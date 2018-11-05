@@ -2,10 +2,6 @@
 #include "Utility/Data/Serialization.h"
 #include "Asset.h"
 
-struct Pixel32 {
-  float r, g, b, a;
-};
-
 class Texture2D : public Asset, public IObject {
 public:
   SERIALIZE_CLASS(Texture2D);
@@ -15,27 +11,19 @@ public:
     ATTRIBUTE_REGISTER(Texture2D, Width);
     ATTRIBUTE_REGISTER(Texture2D, Height);
 
-    ATTRIBUTE_REGISTER(Texture2D, Red);
-    ATTRIBUTE_REGISTER(Texture2D, Green);
-    ATTRIBUTE_REGISTER(Texture2D, Blue);
-    ATTRIBUTE_REGISTER(Texture2D, Alpha);
+    ATTRIBUTE_REGISTER(Texture2D, Pixels);
   };
   virtual ~Texture2D();
 
   ATTRIBUTE_VALUE(String, Name);
 
-  Pixel32 *GetPixels();
-  void SetPixels(unsigned int width, unsigned int height, Pixel32 *newData);
+  float *GetPixels();
+  void SetPixels(unsigned int width, unsigned int height, float *newData);
   void GetResolution(int &width, int &height);
 
 private:
   ATTRIBUTE_VALUE(unsigned int, Width);
   ATTRIBUTE_VALUE(unsigned int, Height);
 
-  ATTRIBUTE_VECTOR(float, Red);
-  ATTRIBUTE_VECTOR(float, Green);
-  ATTRIBUTE_VECTOR(float, Blue);
-  ATTRIBUTE_VECTOR(float, Alpha);
-
-  Pixel32 *Data = nullptr;
+  ATTRIBUTE_VECTOR(float, Pixels);
 };

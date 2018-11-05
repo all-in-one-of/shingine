@@ -5,6 +5,7 @@
 
 #include "Engine/AssetTypes/Material.h"
 #include "Modules/Statics/IAssetManager.h"
+#include "Modules/Statics/IGraphics.h"
 #include "Modules/Utility/GraphicsUtils.h"
 
 #include "Engine/Components/LightComponent.h"
@@ -42,6 +43,8 @@ void SetTexturedMaterial() {
       "Assets/Shaders/SimpleLighting.vert",
       "Assets/Shaders/SimpleLighting.frag");
 
+  Statics::Get<IGraphics>()->SetDefaultShader(shader);
+
   // add material with the lighting
   Material *mat = Statics::Get<IAssetManager>()->AddAssetOfType<Material>();
   mat->Name = "TexturePreviewMaterial";
@@ -49,15 +52,15 @@ void SetTexturedMaterial() {
   mat->SetTexture("_MainTex", tex->UniqueID());
 
   // set the same lighting material to the each object on the scene
-  {
-    ComponentMap<RendererComponent> *renderers =
-        componentManager->GetComponentMap<RendererComponent>();
+  // {
+  //   ComponentMap<RendererComponent> *renderers =
+  //       componentManager->GetComponentMap<RendererComponent>();
 
-    for (unsigned int x = 0; x < renderers->Count(); x++) {
-      RendererComponent *r = renderers->AtIndex(x);
-      r->MaterialReference = mat->UniqueID();
-    }
-  }
+  //   for (unsigned int x = 0; x < renderers->Count(); x++) {
+  //     RendererComponent *r = renderers->AtIndex(x);
+  //     r->MaterialReference = mat->UniqueID();
+  //   }
+  // }
 }
 
 void AddSkyLight() {
@@ -106,6 +109,6 @@ void AddSkyLight() {
 
 void TestStuff() {
   AddFirstPersonController();
-  SetTexturedMaterial();
+    SetTexturedMaterial();
   AddSkyLight();
 }

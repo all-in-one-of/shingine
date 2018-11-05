@@ -90,7 +90,8 @@ void main()
 		}
 		lightColor += (diffuseContribution + specularContribution) * Lights[x].Color.w;
 	}
-
-	vec4 objectColor = vec4(texture(_MainTex, _TexCoord).xyz * lightColor, 1.0);
+	vec4 tex = texture(_MainTex, _TexCoord);
+	
+	vec4 objectColor = vec4(lightColor, 1.0);
 	_OutColor = objectColor;
 }

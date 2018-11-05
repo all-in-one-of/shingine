@@ -24,30 +24,31 @@ class ISerialized;
 
 #define SERIALIZE_CLASS(CLASSNAME)                                             \
   typedef void (CLASSNAME::*MFP)(ISerialized * &attr);                         \
-  std::map<std::string, MFP> AttributeFunctionMap;                             \
+  std::map<std::string, MFP> AttributeFunctionMapGet;                          \
+  std::map<std::string, MFP> AttributeFunctionMapSet;                          \
   std::vector<std::string> AttributeNames;                                     \
   virtual void SetAttribute(ISerialized *&attr) {                              \
     SetAttribute(attr->SerializedName(), attr);                                \
   };                                                                           \
   virtual void SetAttribute(const String &serializedName,                      \
                             ISerialized *&attr) {                              \
-    std::string mapName = std::string("Set_") + serializedName;                \
-    if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end())      \
+    if (AttributeFunctionMapSet.find(serializedName) ==                        \
+        AttributeFunctionMapSet.end())                                         \
       return;                                                                  \
-    MFP fp = AttributeFunctionMap[mapName];                                    \
+    MFP fp = AttributeFunctionMapSet[serializedName];                          \
     (this->*fp)(attr);                                                         \
   };                                                                           \
   virtual void GetAttribute(ISerialized *&attr) {                              \
-    std::string mapName = std::string("Get_") + attr->SerializedName();        \
-    if (AttributeFunctionMap.find(mapName) == AttributeFunctionMap.end())      \
+    if (AttributeFunctionMapGet.find(attr->SerializedName()) ==                \
+        AttributeFunctionMapGet.end())                                         \
       return;                                                                  \
-    MFP fp = AttributeFunctionMap[mapName];                                    \
+    MFP fp = AttributeFunctionMapGet[attr->SerializedName()];                  \
     (this->*fp)(attr);                                                         \
   };                                                                           \
   virtual void GetAllAttributes(std::vector<ISerialized *> &attributes) {      \
     for (unsigned int x = 0; x < AttributeNames.size(); x++) {                 \
       ISerialized *newAttr;                                                    \
-      MFP fp = AttributeFunctionMap[std::string("Get_") + AttributeNames[x]];  \
+      MFP fp = AttributeFunctionMapGet[AttributeNames[x]];                     \
       (this->*fp)(newAttr);                                                    \
       attributes.push_back(newAttr);                                           \
     }                                                                          \
@@ -105,6 +106,57 @@ class ISerialized;
     attr = new TypedAttribute<TYPE_NAME>(#NAME, #TYPE_NAME, NAME);             \
   }
 
+#define ___GET_ATTR_VEC_BOY(NAME)                                              \
+  void Attrib_Set_##NAME(ISerialized *&attr) {                                 \
+    TypedAttribute<float> *typedAttr = (TypedAttribute<float> *)attr;          \
+    if (!typedAttr)                                                            \
+      return;                                                                  \
+    std::vector<float> raw = typedAttr->Get();
+
+#define ATTRIBUTE_GLM_VEC3_ARRAY(NAME)                                         \
+  std::vector<glm::vec3> NAME;                                                 \
+  ___GET_ATTR_VEC_BOY(NAME)                                                    \
+  NAME = std::vector<glm::vec3>();                                             \
+  float vectorSize = raw.size() / 3;                                           \
+  for (unsigned int x = 0; x < vectorSize; x++) {                              \
+    unsigned int index = x * 3;                                                \
+    NAME.push_back(glm::vec3(raw[index + 0], raw[index + 1], raw[index + 2])); \
+  }                                                                            \
+  }                                                                            \
+  void Attrib_Get_##NAME(ISerialized *&attr) {                                 \
+    std::vector<float> outVec;                                                 \
+    for (unsigned int x = 0; x < NAME.size(); x++) {                           \
+      outVec.push_back(NAME[x].x);                                             \
+      outVec.push_back(NAME[x].y);                                             \
+      outVec.push_back(NAME[x].z);                                             \
+    }                                                                          \
+    attr = new TypedAttribute<float>(#NAME, "float", outVec);                  \
+  }
+
+#define ATTRIBUTE_GLM_VEC3(NAME)                                               \
+  glm::vec3 NAME;                                                              \
+  ___GET_ATTR_VEC_BOY(NAME)                                                    \
+  NAME = glm::vec3(raw[0], raw[1], raw[2]);                                    \
+  }                                                                            \
+  void Attrib_Get_##NAME(ISerialized *&attr) {                                 \
+    std::vector<float> packedAttr = {NAME.x, NAME.y, NAME.z};                  \
+    attr = new TypedAttribute<float>(#NAME, "float", packedAttr);              \
+  }
+
+#define ATTRIBUTE_GLM_QUAT(NAME)                                               \
+  glm::quat NAME;                                                              \
+  ___GET_ATTR_VEC_BOY(NAME)                                                    \
+  NAME = glm::quat();                                                          \
+  NAME.x = raw[0];                                                             \
+  NAME.y = raw[1];                                                             \
+  NAME.z = raw[2];                                                             \
+  NAME.w = raw[3];                                                             \
+  }                                                                            \
+  void Attrib_Get_##NAME(ISerialized *&attr) {                                 \
+    std::vector<float> packedAttr = {NAME.x, NAME.y, NAME.z, NAME.w};          \
+    attr = new TypedAttribute<float>(#NAME, "float", packedAttr);              \
+  }
+
 #define ATTRIBUTE_CLASS(CLASSNAME, NAME)                                       \
   CLASSNAME *NAME = nullptr;                                                   \
   void Attrib_Set_##NAME(ISerialized *&attr) {                                 \
@@ -147,7 +199,7 @@ class ISerialized;
 
 #define ATTRIBUTE_REGISTER(CLASSNAME, NAME)                                    \
   AttributeNames.push_back(#NAME);                                             \
-  AttributeFunctionMap.insert(std::make_pair(std::string("Get_") + #NAME,      \
-                                             &CLASSNAME::Attrib_Get_##NAME));  \
-  AttributeFunctionMap.insert(std::make_pair(std::string("Set_") + #NAME,      \
-                                             &CLASSNAME::Attrib_Set_##NAME));
+  AttributeFunctionMapGet.insert(                                              \
+      std::make_pair(#NAME, &CLASSNAME::Attrib_Get_##NAME));                   \
+  AttributeFunctionMapSet.insert(                                              \
+      std::make_pair(#NAME, &CLASSNAME::Attrib_Set_##NAME));

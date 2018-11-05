@@ -18,9 +18,9 @@ public:
   glm::vec3 GetScale();
 
   void SetPosition(float x, float y, float z);
-  void SetPosition(glm::vec3 &val);
-  void SetRotation(glm::quat &val);
-  void SetScale(glm::vec3 &val);
+  void SetPosition(const glm::vec3 &val);
+  void SetRotation(const glm::quat &val);
+  void SetScale(const glm::vec3 &val);
   // cached values
   glm::mat4 LocalTransform;
   glm::mat4 LocalTransformUniformScale;
@@ -33,7 +33,7 @@ public:
   glm::quat WorldRotation;
   glm::vec3 WorldScale;
 private:
-  ATTRIBUTE_VECTOR(float, LocalPosition)
-  ATTRIBUTE_VECTOR(float, LocalScale)
-  ATTRIBUTE_VECTOR(float, LocalRotation)
+  ATTRIBUTE_GLM_VEC3(LocalPosition)
+  ATTRIBUTE_GLM_VEC3(LocalScale)
+  ATTRIBUTE_GLM_QUAT(LocalRotation)
 };

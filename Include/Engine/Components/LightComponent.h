@@ -16,7 +16,7 @@ public:
 
   glm::vec4 GetColor();
 
-  ATTRIBUTE_VECTOR(float, Color);
+  ATTRIBUTE_GLM_VEC3(Color);
   ATTRIBUTE_VALUE(float, Exposure);
   ATTRIBUTE_VALUE(float, Intensity);
 

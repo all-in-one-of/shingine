@@ -1,5 +1,6 @@
 #pragma once
 #include "ComponentSetup.h"
+#include "Core.h"
 
 class SkyLightComponent : public Component {
 public:
@@ -8,7 +9,7 @@ public:
   SkyLightComponent();
   virtual ~SkyLightComponent();
 
-  ATTRIBUTE_VECTOR(float, Color);
+  ATTRIBUTE_GLM_VEC3(Color);
   ATTRIBUTE_VALUE(float, Intensity);
 
   ATTRIBUTE_VALUE(unsigned char, CubemapEnabled);

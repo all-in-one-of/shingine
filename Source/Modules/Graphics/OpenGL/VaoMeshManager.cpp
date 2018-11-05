@@ -98,7 +98,7 @@ void VaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId,
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
 
     unsigned int vertexCount =
-        static_cast<unsigned int>(mesh->Positions.size() / 3);
+        static_cast<unsigned int>(mesh->Positions.size());
 
     unsigned int vertexBufferSizeInBytes =
         sizeof(Vertex_xyz_nxnynz_txtytz) * vertexCount;
@@ -107,18 +107,17 @@ void VaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId,
         new Vertex_xyz_nxnynz_txtytz[vertexCount];
 
     for (unsigned int x = 0; x < vertexCount; x++) {
-      unsigned int vertexIndex = x * 3;
-      vboVertices[x].x = mesh->Positions[vertexIndex + 0];
-      vboVertices[x].y = mesh->Positions[vertexIndex + 1];
-      vboVertices[x].z = mesh->Positions[vertexIndex + 2];
+      vboVertices[x].x = mesh->Positions[x].x;
+      vboVertices[x].y = mesh->Positions[x].y;
+      vboVertices[x].z = mesh->Positions[x].z;
 
-      vboVertices[x].nx = mesh->Normals[vertexIndex + 0];
-      vboVertices[x].ny = mesh->Normals[vertexIndex + 1];
-      vboVertices[x].nz = mesh->Normals[vertexIndex + 2];
+      vboVertices[x].nx = mesh->Normals[x].x;
+      vboVertices[x].ny = mesh->Normals[x].y;
+      vboVertices[x].nz = mesh->Normals[x].z;
 
-      vboVertices[x].tx = mesh->TexCoord[vertexIndex + 0];
-      vboVertices[x].ty = mesh->TexCoord[vertexIndex + 1];
-      vboVertices[x].tz = mesh->TexCoord[vertexIndex + 2];
+      vboVertices[x].tx = mesh->TexCoord[x].x;
+      vboVertices[x].ty = mesh->TexCoord[x].y;
+      vboVertices[x].tz = mesh->TexCoord[x].z;
     }
 
     // static draw

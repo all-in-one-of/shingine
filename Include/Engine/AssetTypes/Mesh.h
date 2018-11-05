@@ -16,9 +16,8 @@ public:
 
   ATTRIBUTE_VALUE(String, Name);
   ATTRIBUTE_VECTOR(unsigned int, Indices); // n
-  ATTRIBUTE_VECTOR(float, Normals);        // n * 3
-  ATTRIBUTE_VECTOR(float, Positions);      // n * 3
-  ATTRIBUTE_VECTOR(float, TexCoord);       // n * 3
-
+  ATTRIBUTE_GLM_VEC3_ARRAY(Normals);
+  ATTRIBUTE_GLM_VEC3_ARRAY(Positions);
+  ATTRIBUTE_GLM_VEC3_ARRAY(TexCoord);
   // TODO add bounding box calculation
 };

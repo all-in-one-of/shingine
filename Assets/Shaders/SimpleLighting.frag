@@ -92,6 +92,6 @@ void main()
 	}
 	vec4 tex = texture(_MainTex, _TexCoord);
 	
-	vec4 objectColor = vec4(lightColor, 1.0);
+	vec4 objectColor = vec4((lightColor + vec3(.5)) * tex, 1.0);
 	_OutColor = objectColor;
 }

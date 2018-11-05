@@ -13,6 +13,8 @@
 #include "Modules/Statics/IComponentManager.h"
 #include "Modules/Statics/IEventSystem.h"
 
+#include "Core.h"
+
 #include <vector>
 REGISTER_SERIALIZED_CLASS(SceneManager)
 SceneManager::SceneManager(){};
@@ -53,7 +55,7 @@ String GetExternalAssetPathRelativeToTheSceneFile(const String &assetFileName,
 bool SceneManager::LoadScene(const String &fileName) {
   if (CurrentSceneFileName == fileName) // this scene is already loaded
     return true;
-
+  S_LOG_FUNC("Loading %s", fileName.GetCharArray());
   // handle scene loading
   assert(UnloadCurrentScene()); // this should do fine
 
@@ -63,6 +65,8 @@ bool SceneManager::LoadScene(const String &fileName) {
     return false;
   // traverse through each node, create unique ids
   UniqueIdSetter::SetIds(nodes);
+  
+  S_LOG_FUNC("Got %lu nodes", nodes.size());
 
   IAssetManager *assetManager = Statics::Get<IAssetManager>();
   // old id new id pairs
@@ -157,8 +161,10 @@ void SceneManager::LoadExternalAssetFromScene(ISerialized *obj,
   unsigned int uniqueId = externalAsset->UniqueID();
   delete externalAsset;
 
+  S_LOG_FUNC("Started loading %s", fileName.GetCharArray());
   if (Statics::Get<IAssetManager>()->IsExternalAssetLoaded(fileName))
     return;
   Asset *loadedAsset;
   assert(ResourceLoader::LoadAsset(fileName, loadedAsset, uniqueId));
+  S_LOG_FUNC("Loaded %s", fileName.GetCharArray());
 }

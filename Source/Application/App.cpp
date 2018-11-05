@@ -11,7 +11,7 @@ int main() {
   InitializeEngine();
 
   if (!Statics::Get<ISceneManager>()->LoadScene(
-          "Assets/Scenes/UnityExports/very_simple_scene.ssd")) {
+          "Assets/Scenes/UnityExports/Vik/Vik.ssd")) {
     std::cout << "Couldn't load the scene" << std::endl;
     return 1;
   }

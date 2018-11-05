@@ -44,7 +44,7 @@ void OglTextureManager::LoadTextureToGpu(unsigned int textureAssetId,
       Statics::Get<IAssetManager>()->GetAssetOfType<Texture2D>(textureAssetId);
   textureAsset->GetResolution(width, height);
 
-  Pixel32 *data = textureAsset->GetPixels();
+  float *data = textureAsset->GetPixels();
 
   // get a texture asset
   glGenTextures(1, &texture);

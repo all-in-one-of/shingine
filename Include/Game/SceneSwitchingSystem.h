@@ -12,7 +12,7 @@ public:
 
 private:
   const unsigned char SceneCount = 3;
-  unsigned char CurrentLoadedScene = 2;
+  unsigned char CurrentLoadedScene = 0;
   String ScenePaths[3] = {"Assets/Scenes/test0.ssd", "Assets/Scenes/test1.ssd",
                           "Assets/Scenes/test2.ssd"};
 };

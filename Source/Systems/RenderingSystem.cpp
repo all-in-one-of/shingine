@@ -139,7 +139,7 @@ void RenderingSystem::SetLightParameters(unsigned int shaderId) {
     glm::vec4 pos4 = glm::vec4(pos.x, pos.y, pos.z, 1.0);
     glm::vec4 dir4 = glm::vec4(dir.x, dir.y, dir.z, 1.0);
 
-    lightColor = glm::vec4(light->Color[0], light->Color[1], lightColor[2],
+    lightColor = glm::vec4(light->Color[0], light->Color[1], light->Color[2],
                            light->Intensity);
 
     glm::vec4 params0(light->LightType, light->InnerAngle, light->OuterAngle,

@@ -19,7 +19,7 @@ public:
   ATTRIBUTE_VECTOR(float, VectorUniformValues)
 
   ATTRIBUTE_VECTOR(String, TextureUniformNames)
-  ATTRIBUTE_VECTOR(unsigned int, TextureUniformValues)
+  ATTRIBUTE_ID_VECTOR(TextureUniformValues)
 
   virtual void GetFloatUniforms(std::vector<std::string> &names,
                                 std::vector<float> &values);

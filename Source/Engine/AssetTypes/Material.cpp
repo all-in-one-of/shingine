@@ -10,6 +10,9 @@ Material::Material() {
 
   ATTRIBUTE_REGISTER(Material, VectorUniformNames);
   ATTRIBUTE_REGISTER(Material, VectorUniformValues);
+  
+  ATTRIBUTE_REGISTER(Material, TextureUniformNames);
+  ATTRIBUTE_REGISTER(Material, TextureUniformValues);
 
   ShaderId = 0;
   Name = "defaultMaterial";

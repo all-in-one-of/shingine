@@ -6,7 +6,18 @@ LightComponent::LightComponent() {
   ATTRIBUTE_REGISTER(LightComponent, Color);
   ATTRIBUTE_REGISTER(LightComponent, Exposure);
   ATTRIBUTE_REGISTER(LightComponent, Intensity);
-
+  
+  ATTRIBUTE_REGISTER(LightComponent, LightType);
+  
+  ATTRIBUTE_REGISTER(LightComponent, Constant);
+  ATTRIBUTE_REGISTER(LightComponent, Linear);
+  ATTRIBUTE_REGISTER(LightComponent, Quadratic);
+  
+  ATTRIBUTE_REGISTER(LightComponent, InnerAngle);
+  ATTRIBUTE_REGISTER(LightComponent, OuterAngle);
+  ATTRIBUTE_REGISTER(LightComponent, CutOff);
+  ATTRIBUTE_REGISTER(LightComponent, ShadowEnabled);
+  
   Color = {1, 1, 1};
   Exposure = 1.f;
   Intensity = 1.f;

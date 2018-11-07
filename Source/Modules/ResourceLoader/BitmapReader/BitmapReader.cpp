@@ -13,7 +13,7 @@ bool ReadBitmapToTexture(const char *fileName, IObject *texture) {
   unsigned int size = 0;
   unsigned short bitCount = 0;
   unsigned char *pixelsRaw = nullptr;
-  float *pixels = nullptr;
+  unsigned char *pixels32 = nullptr;
 
   Texture2D *tex = dynamic_cast<Texture2D *>(texture);
   if (!tex)
@@ -37,20 +37,20 @@ bool ReadBitmapToTexture(const char *fileName, IObject *texture) {
   fread(pixelsRaw, sizeof(unsigned char), size, file);
   fclose(file);
 
-  pixels = new float[width * height * 4];
+  pixels32 = new unsigned char[width * height * 4];
   unsigned int pixelCount = width * height;
   for (unsigned int x = 0; x < pixelCount; x++) {
     unsigned int index = x * 4;
-    pixels[index + 0] = pixelsRaw[x * 3 + 2] / 255.f;
-    pixels[index + 1] = pixelsRaw[x * 3 + 1] / 255.f;
-    pixels[index + 2] = pixelsRaw[x * 3 + 0] / 255.f;
-    pixels[index + 3] = 1.f;
+    pixels32[index + 0] = pixelsRaw[x * 3 + 2];
+    pixels32[index + 1] = pixelsRaw[x * 3 + 1];
+    pixels32[index + 2] = pixelsRaw[x * 3 + 0];
+    pixels32[index + 3] = 255;
   }
   tex->Name = fileName;
-  tex->SetPixels(width, height, pixels);
+  tex->SetPixels(width, height, pixels32);
 
   delete[] pixelsRaw;
-  delete[] pixels;
+  delete[] pixels32;
   fclose(file);
   return true;
 }

@@ -20,6 +20,7 @@ public:
 
   ATTRIBUTE_VECTOR(String, TextureUniformNames)
   ATTRIBUTE_ID_VECTOR(TextureUniformValues)
+  ATTRIBUTE_VECTOR(String, ExternalTexturePaths)
 
   virtual void GetFloatUniforms(std::vector<std::string> &names,
                                 std::vector<float> &values);

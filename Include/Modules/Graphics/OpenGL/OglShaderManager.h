@@ -3,7 +3,6 @@
 #include <string>
 #include <unordered_map>
 class IShader;
-class IMaterial;
 class String;
 // handles OpenGL shader compilation, fetches shader program id by shader asset
 // id
@@ -11,8 +10,6 @@ class OglShaderManager {
 public:
   OglShaderManager();
   int GetShaderProgramId(unsigned int shaderId);
-  // uniforms
-  void SetMaterialUniforms(IMaterial *material, int programId);
   void GetUniformId(const std::string &uniformName, int programId,
                     int &uniformLoc);
 

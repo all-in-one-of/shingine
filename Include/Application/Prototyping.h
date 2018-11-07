@@ -35,9 +35,6 @@ void AddFirstPersonController() {
 void SetTexturedMaterial() {
   IComponentManager *componentManager = Statics::Get<IComponentManager>();
 
-  // load texture
-  IObject *tex;
-  ResourceLoader::LoadBitmap("Assets/Textures/uv_checker.bmp", tex);
   // add default shader
   IShader *shader = GraphicsUtils::CreateVertexFragmentShader(
       "Assets/Shaders/SimpleLighting.vert",
@@ -45,22 +42,25 @@ void SetTexturedMaterial() {
 
   Statics::Get<IGraphics>()->SetDefaultShader(shader);
 
+  // load texture
+  IObject *tex;
+  ResourceLoader::LoadBitmap("Assets/Textures/uv_checker.bmp", tex);
   // add material with the lighting
   Material *mat = Statics::Get<IAssetManager>()->AddAssetOfType<Material>();
   mat->Name = "TexturePreviewMaterial";
   mat->ShaderId = shader->AssetId();
   mat->SetTexture("_MainTex", tex->UniqueID());
 
-  // set the same lighting material to the each object on the scene
-  // {
-  //   ComponentMap<RendererComponent> *renderers =
-  //       componentManager->GetComponentMap<RendererComponent>();
+   // set the same lighting material to the each object on the scene
+   {
+     ComponentMap<RendererComponent> *renderers =
+         componentManager->GetComponentMap<RendererComponent>();
 
-  //   for (unsigned int x = 0; x < renderers->Count(); x++) {
-  //     RendererComponent *r = renderers->AtIndex(x);
-  //     r->MaterialReference = mat->UniqueID();
-  //   }
-  // }
+     for (unsigned int x = 0; x < renderers->Count(); x++) {
+       RendererComponent *r = renderers->AtIndex(x);
+       r->MaterialReference = mat->UniqueID();
+     }
+   }
 }
 
 void AddSkyLight() {

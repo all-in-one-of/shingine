@@ -44,9 +44,8 @@ void OglTextureManager::LoadTextureToGpu(unsigned int textureAssetId,
       Statics::Get<IAssetManager>()->GetAssetOfType<Texture2D>(textureAssetId);
   textureAsset->GetResolution(width, height);
 
-  float *data = textureAsset->GetPixels();
-  
-  std::cout << "Loaded texture #" << textureAsset->UniqueID() << std::endl;
+  // float *data = textureAsset->GetPixels();
+  S_LOG_FUNC("Loaded texture #%d", textureAsset->UniqueID());
 
   // get a texture asset
   glGenTextures(1, &texture);
@@ -58,8 +57,21 @@ void OglTextureManager::LoadTextureToGpu(unsigned int textureAssetId,
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT,
-               data);
+  Texture2D::TextureFormat format = textureAsset->GetTextureFormat();
+  if (format == Texture2D::TextureFormat::Float_RGBA)
+  {
+    float *data = textureAsset->GetPixels();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT,
+                data);
+  }
+  
+  if (format == Texture2D::TextureFormat::Byte_RGBA)
+  {
+    unsigned char *data32 = textureAsset->GetPixels32();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                data32);
+  }
+
   glGenerateMipmap(GL_TEXTURE_2D);
 
   AssetIdToTextureId[textureAssetId] = texture;

@@ -7,7 +7,7 @@ namespace Shingine
 {
   public static class NodeUtils
   {
-    public static class Constants
+    public static class DefaultNodeNames
     {
       public const string TransformComponentName = "TransformComponent";
       public const string MetadataComponentName = "ObjectMetadataComponent";
@@ -23,41 +23,67 @@ namespace Shingine
     public static Node MakeExternalNode(uint uniqueId, string nodeName, string fileName)
     {
       int idConv = Convert.ToInt32(uniqueId);
-      var node = new Node(Constants.ExternalName, idConv);
+      var node = new Node(DefaultNodeNames.ExternalName, idConv);
       node.AddAttribute(new Attribute<string>("Name", nodeName, true));
       node.AddAttribute(new Attribute<string>("FileName", fileName, true));
       return node;
     }
     public static Node MakeObjectMetadataNode(string nodeName)
     {
-      var metadata = new Node(Constants.MetadataComponentName);
+      var metadata = new Node(DefaultNodeNames.MetadataComponentName);
       metadata.AddAttribute(new Attribute<string>("Name", nodeName, true));
       metadata.AddAttribute(new Attribute<string>("Tag", "default", true));
       metadata.AddAttribute(new Attribute<string>("Layer", "default", true));
       return metadata;
     }
+    enum TextureFormat { Float_RGBA, Byte_RGBA };
     public static Node MakeTextureNode(Texture2D texture)
     {
-      var textureNode = new Node(Constants.TextureName);
+      var textureNode = new Node(DefaultNodeNames.TextureName);
+      textureNode.AddAttribute(new Attribute<uint>("Format", (uint)TextureFormat.Byte_RGBA, true));
       textureNode.AddAttribute(new Attribute<string>("Name", texture.name, true));
-      textureNode.AddAttribute(new Attribute<uint>("Width", Convert.ToUInt32(texture.width), true));
-      textureNode.AddAttribute(new Attribute<uint>("Height", Convert.ToUInt32(texture.height), true));
-      var pixels = texture.GetPixels();
-      float[] pixelArray = new float[pixels.Length * 4];
-      for (int x = 0; x < pixels.Length; x++)
+      // pixels to skip
+      var targetTextureWidth = texture.width;
+      var originalPixelCount = texture.width * texture.height;
+      int maxResolution = Shingine.Constants.MaxTextureResolution;
+      var maxPixelCount = maxResolution * maxResolution;
+      var targetPixelCount = originalPixelCount;
+      var pixelsToSkip = 1;
+      var pixeToSkip2 = 1;
+      if (maxPixelCount < originalPixelCount)
       {
-        int index = x * 4;
-        pixelArray[index + 0] = pixels[x].r;
-        pixelArray[index + 1] = pixels[x].g;
-        pixelArray[index + 2] = pixels[x].b;
-        pixelArray[index + 3] = pixels[x].a;
+        targetTextureWidth = maxResolution;
+        targetPixelCount = maxPixelCount;
+        pixelsToSkip = (texture.width * texture.height) / (maxResolution * maxResolution);
+        pixeToSkip2 = texture.width / maxResolution;
       }
-      textureNode.AddAttribute(new Attribute<float[]>("Pixels", pixelArray));
+      textureNode.AddAttribute(new Attribute<uint>("Width", Convert.ToUInt32(targetTextureWidth), true));
+      textureNode.AddAttribute(new Attribute<uint>("Height", Convert.ToUInt32(targetTextureWidth), true));
+
+      var pixels = texture.GetPixels();
+      if (pixels.Length != originalPixelCount)
+        throw new Exception();
+      byte[] pixelArray = new byte[targetPixelCount * 4];
+      for (int x = 0; x < targetPixelCount; x++)
+      {
+        var currentX = x % targetTextureWidth;
+        var currentY = x / targetTextureWidth;
+
+        var sampleX = currentX * pixeToSkip2;
+        var sampleY = currentY * pixeToSkip2;
+
+        int index = sampleX + sampleY * texture.width;
+        pixelArray[x * 4 + 0] = Convert.ToByte(pixels[index].r * 255);
+        pixelArray[x * 4 + 1] = Convert.ToByte(pixels[index].g * 255);
+        pixelArray[x * 4 + 2] = Convert.ToByte(pixels[index].b * 255);
+        pixelArray[x * 4 + 3] = Convert.ToByte(pixels[index].a * 255);
+      }
+      textureNode.AddAttribute(new Attribute<byte[]>("Pixels32", pixelArray));
       return textureNode;
     }
     public static Node MakeTransformNode(uint parentId, TransformNodeData transformNodeData)
     {
-      var xformNode = new Node(Constants.TransformComponentName);
+      var xformNode = new Node(DefaultNodeNames.TransformComponentName);
       xformNode.AddAttribute(new Attribute<uid>("ParentID", parentId, true));
       xformNode.AddAttribute(new Attribute<byte>("IsDynamic", 0, true));
       xformNode.AddAttribute(new Attribute<float[]>("LocalPosition",
@@ -89,12 +115,12 @@ namespace Shingine
     }
     public static Node MakeMeshNode(Mesh mesh)
     {
-      var meshNode = new Node(Constants.MeshName);
+      var meshNode = new Node(DefaultNodeNames.MeshName);
       meshNode.AddAttribute(new Attribute<string>("Name", mesh.name, true));
       float[] uv = new float[mesh.uv.Length * 3];
       float[] vertices = new float[mesh.vertices.Length * 3];
       float[] normals = new float[mesh.normals.Length * 3];
-      for (uint x = 0; x < mesh.uv.Length; x++) 
+      for (uint x = 0; x < mesh.uv.Length; x++)
       {
         uint index = x * 3;
         uv[index + 0] = mesh.uv[x].x;
@@ -110,7 +136,7 @@ namespace Shingine
         normals[index + 2] = mesh.normals[x].z;
       }
       uint[] indices = new uint[mesh.triangles.Length];
-      for (uint x = 0; x < mesh.triangles.Length; x++) indices[x] = (uint) mesh.triangles[x];
+      for (uint x = 0; x < mesh.triangles.Length; x++) indices[x] = (uint)mesh.triangles[x];
       meshNode.AddAttribute(new Attribute<uint[]>("Indices", indices));
       meshNode.AddAttribute(new Attribute<float[]>("Normals", normals));
       meshNode.AddAttribute(new Attribute<float[]>("Positions", vertices));
@@ -119,7 +145,7 @@ namespace Shingine
     }
     public static Node MakeRendererNode(uint materialId, uint meshId)
     {
-      var rendererNode = new Node(Constants.RendererComponentName);
+      var rendererNode = new Node(DefaultNodeNames.RendererComponentName);
       rendererNode.AddAttribute(new Attribute<byte>("DrawType", 1, true)); // Fill
       rendererNode.AddAttribute(new Attribute<byte>("Enabled", 1, true));
       rendererNode.AddAttribute(new Attribute<uid>("MeshReference", meshId, true));
@@ -128,7 +154,7 @@ namespace Shingine
     }
     public static Node MakeMaterialNode(Material mat)
     {
-      var materialNode = new Node(Constants.MaterialName);
+      var materialNode = new Node(DefaultNodeNames.MaterialName);
       var shader = mat.shader;
       var propertyCount = ShaderUtil.GetPropertyCount(shader);
 

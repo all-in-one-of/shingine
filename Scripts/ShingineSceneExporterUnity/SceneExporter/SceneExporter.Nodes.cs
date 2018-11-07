@@ -17,6 +17,7 @@ namespace Shingine
       _uidToGameObject.Clear();
       _uidToComponents.Clear();
       _components.Clear();
+      _externalPathsDict.Clear();
     }
     void CreateNodeListFromCollectedData()
     {
@@ -58,6 +59,7 @@ namespace Shingine
       {
         var uid = entry.Key;
         var go = entry.Value;
+        ProgressBar("Saving " + go.name, 0.3f, false);
         // add object metadata 
         AddComponentNode(uid, NodeUtils.MakeObjectMetadataNode(go.name));
         var parentId = GetParentNodeUid(go);

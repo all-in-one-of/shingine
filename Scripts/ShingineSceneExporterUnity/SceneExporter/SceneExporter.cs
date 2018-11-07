@@ -8,17 +8,33 @@ namespace Shingine
 {
   public partial class SceneExporter
   {
+    
     public SceneExporter(string fileName)
     {
       _exportData = new SceneExportData(fileName);
     }
+
+    void ProgressBar(string message, float progress, bool open = true)
+    {
+      if (!open)
+      {
+        EditorUtility.ClearProgressBar();
+        return;
+      }
+      EditorUtility.DisplayProgressBar("Scene Exporter", message, progress);
+    }
     public void CollectNodes()
     {
+      ProgressBar("Initialize", 0.1f, false);
       Initialize();
+      ProgressBar("SetParentIds", 0.2f, false);
       SetParentIds();
+      ProgressBar("CollectDataFromGameObjects", 0.3f, false);
       CollectDataFromGameObjects();
+      ProgressBar("CreateNodeListFromCollectedData", 0.3f, false);
       CreateNodeListFromCollectedData();
       _binaryExportData[_exportData.AbsoluteFileName] = BinaryConverter.NodesToBytes(_nodes.ToArray());
+      ProgressBar("", 1.0f, false);
     }
     public void Save()
     {
@@ -47,5 +63,6 @@ namespace Shingine
     Dictionary<uint, List<uid>> _uidToComponents = new Dictionary<uint, List<uid>>();
     List<Node> _components = new List<Node>();
     SceneExportData _exportData;
+    Dictionary<uint, string> _externalPathsDict = new Dictionary<uint, string>();
   }
 }

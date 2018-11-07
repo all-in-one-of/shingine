@@ -32,6 +32,7 @@ namespace Shingine
       {typeof(string), "char"},
       {typeof(string[]), "char"},
       {typeof(byte), "unsigned char"},
+      {typeof(byte[]), "unsigned char"},
       {typeof(int), "int"},
       {typeof(uint), "unsigned int"},
       {typeof(uint[]), "unsigned int"},

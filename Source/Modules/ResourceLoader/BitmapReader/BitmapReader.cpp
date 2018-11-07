@@ -5,6 +5,7 @@
 #include "Engine/AssetTypes/Texture2D.h"
 #include "Utility/Data/SerializedFactory.h"
 
+
 namespace BitmapReader {
 bool ReadBitmapToTexture(const char *fileName, IObject *texture) {
   unsigned char headerInfo[54] = {0};

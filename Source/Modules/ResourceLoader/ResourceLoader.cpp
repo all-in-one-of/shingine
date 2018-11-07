@@ -18,7 +18,7 @@ String ResourceLoader::LastError = "";
 String ResourceLoader::GetLastError() { return LastError; }
 
 void ResourceLoader::SetupPath(const String &localPath, String &outPath) {
-  const String basePath = "/Users/snowbear/Documents/GIT/shingine/";
+  const String basePath = "";
   outPath = basePath + localPath;
 }
 

@@ -12,7 +12,7 @@ bool SceneSwitchingSystem::Initialize() {
   // Array of scenes
   // load scene 0
   SceneManager = Statics::Get<ISceneManager>();
-  std::cout << "Loading scene " << ScenePaths[CurrentLoadedScene] << std::endl;
+  S_LOG_FUNC("Loading scene %s", ScenePaths[CurrentLoadedScene].GetCharArray());
   SceneManager->LoadScene(ScenePaths[CurrentLoadedScene]);
   
   return true;
@@ -21,7 +21,7 @@ bool SceneSwitchingSystem::Update() {
   IInput *input = Statics::Get<IInput>();
   if (input->GetKeyUp(S_INPUT_KEY_EQUAL)) {
     CurrentLoadedScene = (CurrentLoadedScene + 1) % SceneCount;
-    std::cout << "Triggering the scene switch" << std::endl;
+    S_LOG_FUNC("Triggering the scene switch");
     SceneManager->LoadScene(ScenePaths[CurrentLoadedScene]);
   }
   return true;

@@ -41,8 +41,14 @@ bool SceneManager::UnloadCurrentScene() {
   return true;
 }
 
-String GetExternalAssetPathRelativeToTheSceneFile(const String &assetFileName,
-                                                  const String &sceneFileName) {
+String SceneManager::GetExternalAssetPathRelativeToTheSceneFile(
+    const String &assetFileName) {
+  return GetExternalAssetPathRelativeToTheSceneFile(assetFileName,
+                                                    CurrentSceneFileName);
+}
+
+String SceneManager::GetExternalAssetPathRelativeToTheSceneFile(
+    const String &assetFileName, const String &sceneFileName) {
   String sceneRootDir;
   // Get directory of the scene file
   std::vector<String> fileSegments = sceneFileName.Split('/');
@@ -64,8 +70,9 @@ bool SceneManager::LoadScene(const String &fileName) {
   if (!ResourceLoader::LoadSsd(fileName, nodes))
     return false;
   // traverse through each node, create unique ids
-  UniqueIdSetter::SetIds(nodes);
-  
+  UniqueIdSetter *uidSetter = new UniqueIdSetter(nodes);
+  // UniqueIdSetter::SetIds(nodes);
+
   S_LOG_FUNC("Got %lu nodes", nodes.size());
 
   IAssetManager *assetManager = Statics::Get<IAssetManager>();
@@ -104,8 +111,7 @@ bool SceneManager::LoadScene(const String &fileName) {
       deserializedNodes.push_back(deserializedDataNode);
 
     // add instance
-    IObject *serializedObject =
-        dynamic_cast<IObject *>(deserializedDataNode);
+    IObject *serializedObject = dynamic_cast<IObject *>(deserializedDataNode);
 
     Statics::AddSerializedObject(serializedObject);
   }
@@ -133,7 +139,7 @@ bool SceneManager::LoadScene(const String &fileName) {
 
     // handle external node
     else if (deserializedNodes[x]->SerializedName() == "ExternalAsset") {
-      LoadExternalAssetFromScene(deserializedNodes[x], fileName);
+      LoadExternalAssetFromScene(deserializedNodes[x], fileName, uidSetter);
     }
   }
 
@@ -144,15 +150,16 @@ bool SceneManager::LoadScene(const String &fileName) {
 
   for (size_t x = 0; x < nodes.size(); x++)
     delete nodes[x];
-    
+
   Statics::Get<IEventSystem>()->DispatchEvent(EventType::OnSceneLoad);
   SetCurrentScene(fileName);
-  
+
   return true;
 }
 
 void SceneManager::LoadExternalAssetFromScene(ISerialized *obj,
-                                              const String &sceneFileName) {
+                                              const String &sceneFileName,
+                                              UniqueIdSetter *uidSetter) {
   ExternalAsset *externalAsset = dynamic_cast<ExternalAsset *>(obj);
 
   const String fileName = GetExternalAssetPathRelativeToTheSceneFile(
@@ -165,6 +172,24 @@ void SceneManager::LoadExternalAssetFromScene(ISerialized *obj,
   if (Statics::Get<IAssetManager>()->IsExternalAssetLoaded(fileName))
     return;
   Asset *loadedAsset;
-  assert(ResourceLoader::LoadAsset(fileName, loadedAsset, uniqueId));
+  {
+    std::vector<IDataNode *> nodes;
+    assert(ResourceLoader::LoadSsd(fileName, nodes));
+    assert(nodes.size() == 1);
+    // the loaded may contain references to the other assets of the scene
+    uidSetter->UpdateAttributeUid(nodes[0]);
+    IObject *serializedClass = dynamic_cast<IObject *>(nodes[0]->Deserialize());
+    serializedClass->SetUniqueID(uniqueId);
+    Statics::AddSerializedObject(serializedClass);
+    loadedAsset = dynamic_cast<Asset *>(serializedClass);
+    assert(loadedAsset != NULL);
+    loadedAsset->SetOrigin(Asset::OriginType::External);
+    loadedAsset->SetFileName(fileName);
+    Statics::Get<IAssetManager>()->SaveExternalAssetPath(
+        fileName, serializedClass->UniqueID());
+    // clean up
+    delete nodes[0];
+  }
+  // assert(ResourceLoader::LoadAsset(fileName, loadedAsset, uniqueId));
   S_LOG_FUNC("Loaded %s", fileName.GetCharArray());
 }

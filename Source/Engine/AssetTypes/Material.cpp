@@ -1,4 +1,7 @@
 #include "Engine/AssetTypes/Material.h"
+#include "Modules/Statics/IAssetManager.h"
+#include "Modules/Statics/ISceneManager.h"
+
 REGISTER_SERIALIZED_CLASS(Material);
 
 Material::Material() {
@@ -10,9 +13,10 @@ Material::Material() {
 
   ATTRIBUTE_REGISTER(Material, VectorUniformNames);
   ATTRIBUTE_REGISTER(Material, VectorUniformValues);
-  
+
   ATTRIBUTE_REGISTER(Material, TextureUniformNames);
   ATTRIBUTE_REGISTER(Material, TextureUniformValues);
+  ATTRIBUTE_REGISTER(Material, ExternalTexturePaths);
 
   ShaderId = 0;
   Name = "defaultMaterial";
@@ -94,6 +98,18 @@ void Material::GetVectorUniforms(std::vector<std::string> &names,
 
 void Material::GetTextureUniforms(std::vector<std::string> &names,
                                   std::vector<unsigned int> &values) {
+  if (TextureUniformNames.size() != TextureUniformValues.size()) {
+    ISceneManager *sceneManager = Statics::Get<ISceneManager>();
+    assert(TextureUniformNames.size() == ExternalTexturePaths.size());
+    TextureUniformValues.clear();
+    for (unsigned int x = 0; x < TextureUniformNames.size(); x++) {
+      String path = sceneManager->GetExternalAssetPathRelativeToTheSceneFile(
+          ExternalTexturePaths[x]);
+      IObject *obj = Statics::Get<IAssetManager>()->GetAssetByFileName(path);
+      unsigned int uid = obj != nullptr ? obj->UniqueID() : 0;
+      TextureUniformValues.push_back(uid);
+    }
+  }
   names.clear();
   for (size_t x = 0; x < TextureUniformNames.size(); x++) {
     names.push_back(TextureUniformNames[x]);

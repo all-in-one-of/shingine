@@ -9,25 +9,8 @@
 #include "Engine/AssetTypes/IMaterial.h"
 
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-
+#include "Core.h"
 OglShaderManager::OglShaderManager() {}
-
-void OglShaderManager::SetMaterialUniforms(IMaterial *material, int programId) {
-  // float uniforms
-  std::vector<std::string> names;
-  std::vector<float> floatValues;
-  material->GetFloatUniforms(names, floatValues);
-  for (size_t x = 0; x < names.size(); x++)
-    throw 1;
-  // SetFloat(names[x], programId, floatValues[x]);
-  // vector uniforms
-  std::vector<glm::vec4> vectorValues;
-  material->GetVectorUniforms(names, vectorValues);
-  for (size_t x = 0; x < names.size(); x++)
-    throw 1;
-  // SetVector(names[x], programId, vectorValues[x]);
-}
 
 void OglShaderManager::GetUniformId(const std::string &uniformName,
                                     int programId, int &uniformLoc) {
@@ -39,8 +22,7 @@ void OglShaderManager::GetUniformId(const std::string &uniformName,
     glUseProgram(programId);
     uniformLoc = glGetUniformLocation(programId, uniformName.c_str());
     UniformLocations[programId][uniformName] = uniformLoc;
-    
-    std::cout << "Getting uniform location for " << uniformName << std::endl;
+    S_LOG_FUNC("Getting uniform location for %s", uniformName.c_str());
   } else
     uniformLoc = it->second;
 }

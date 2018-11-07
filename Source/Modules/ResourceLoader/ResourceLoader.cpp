@@ -74,8 +74,7 @@ bool ResourceLoader::LoadAsset(const String &fileName, Asset *&loadedAsset,
     UniqueIdSetter::SetIds(nodes);
 
   ISerialized *deserializedObj = nodes[0]->Deserialize();
-  IObject *serializedClass =
-      dynamic_cast<IObject *>(deserializedObj);
+  IObject *serializedClass = dynamic_cast<IObject *>(deserializedObj);
   // TODO fix
   // if it's a complex asset which contains serialized objects inside,
   // those won't get a global unique id.
@@ -88,7 +87,8 @@ bool ResourceLoader::LoadAsset(const String &fileName, Asset *&loadedAsset,
   // set run time parameters
   loadedAsset->SetOrigin(Asset::OriginType::External);
   loadedAsset->SetFileName(fileName);
-  Statics::Get<IAssetManager>()->SaveExternalAssetPath(fileName, serializedClass->UniqueID());
+  Statics::Get<IAssetManager>()->SaveExternalAssetPath(
+      fileName, serializedClass->UniqueID());
   // clean up
   delete nodes[0];
   return true;
@@ -106,7 +106,9 @@ bool ResourceLoader::LoadSsd(const String &fileName,
 
   CResourceReaderFactory ResourceReaderFactory;
   IResourceReader *reader = ResourceReaderFactory.CreateReader(updatedFileName);
-
+  if (reader == nullptr)
+    return false;
+  
   if (!reader->Open()) {
     LastError = "Couldn't open file : " + fileName;
     delete reader;

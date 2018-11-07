@@ -11,8 +11,8 @@ int main() {
   InitializeEngine();
 
   if (!Statics::Get<ISceneManager>()->LoadScene(
-          "Assets/Scenes/UnityExports/Vik/Vik.ssd")) {
-    std::cout << "Couldn't load the scene" << std::endl;
+          "Assets/Scenes/test0.ssd")) {
+    S_LOG("Couldn't load the scene");
     return 1;
   }
 
@@ -24,7 +24,7 @@ int main() {
   solver->AddSystem("RenderingSystem");
   solver->AddSystem("FirstPersonSystem");
   // Test systems
-  //  solver->AddSystem("SceneSwitchingSystem");
+  solver->AddSystem("SceneSwitchingSystem");
   solver->AddSystem("LightViewerSystem");
 
   solver->InitializeSystems();

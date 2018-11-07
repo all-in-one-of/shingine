@@ -38,12 +38,12 @@ void VaoMeshManager::DeleteUnusedResources() {
     std::vector<int> vboToDelete;
     unsigned vaoId = uintMapIterator->first;
     int attribCount = 0;
-    
+
     std::unordered_map<unsigned int, unsigned int>::iterator
         indexCountIterator = IndexCountMap.find(vaoId);
     if (indexCountIterator != IndexCountMap.end())
       IndexCountMap.erase(indexCountIterator);
-      
+
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &attribCount);
     glBindVertexArray(vaoId);
     for (int currentAttrib = 0; currentAttrib < attribCount; currentAttrib++) {
@@ -119,8 +119,8 @@ void VaoMeshManager::GetVAOForMeshId(int programId, unsigned int meshAssetId,
       vboVertices[x].ty = mesh->TexCoord[x].y;
       vboVertices[x].tz = mesh->TexCoord[x].z;
     }
-    
-    std::cout << "Loaded mesh #" << mesh->UniqueID() << std::endl;
+
+    S_LOG_FUNC("Loaded mesh #%d", mesh->UniqueID());
 
     // static draw
     glBufferData(GL_ARRAY_BUFFER, vertexBufferSizeInBytes, vboVertices,

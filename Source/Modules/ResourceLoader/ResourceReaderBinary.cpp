@@ -117,11 +117,7 @@ SSD::Attribute *ResourceReaderBinary::ReadAttribute() {
     unsigned int byteCount = attr->ByteCount;
 
     attr->Values = new unsigned char[byteCount];
-    for (unsigned int x = 0; x < byteCount; x++) {
-      char v;
-      FileStream.read(&v, 1);
-      attr->Values[x] = v;
-    }
+    FileStream.read((char*)(attr->Values), byteCount);
   }
 
   ReadByte(garbage);
